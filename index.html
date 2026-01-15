@@ -1,0 +1,3475 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-UVTools</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <style>
+      /* Settings Tabs */
+      .settings-tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 0;
+        border-bottom: 2px solid var(--border);
+      }
+      .settings-tabs .tab-btn {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -2px;
+        color: var(--text-muted);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .settings-tabs .tab-btn:hover {
+        color: var(--text);
+        background: var(--bg-hover);
+      }
+      .settings-tabs .tab-btn.active {
+        color: var(--primary);
+        border-bottom-color: var(--primary);
+      }
+      .settings-tabs .tab-btn svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+      }
+      .tab-content {
+        display: none !important;
+        padding: 1.5rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-top: none;
+        border-radius: 0 0 8px 8px;
+      }
+      .tab-content.active {
+        display: block !important;
+      }
+      /* Radio FM Table */
+      .radio-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+      .radio-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .radio-table th, .radio-table td {
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        text-align: left;
+      }
+      .radio-table th {
+        background: var(--bg-darker, #e0e0e0);
+        font-weight: 600;
+      }
+      .radio-table input[type="number"] {
+        width: 150px;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg-input);
+        color: var(--text);
+      }
+      /* DTMF Table */
+      .dtmf-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      .dtmf-table th,
+      .dtmf-table td {
+        padding: 0.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      .dtmf-table th {
+        font-weight: 600;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+      }
+      .dtmf-table input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        background: var(--bg-input);
+        color: var(--text);
+        font-family: monospace;
+      }
+      .dtmf-table input:focus {
+        outline: none;
+        border-color: var(--primary);
+      }
+      .dtmf-table .index-col {
+        width: 50px;
+        text-align: center;
+        color: var(--text-muted);
+      }
+      .dtmf-table .clear-btn {
+        padding: 0.25rem 0.5rem;
+        background: var(--bg-hover);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        color: var(--text-muted);
+        cursor: pointer;
+      }
+      .dtmf-table .clear-btn:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+      }
+      .dtmf-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="theme-switcher">
+        <label for="themeSelect" class="theme-label">Theme:</label>
+        <select id="themeSelect">
+          <optgroup label="── Dark Themes ──">
+            <option value="dark">🌙 Dark</option>
+            <option value="midnight">🌌 Midnight</option>
+            <option value="ocean">🌊 Ocean</option>
+            <option value="forest">🌲 Forest</option>
+            <option value="sunset">🌅 Sunset</option>
+            <option value="cyberpunk">💜 Cyberpunk</option>
+            <option value="retro">📟 Retro</option>
+          </optgroup>
+          <optgroup label="── Popular Themes ──">
+            <option value="nord">❄️ Nord</option>
+            <option value="dracula">🧛 Dracula</option>
+            <option value="monokai">🎨 Monokai</option>
+            <option value="solarized">☀️ Solarized</option>
+            <option value="gruvbox">🟠 Gruvbox</option>
+            <option value="tokyo">🗼 Tokyo Night</option>
+            <option value="catppuccin">🐱 Catppuccin</option>
+            <option value="rosepine">🌸 Rosé Pine</option>
+            <option value="onedark">⚫ One Dark</option>
+          </optgroup>
+          <optgroup label="── Light Themes ──">
+            <option value="light">☀️ Light</option>
+            <option value="cream">🍦 Cream</option>
+            <option value="bluelight">🔵 Blue Light</option>
+            <option value="lavender">💜 Lavender</option>
+            <option value="mint">🌿 Mint</option>
+            <option value="roselight">🌹 Rose</option>
+            <option value="paper">📄 Paper</option>
+            <option value="sky">🌤️ Sky</option>
+          </optgroup>
+          <optgroup label="── Accessibility ──">
+            <option value="contrast">⚡ High Contrast</option>
+          </optgroup>
+        </select>
+      </div>
+      
+      <!-- Navigation Bar - visible on all pages -->
+      <nav class="main-nav">
+        <div class="nav-top">
+          <a href="#home" class="nav-brand">Multi-UVTools</a>
+          <div class="nav-links">
+            <a href="#instructions" class="nav-item" data-nav="instructions">Home</a>
+            <a href="#home" class="nav-item" data-nav="home">Tools</a>
+            <a href="#k1" class="nav-item" data-nav="k1">Flash</a>
+            <a href="#channels" class="nav-item" data-nav="channels">Channels</a>
+            <a href="#settings" class="nav-item k5-only" data-nav="settings">Settings</a>
+            <a href="#tk11-settings" class="nav-item tk11-only" data-nav="tk11-settings" style="display: none;">Settings</a>
+            <a href="#mirror" class="nav-item" data-nav="mirror">Mirror</a>
+            <a href="#smr" class="nav-item" data-nav="smr">SMR</a>
+            <a href="#unbricking" class="nav-item k5-only" data-nav="unbricking">Unbricking</a>
+          </div>
+        </div>
+        <div class="nav-status">
+          <select id="radioTypeSelect" class="radio-type-select nav-radio-type" title="Select Radio Type">
+            <option value="K5" selected>📻 UV-K5/K1</option>
+            <option value="TK11">📻 TK11/RT-890</option>
+          </select>
+          <span class="status-dot" id="homeStatusDot" data-status="disconnected"></span>
+          <span id="connectionLabel" class="status-label">Disconnected</span>
+          <span id="deviceInfo" class="status-device">No port</span>
+          <span id="firmwareInfo" class="status-firmware">-</span>
+          <select id="baudSelect" class="nav-baud">
+            <option value="38400" selected>38400</option>
+            <option value="115200">115200</option>
+          </select>
+          <button id="connectBtn" class="nav-btn primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" width="16" height="16">
+              <path d="M8 12h8"></path>
+              <path d="M5 12l3-3v6l-3-3z"></path>
+              <path d="M19 12l-3 3V9l3 3z"></path>
+            </svg>
+            Connect
+          </button>
+          <button id="disconnectBtn" class="nav-btn ghost" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" width="16" height="16">
+              <path d="M6 6l12 12"></path>
+              <path d="M18 6l-12 12"></path>
+            </svg>
+            Disconnect
+          </button>
+        </div>
+      </nav>
+      
+      <main class="app tool-scope">
+      <section class="page" id="instructions" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">INTRO</p>
+            <h1>Instructions</h1>
+            <p class="subtitle">
+              Welcome to Multi-UVTools. This application helps you manage your Quansheng radio.
+            </p>
+          </div>
+        </header>
+
+        <!-- TK11 Work in Progress Warning -->
+        <section class="panel tk11-only" style="display: none; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; margin-bottom: 1rem;">
+          <h2 style="color: #856404;">⚠️ TK11 Support - Work in Progress</h2>
+          <p style="color: #856404;">TK11 support is currently under development. Some features may not work correctly. Use at your own risk.</p>
+        </section>
+
+        <!-- K5 Instructions -->
+        <section class="panel k5-only">
+          <h2>Getting Started</h2>
+          <p>Connect your radio via USB. Baud rate: 38400 (Default) / 115200 (Specific firmwares).</p>
+          <h3>Available Features:</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 1.8;">
+            <li><strong>Tools:</strong> EEPROM backup/restore, calibration management, and HEX view</li>
+            <li><strong>Flash:</strong> Flash firmware for UV-K5/K6/5R and UV-K5 V3/K1 radios</li>
+            <li><strong>Channels:</strong> Read, edit and write channels to the radio</li>
+            <li><strong>Settings:</strong> Edit basic settings, DTMF contacts, and FM radio frequencies</li>
+            <li><strong>Mirror:</strong> Mirror the radio display in real time</li>
+            <li><strong>SMR:</strong> Short message radio for sending and receiving SMS frames</li>
+          </ul>
+          <h3>Boot Mode:</h3>
+          <p>To flash firmware, connect the radio in boot mode by holding PTT while turning on the power.</p>
+
+
+          <div style="margin-top: 1.5rem; padding: 1.2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #ffd700; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              ⭐ Complete Documentation of the Quansheng UV-K5 — Wiki by Ludwich66
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              An exceptional work of documentation and reference.
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <a href="https://github.com/ludwich66/Quansheng_UV-K5_Wiki" target="_blank" style="color: #ffd700; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                View Wiki on GitHub
+              </a>
+            </p>
+          </div>
+          <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #e94560; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              Open Source Project
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              This website is available on my GitHub (<a href="https://github.com/spm1981" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm1981</a>) <strong style="color: #fff;">Matoz</strong>.
+            </p>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
+            </p>
+            <p style="color: #e94560; font-weight: bold; font-size: 1.1rem; margin-top: 1rem;">
+              I hope you enjoy my work! 🚀
+            </p>
+          </div>
+        </section>
+        
+        <!-- TK11 Instructions -->
+        <section class="panel tk11-only" style="display: none;">
+          <h2>Getting Started</h2>
+          <p>Connect your radio via USB. Baud rate: 115200 (Default).</p>
+          <h3>Available Features:</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 1.8;">
+            <li><strong>Tools:</strong> EEPROM backup/restore, calibration management, and HEX view</li>
+            <li><strong>Flash:</strong> Flash firmware for TK11 and RT-890 radios</li>
+            <li><strong>Channels:</strong> Read, edit and write channels to the radio</li>
+          </ul>
+
+          <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #e94560; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              Open Source Project
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              This website is available on my GitHub (<a href="https://github.com/spm1981" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm1981</a>) <strong style="color: #fff;">Matoz</strong>.
+            </p>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
+            </p>
+            <p style="color: #e94560; font-weight: bold; font-size: 1.1rem; margin-top: 1rem;">
+              I hope you enjoy my work! 🚀
+            </p>
+            <p style="margin-top: 0.8rem;">
+              <a href="https://t.me/tk11quansheng" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                Join TK11 Telegram Group
+              </a>
+            </p>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="home" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow" id="toolsEyebrow">UV-K5/K1 TOOLSET</p>
+            <h1>Tools to manage your radio.</h1>
+            <p class="subtitle">
+              Connect the radio to backup, restore, firmware update, channel editing and basic settings.
+            </p>
+            <p class="subtitle muted" style="font-size: 0.9rem; margin-top: 0.5rem;">
+              <span class="k5-only">Memory: 8 KB EEPROM | 200 Channels | External EEPROM</span>
+              <span class="tk11-only" style="display: none;">Memory: 640 KB (~644 KB with calibration) | 999 Channels | Internal Flash</span>
+            </p>
+            <div class="tk11-only" style="display: none; margin-top: 1rem; padding: 1rem; background: #f59e0b22; border: 1px solid #f59e0b; border-radius: 8px; color: #f59e0b;">
+              ⚠️ <strong>TK11 support is a work in progress.</strong> Some features may not work correctly yet.
+            </div>
+          </div>
+        </header>
+
+        <section class="panel-grid">
+          <!-- 1. EEPROM backup -->
+          <section class="panel">
+            <h2>EEPROM backup</h2>
+            <p class="muted">Save the radio's current configuration.</p>
+            <div class="field-row">
+              <label class="toggle">
+                <input type="checkbox" id="backupCalib" />
+                <span>Include calibration</span>
+              </label>
+            </div>
+            <button id="backupBtn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Backup EEPROM
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="backupPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="backupFill"></div>
+              </div>
+            </div>
+            <p class="hint" id="backupHint">The file will be downloaded as .bin.</p>
+          </section>
+
+          <!-- 3. Restore EEPROM -->
+          <section class="panel">
+            <h2>Restore EEPROM</h2>
+            <p class="muted">Restore a backup file to the radio.</p>
+            <div class="field-row">
+              <label class="toggle">
+                <input type="checkbox" id="restoreCalib" />
+                <span>Include calibration</span>
+              </label>
+            </div>
+            <div class="field-row">
+              <input type="file" id="restoreFile" accept=".bin" />
+            </div>
+            <button id="restoreBtn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Restore EEPROM
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="restorePct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="restoreFill"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. Dump Calibration -->
+          <section class="panel k5-calib-only">
+            <h2>Dump Calibration</h2>
+            <p class="muted">Save the calibration area (0x1E00-0x2000).</p>
+            <button id="dumpCalibK5Btn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Dump Calibration
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="dumpCalibK5Pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="dumpCalibK5Fill"></div>
+              </div>
+            </div>
+            <p class="hint">Calibration file will be downloaded as .bin.</p>
+          </section>
+
+          <!-- 5. Restore Calibration -->
+          <section class="panel k5-calib-only">
+            <h2>Restore Calibration</h2>
+            <p class="muted">Restore calibration data from a backup file.</p>
+            <div class="field-row">
+              <input type="file" id="restoreCalibK5File" accept=".bin" />
+            </div>
+            <button id="restoreCalibK5Btn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Restore Calibration
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="restoreCalibK5Pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="restoreCalibK5Fill"></div>
+              </div>
+            </div>
+            <p class="hint">Expected size: 512 bytes.</p>
+          </section>
+
+          <!-- TK11 Dump Calibration -->
+          <section class="panel tk11-only" style="display: none;">
+            <h2>Dump Calibration</h2>
+            <p class="muted">Save the calibration area (0x0A0000-0x0A1000) - 4KB.</p>
+            <button id="dumpCalibTK11Btn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Dump Calibration
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="dumpCalibTK11Pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="dumpCalibTK11Fill"></div>
+              </div>
+            </div>
+            <p class="hint">TK11 calibration file will be downloaded as .bin (4096 bytes).</p>
+          </section>
+
+          <!-- TK11 Restore Calibration -->
+          <section class="panel tk11-only" style="display: none;">
+            <h2>Restore Calibration</h2>
+            <p class="muted">Restore calibration data from a backup file (0x0A0000-0x0A1000).</p>
+            <div class="field-row">
+              <input type="file" id="restoreCalibTK11File" accept=".bin" />
+            </div>
+            <button id="restoreCalibTK11Btn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Restore Calibration
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="restoreCalibTK11Pct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="restoreCalibTK11Fill"></div>
+              </div>
+            </div>
+            <p class="hint">Expected size: 4096 bytes (4KB).</p>
+          </section>
+
+          <!-- 6. Default Calibrations -->
+          <section class="panel k5-calib-only">
+            <h2>Emergency Calibration Restore Tool</h2>
+            <p class="muted">Restore calibration from pre-loaded files.</p>
+            <p class="muted warning">⚠️ Warning: Use only in case of emergency (radio with password, locked radio, or misconfigured radio) and/or only if you do not have the calibration file for your radio.</p>
+
+            <div class="field-row">
+              <label for="defaultCalibSelect">Select Radio Model</label>
+              <select id="defaultCalibSelect">
+                <option value="">-- Select calibration --</option>
+                <option value="calibrations/UV-K5.bin">UV-K5</option>
+                <option value="calibrations/UV-K5(8).bin">UV-K5(8)</option>
+                <option value="calibrations/UV-5R_Plus.bin">UV-5R_Plus</option>
+                <option value="calibrations/UV-K5(99).bin">UV-K5(99)</option>
+                <option value="calibrations/K5V3_calibration.dat">UV-K5(v3)</option>
+                <option value="calibrations/UV-K1(8).bin">UV-K1(8)</option>
+              </select>
+            </div>
+            <button id="restoreDefaultCalibBtn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Restore Default Calibration
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="defaultCalibPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="defaultCalibFill"></div>
+              </div>
+            </div>
+            <p class="hint" id="defaultCalibHint">Select a model to restore its default calibration.</p>
+          </section>
+
+
+        </section>
+
+        <!-- Advanced Tools Section -->
+        <h2 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">Advanced Tools <span class="collapse-icon">▼</span></h2>
+        <section class="panel-grid hidden">
+          <!-- Read EEPROM -->
+          <section class="panel">
+            <h2>Read EEPROM</h2>
+            <p class="muted">Read full EEPROM contents from the radio.</p>
+            <div class="field-group">
+              <label for="readEepromSize">Size</label>
+              <select id="readEepromSize">
+                <option value="8192" selected>8 KB (64Kbit) (0x2000)</option>
+                <option value="65536">64 KB (512Kbit) (0x10000)</option>
+                <option value="131072">128 KB (1Mbit) (0x20000)</option>
+                <option value="262144">256 KB (2Mbit) (0x40000)</option>
+                <option value="524288">512 KB (4Mbit) (0x80000)</option>
+              </select>
+            </div>
+            <button id="readEepromBtn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Read EEPROM
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="readEepromPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="readEepromFill"></div>
+              </div>
+            </div>
+            <p class="hint">Download full EEPROM as .bin file.</p>
+          </section>
+
+          <!-- Write EEPROM -->
+          <section class="panel">
+            <h2>Write EEPROM</h2>
+            <p class="muted">Write a full EEPROM file to the radio.</p>
+            <div class="field-row">
+              <input type="file" id="writeEepromFile" accept=".bin" />
+            </div>
+            <button id="writeEepromBtn">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Write EEPROM
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="writeEepromPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="writeEepromFill"></div>
+              </div>
+            </div>
+            <p class="hint">Write entire EEPROM file to the radio.</p>
+          </section>
+          <!-- DEV Tools - TK11 (Hidden until devmode) -->
+          <section class="panel dev-panel tk11-dev" id="devToolsTK11Backup" style="display: none; border: 2px solid #f59e0b;">
+            <h2 style="color: #f59e0b;">🔧 EEPROM Backup DEV (TK11)</h2>
+            <p class="muted">Read custom EEPROM range from the TK11 radio.</p>
+            <div class="field-row" style="gap: 1rem; flex-wrap: wrap;">
+              <div class="field-group">
+                <label for="devBackupStartAddrTK11">Start Address</label>
+                <input type="text" id="devBackupStartAddrTK11" value="0x0000" placeholder="0x0000" style="width: 120px;">
+              </div>
+              <div class="field-group">
+                <label for="devBackupEndAddrTK11">End Address</label>
+                <input type="text" id="devBackupEndAddrTK11" value="0x0A1000" placeholder="0x0A1000" style="width: 120px;">
+              </div>
+            </div>
+            <button id="devBackupBtnTK11" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Read EEPROM Range
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="devBackupPctTK11">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="devBackupFillTK11"></div>
+              </div>
+            </div>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - use with caution! (TK11: max ~644KB with calibration)</p>
+          </section>
+
+          <section class="panel dev-panel tk11-dev" id="devToolsTK11Restore" style="display: none; border: 2px solid #f59e0b;">
+            <h2 style="color: #f59e0b;">🔧 Restore EEPROM DEV (TK11)</h2>
+            <p class="muted">Write custom EEPROM range to the TK11 radio.</p>
+            <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <div class="field-group">
+                <label for="devRestoreStartAddrTK11">Start Address</label>
+                <input type="text" id="devRestoreStartAddrTK11" value="0x0000" placeholder="0x0000" style="width: 120px;">
+              </div>
+            </div>
+            <div class="field-row">
+              <input type="file" id="devRestoreFileTK11" accept=".bin" />
+            </div>
+            <button id="devRestoreBtnTK11" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Write EEPROM Range
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="devRestorePctTK11">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="devRestoreFillTK11"></div>
+              </div>
+            </div>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - writes from Start Address! (TK11)</p>
+          </section>
+
+          <!-- DEV Tools - K5 (Hidden until devmode) -->
+          <section class="panel dev-panel k5-dev" id="devToolsK5Backup" style="display: none; border: 2px solid #f59e0b;">
+            <h2 style="color: #f59e0b;">🔧 EEPROM Backup DEV (K5)</h2>
+            <p class="muted">Read custom EEPROM range from the K5 radio.</p>
+            <div class="field-row" style="gap: 1rem; flex-wrap: wrap;">
+              <div class="field-group">
+                <label for="devBackupStartAddrK5">Start Address</label>
+                <input type="text" id="devBackupStartAddrK5" value="0x0000" placeholder="0x0000" style="width: 120px;">
+              </div>
+              <div class="field-group">
+                <label for="devBackupEndAddrK5">End Address</label>
+                <input type="text" id="devBackupEndAddrK5" value="0x2000" placeholder="0x2000" style="width: 120px;">
+              </div>
+            </div>
+            <button id="devBackupBtnK5" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 3v12" />
+                  <path d="M7 10l5 5 5-5" />
+                  <path d="M4 20h16" />
+                </svg>
+              </span>
+              Read EEPROM Range
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="devBackupPctK5">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="devBackupFillK5"></div>
+              </div>
+            </div>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - use with caution! (K5: max 512KB)</p>
+          </section>
+
+          <section class="panel dev-panel k5-dev" id="devToolsK5Restore" style="display: none; border: 2px solid #f59e0b;">
+            <h2 style="color: #f59e0b;">🔧 Restore EEPROM DEV (K5)</h2>
+            <p class="muted">Write custom EEPROM range to the K5 radio.</p>
+            <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+              <div class="field-group">
+                <label for="devRestoreStartAddrK5">Start Address</label>
+                <input type="text" id="devRestoreStartAddrK5" value="0x0000" placeholder="0x0000" style="width: 120px;">
+              </div>
+            </div>
+            <div class="field-row">
+              <input type="file" id="devRestoreFileK5" accept=".bin" />
+            </div>
+            <button id="devRestoreBtnK5" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9" />
+                  <path d="M7 14l5-5 5 5" />
+                  <path d="M4 4h16" />
+                </svg>
+              </span>
+              Write EEPROM Range
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="devRestorePctK5">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="devRestoreFillK5"></div>
+              </div>
+            </div>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - writes from Start Address! (K5)</p>
+          </section>
+        </section>
+
+
+
+        <!-- HEX View Section -->
+        <h2 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">HEX View <span class="collapse-icon">▼</span></h2>
+        <section class="panel hidden" id="hexViewPanel">
+          <p class="muted">Read and view EEPROM memory in hexadecimal format from radio or file.</p>
+          
+          <!-- Read from Radio -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="field-group">
+              <label for="hexStartAddr">Start Address</label>
+              <input type="text" id="hexStartAddr" value="0x0000" placeholder="0x0000" style="width: 100px;">
+            </div>
+            <div class="field-group">
+              <label for="hexLength">Length</label>
+              <select id="hexLength">
+                <option value="8192" selected>8 KB (64Kbit) (0x2000)</option>
+                <option value="65536">64 KB (512Kbit) (0x10000)</option>
+                <option value="131072">128 KB (1Mbit) (0x20000)</option>
+                <option value="262144">256 KB (2Mbit) (0x40000)</option>
+                <option value="524288">512 KB (4Mbit) (0x80000)</option>
+              </select>
+            </div>
+            <div class="field-group" style="align-self: flex-end;">
+              <button id="hexReadBtn" class="primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                Read from Radio
+              </button>
+            </div>
+          </div>
+          
+          <!-- Load from File -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; padding-top: 1rem; border-top: 1px solid var(--border);">
+            <div class="field-group">
+              <label for="hexFileInput">Load .bin File</label>
+              <input type="file" id="hexFileInput" accept=".bin,.eeprom,.dat" style="max-width: 250px;">
+            </div>
+            <div class="field-group">
+              <label for="hexFileOffset">View Offset</label>
+              <input type="text" id="hexFileOffset" value="0x0000" placeholder="0x0000" style="width: 100px;">
+            </div>
+            <div class="field-group">
+              <label for="hexFileLength">View Length</label>
+              <select id="hexFileLength">
+                <option value="0">Entire File</option>
+                <option value="8192">8 KB (0x2000)</option>
+                <option value="65536">64 KB (0x10000)</option>
+                <option value="131072">128 KB (0x20000)</option>
+                <option value="262144">256 KB (0x40000)</option>
+                <option value="524288">512 KB (0x80000)</option>
+              </select>
+            </div>
+          </div>
+          <div class="progress" style="margin: 1rem 0;">
+            <div class="progress-label">
+              <span id="hexStatus">Ready</span>
+              <span id="hexPct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="hexFill"></div>
+            </div>
+          </div>
+          <div id="hexOutput" class="hex-view" style="font-family: 'Courier New', monospace; font-size: 12px; background: var(--surface-2); border-radius: 8px; padding: 1rem; overflow-x: auto; white-space: pre; max-height: 400px; overflow-y: auto; display: none;"></div>
+        </section>
+
+        
+        <!-- HEX View DEV - TK11 (Hidden until devmode) -->
+        <section class="panel dev-panel tk11-dev" id="hexViewDevTK11" style="display: none; border: 2px solid #f59e0b;">
+          <h2 style="color: #f59e0b;">🔧 HEX View DEV (TK11)</h2>
+          <p class="muted">Compare two files or a file with radio memory side by side.</p>
+          
+          <!-- Compare Options -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="field-group">
+              <label for="hexDevCompareModeTK11">Compare Mode</label>
+              <select id="hexDevCompareModeTK11">
+                <option value="files" selected>Two Files</option>
+                <option value="radio">File vs Radio</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="hexDevStartAddrTK11">Start Address (optional)</label>
+              <input type="text" id="hexDevStartAddrTK11" value="" placeholder="0x0000" style="width: 120px;">
+            </div>
+            <div class="field-group">
+              <label for="hexDevEndAddrTK11">End Address (optional)</label>
+              <input type="text" id="hexDevEndAddrTK11" value="" placeholder="Auto" style="width: 120px;">
+            </div>
+          </div>
+          
+          <!-- File inputs -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; padding: 1rem; background: var(--surface-2); border-radius: 8px;">
+            <div class="field-group" style="flex: 1;">
+              <label for="hexDevFile1TK11">📁 File 1 (Left)</label>
+              <input type="file" id="hexDevFile1TK11" accept=".bin,.eeprom,.dat">
+            </div>
+            <div class="field-group hexDevFile2GroupTK11" style="flex: 1;">
+              <label for="hexDevFile2TK11">📁 File 2 (Right)</label>
+              <input type="file" id="hexDevFile2TK11" accept=".bin,.eeprom,.dat">
+            </div>
+          </div>
+          
+          <!-- Compare button -->
+          <div class="field-row" style="gap: 1rem; margin-bottom: 1rem;">
+            <button id="hexDevCompareBtnTK11" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"></path>
+                  <path d="M15 3v4a2 2 0 0 0 2 2h4"></path>
+                </svg>
+              </span>
+              Compare
+            </button>
+            <button id="hexDevClearBtnTK11" style="background: #6b7280;">
+              Clear
+            </button>
+          </div>
+          
+          <!-- Progress -->
+          <div class="progress" id="hexDevProgressTK11" style="display: none;">
+            <div class="progress-label">
+              <span>Reading from radio...</span>
+              <span id="hexDevPctTK11">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="hexDevFillTK11"></div>
+            </div>
+          </div>
+          
+          <!-- Side by side comparison output -->
+          <div id="hexDevOutputTK11" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <h4 style="color: #4ade80; margin-bottom: 0.5rem;">📄 <span id="hexDevFile1NameTK11">File 1</span></h4>
+                <div id="hexDevLeft_TK11" class="hex-view" style="font-family: 'Courier New', monospace; font-size: 11px; background: var(--surface-2); border-radius: 8px; padding: 0.5rem; overflow-x: auto; white-space: pre; max-height: 350px; overflow-y: auto;"></div>
+              </div>
+              <div>
+                <h4 style="color: #60a5fa; margin-bottom: 0.5rem;">📄 <span id="hexDevFile2NameTK11">File 2 / Radio</span></h4>
+                <div id="hexDevRight_TK11" class="hex-view" style="font-family: 'Courier New', monospace; font-size: 11px; background: var(--surface-2); border-radius: 8px; padding: 0.5rem; overflow-x: auto; white-space: pre; max-height: 350px; overflow-y: auto;"></div>
+              </div>
+            </div>
+            
+            <!-- Differences Console -->
+            <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+              <h4 style="color: #f59e0b; margin-bottom: 0.5rem;">📋 Differences Console</h4>
+              <div id="hexDevConsoleTK11" style="font-family: 'Courier New', monospace; font-size: 11px; background: #1a1a2e; color: #a2d2ff; border-radius: 8px; padding: 1rem; max-height: 200px; overflow-y: auto; white-space: pre-wrap;"></div>
+            </div>
+          </div>
+          
+          <p class="hint" style="color: #f59e0b; margin-top: 1rem;">⚠️ Developer mode - differences are highlighted in red</p>
+        </section>
+        
+        <!-- HEX View DEV - K5 (Hidden until devmode) -->
+        <section class="panel dev-panel k5-dev" id="hexViewDevK5" style="display: none; border: 2px solid #f59e0b;">
+          <h2 style="color: #f59e0b;">🔧 HEX View DEV (K5)</h2>
+          <p class="muted">Compare two files or a file with radio memory side by side.</p>
+          
+          <!-- Compare Options -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div class="field-group">
+              <label for="hexDevCompareModeK5">Compare Mode</label>
+              <select id="hexDevCompareModeK5">
+                <option value="files" selected>Two Files</option>
+                <option value="radio">File vs Radio</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="hexDevStartAddrK5">Start Address (optional)</label>
+              <input type="text" id="hexDevStartAddrK5" value="" placeholder="0x0000" style="width: 120px;">
+            </div>
+            <div class="field-group">
+              <label for="hexDevEndAddrK5">End Address (optional)</label>
+              <input type="text" id="hexDevEndAddrK5" value="" placeholder="Auto" style="width: 120px;">
+            </div>
+          </div>
+          
+          <!-- File inputs -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; padding: 1rem; background: var(--surface-2); border-radius: 8px;">
+            <div class="field-group" style="flex: 1;">
+              <label for="hexDevFile1K5">📁 File 1 (Left)</label>
+              <input type="file" id="hexDevFile1K5" accept=".bin,.eeprom,.dat">
+            </div>
+            <div class="field-group hexDevFile2GroupK5" style="flex: 1;">
+              <label for="hexDevFile2K5">📁 File 2 (Right)</label>
+              <input type="file" id="hexDevFile2K5" accept=".bin,.eeprom,.dat">
+            </div>
+          </div>
+          
+          <!-- Compare button -->
+          <div class="field-row" style="gap: 1rem; margin-bottom: 1rem;">
+            <button id="hexDevCompareBtnK5" style="background: #f59e0b;">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"></path>
+                  <path d="M15 3v4a2 2 0 0 0 2 2h4"></path>
+                </svg>
+              </span>
+              Compare
+            </button>
+            <button id="hexDevClearBtnK5" style="background: #6b7280;">
+              Clear
+            </button>
+          </div>
+          
+          <!-- Progress -->
+          <div class="progress" id="hexDevProgressK5" style="display: none;">
+            <div class="progress-label">
+              <span>Reading from radio...</span>
+              <span id="hexDevPctK5">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="hexDevFillK5"></div>
+            </div>
+          </div>
+          
+          <!-- Side by side comparison output -->
+          <div id="hexDevOutputK5" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div>
+                <h4 style="color: #4ade80; margin-bottom: 0.5rem;">📄 <span id="hexDevFile1NameK5">File 1</span></h4>
+                <div id="hexDevLeft_K5" class="hex-view" style="font-family: 'Courier New', monospace; font-size: 11px; background: var(--surface-2); border-radius: 8px; padding: 0.5rem; overflow-x: auto; white-space: pre; max-height: 350px; overflow-y: auto;"></div>
+              </div>
+              <div>
+                <h4 style="color: #60a5fa; margin-bottom: 0.5rem;">📄 <span id="hexDevFile2NameK5">File 2 / Radio</span></h4>
+                <div id="hexDevRight_K5" class="hex-view" style="font-family: 'Courier New', monospace; font-size: 11px; background: var(--surface-2); border-radius: 8px; padding: 0.5rem; overflow-x: auto; white-space: pre; max-height: 350px; overflow-y: auto;"></div>
+              </div>
+            </div>
+            
+            <!-- Differences Console -->
+            <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+              <h4 style="color: #f59e0b; margin-bottom: 0.5rem;">📋 Differences Console</h4>
+              <div id="hexDevConsoleK5" style="font-family: 'Courier New', monospace; font-size: 11px; background: #1a1a2e; color: #a2d2ff; border-radius: 8px; padding: 1rem; max-height: 200px; overflow-y: auto; white-space: pre-wrap;"></div>
+            </div>
+          </div>
+          
+          <p class="hint" style="color: #f59e0b; margin-top: 1rem;">⚠️ Developer mode - differences are highlighted in red</p>
+        </section>
+
+<div id="log" class="log-area"></div>
+      </section>
+
+      <!-- Channel Editor Page -->
+      <section class="page" id="channels" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow" id="channelsEyebrow">CHANNELS TOOLS</p>
+            <h1>Channel editor.</h1>
+            <p class="subtitle">Read, edit and write channels to the radio.</p>
+            <div class="k5-only" style="margin-top: 0.75rem;">
+              <label for="channelProfileSelect" style="font-size: 0.85rem; color: var(--muted); margin-right: 0.5rem;">Channel Profile:</label>
+              <select id="channelProfileSelect" style="padding: 0.4rem 0.8rem; border-radius: 6px; background: var(--card); color: var(--text); border: 1px solid var(--border); font-size: 0.85rem;">
+                <option value="default200">Default 200 Channels</option>
+                <option value="ijv_vx3">IJV_vX3xx (999 Channels)</option>
+              </select>
+            </div>
+            <p class="subtitle muted tk11-only" style="font-size: 0.9rem; margin-top: 0.5rem; display: none;">TK11: 999 Channels</p>
+          </div>
+          <div class="status-card status-split">
+            <div class="status-main">
+              <div class="status-top">
+                <span class="status-dot" id="channelsStatusDot" data-status="disconnected"></span>
+                <span id="channelsStatusLabel">Disconnected</span>
+              </div>
+              <p id="channelsFirmware" class="muted">-</p>
+              <div class="status-actions">
+                <button id="readChannelsBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M3 12h4l3-9 4 18 3-9h4" />
+                    </svg>
+                  </span>
+                  Read channels
+                </button>
+                <button id="writeChannelsBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M12 3v12" />
+                      <path d="M17 8l-5 5-5-5" />
+                      <path d="M5 21h14" />
+                    </svg>
+                  </span>
+                  Write channels
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <input type="text" id="channelSearch" placeholder="Search channels..." class="search-input" />
+            <button id="exportCsvBtn" class="secondary" title="Export to CSV">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              </span>
+              Export CSV
+            </button>
+            <button id="importCsvBtn" class="secondary" title="Import from CSV">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </span>
+              Import CSV
+            </button>
+          </div>
+          <div class="toolbar-right">
+            <div class="view-toggle">
+              <button id="viewPagesBtn" class="active">Pages</button>
+              <button id="viewAllBtn">All</button>
+            </div>
+<div id="paginationControls" class="pagination-controls">
+              <span id="pageInfo" class="page-info">1-50 of 200</span>
+              <button id="prevPageBtn" class="pagination-btn" title="Previous page">←</button>
+              <div id="pageLinks" class="pagination"></div>
+              <button id="nextPageBtn" class="pagination-btn" title="Next page">→</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="channel-status">
+          <span id="channelStatus">Idle.</span>
+          <div class="progress" id="channelProgress">
+            <div class="progress-label">
+              <span>Progress&nbsp;</span>
+              <span id="channelPct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="channelFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="channelTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>RX Freq</th>
+                <th>TX Freq</th>
+                <th>Mod</th>
+                <th>BW</th>
+                <th>Power</th>
+                <th>RX Tone</th>
+                <th>TX Tone</th>
+                <th>Step</th>
+                <th>Scrambler</th>
+                <th>List</th>
+              </tr>
+            </thead>
+            <tbody id="channelBody"></tbody>
+          </table>
+        </div>
+
+        <div class="progress" style="margin-top: 1rem;">
+          <div class="progress-label">
+            <span id="channelsStatus">Idle</span>
+            <span id="channelsPct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="channelsFill"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Basic Settings Page -->
+      <section class="page" id="settings" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">SETTINGS TOOLS</p>
+            <h1>Basic settings editor.</h1>
+            <p class="subtitle">Read and write settings from the radio.</p>
+            <p class="warning" style="color: #f59e0b; font-weight: 600; margin-top: 0.5rem;">⚠️ Work in progress. Do not use yet.</p>
+          </div>
+          <div class="status-card status-split">
+            <div class="status-main">
+              <div class="status-top">
+                <span class="status-dot" id="settingsStatusDot" data-status="disconnected"></span>
+                <span id="settingsStatusLabel">Disconnected</span>
+              </div>
+              <p id="settingsFirmware" class="muted">-</p>
+              <div class="status-actions">
+                <button id="readSettingsBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M3 12h4l3-9 4 18 3-9h4" />
+                    </svg>
+                  </span>
+                  Read settings
+                </button>
+                <button id="writeSettingsBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M12 3v12" />
+                      <path d="M17 8l-5 5-5-5" />
+                      <path d="M5 21h14" />
+                    </svg>
+                  </span>
+                  Write settings
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Settings Tabs -->
+        <div class="settings-tabs-container" style="margin-bottom: 1.5rem;">
+          <div class="settings-tabs">
+            <button class="tab-btn active" data-tab="firmware-profile">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Firmware Profile (Work in progress. Do not use yet.)
+            </button>
+            <button class="tab-btn" data-tab="dtmf-contacts">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                <path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M12 12h.01"></path>
+              </svg>
+              DTMF Contacts
+            </button>
+            <button class="tab-btn" data-tab="radio-fm">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polygon points="10 8 16 12 10 16 10 8"></polygon>
+              </svg>
+              Radio FM
+            </button>
+          </div>
+          
+          <!-- Tab 1: Firmware Profile -->
+          <div class="tab-content active" id="tab-firmware-profile">
+            <h3>Firmware Profile</h3>
+            <p class="muted">Select the firmware profile to use for settings.</p>
+            <div class="field-group" style="max-width: 300px; margin-top: 1rem;">
+              <label for="firmwareProfile">Profile</label>
+              <select id="firmwareProfile">
+                <!-- Options populated by JavaScript -->
+              </select>
+            </div>
+          </div>
+          
+          <!-- Tab 2: DTMF Contacts -->
+          <div class="tab-content" id="tab-dtmf-contacts">
+            <h3>DTMF Contacts</h3>
+            <p class="muted">Manage DTMF contacts stored in the radio (EEPROM: 0x1C00 - 0x1D00).</p>
+            
+            <div class="dtmf-actions">
+              <button id="dtmfReadBtn" class="primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                Read DTMF
+              </button>
+              <button id="dtmfWriteBtn">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </span>
+                Write DTMF
+              </button>
+              <button id="dtmfClearAllBtn" class="ghost">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </span>
+                Clear All
+              </button>
+            </div>
+            
+            <table class="dtmf-table">
+              <thead>
+                <tr>
+                  <th class="index-col">#</th>
+                  <th>Name (8 chars)</th>
+                  <th>DTMF ID (0-9, A-D, *, #)</th>
+                  <th style="width: 60px;"></th>
+                </tr>
+              </thead>
+              <tbody id="dtmfTableBody">
+                <!-- DTMF rows will be generated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Tab 3: Radio FM Frequencies -->
+          <div class="tab-content" id="tab-radio-fm">
+            <h3>Radio (FM Frequencies)</h3>
+            <p class="muted">Quick frequency memory slots (EEPROM: 0x0E40 - 0x0E68).</p>
+            
+            <div class="radio-actions">
+              <button id="radioReadBtn" class="primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                Read Radio
+              </button>
+              <button id="radioWriteBtn">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </span>
+                Write Radio
+              </button>
+              <button id="radioClearAllBtn" class="ghost">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </span>
+                Clear All
+              </button>
+            </div>
+            
+            <table class="radio-table">
+              <thead>
+                <tr>
+                  <th class="index-col">#</th>
+                  <th>RX Frequency (MHz)</th>
+                  <th style="width: 60px;"></th>
+                </tr>
+              </thead>
+              <tbody id="radioTableBody">
+                <!-- Radio FM rows will be generated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="progress">
+          <div class="progress-label">
+            <span id="settingsStatus">Idle</span>
+            <span id="settingsPct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="settingsFill"></div>
+          </div>
+        </div>
+
+        <div id="settingsPanel" class="settings-table is-locked">
+          <!-- Profile-specific settings will be dynamically inserted here -->
+          <div id="profileSettings">
+            <p class="muted">Select a firmware profile and click "Read Settings" to load settings from your radio.</p>
+          </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal" aria-hidden="true">
+          <div class="modal-content">
+            <h3 id="settingsModalTitle">Processing</h3>
+            <p id="settingsModalMessage">Please keep the radio connected.</p>
+            <div class="progress">
+              <div class="progress-bar">
+                <div class="progress-fill" id="settingsModalFill"></div>
+              </div>
+              <div class="progress-label">
+                <span id="settingsModalPct">0%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================ -->
+      <!-- TK11 SETTINGS PAGE                           -->
+      <!-- ============================================ -->
+      <section class="page tk11-only" id="tk11-settings" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">TK11 SETTINGS</p>
+            <h1>TK11 Settings</h1>
+            <p class="subtitle">Configure TK11 radio settings.</p>
+            
+          </div>
+        </header>
+
+        <!-- Status Card -->
+        <div class="status-card status-split tk11-status-card">
+          <div class="status-main">
+            <div class="status-top">
+              <span class="status-dot" id="tk11SettingsStatusDot" data-status="disconnected"></span>
+              <span id="tk11SettingsStatusLabel">Not connected</span>
+            </div>
+            <p id="tk11SettingsFirmware" class="muted">-</p>
+            <div class="status-actions">
+              <button id="tk11ReadAllSettingsBtn" class="primary" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                Read All Settings
+              </button>
+              <button id="tk11WriteAllSettingsBtn" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </span>
+                Write All Settings
+              </button>
+            </div>
+          </div>
+          <div class="progress-bar" style="margin-top: 0.5rem;">
+            <div class="progress-fill" id="tk11SettingsFill"></div>
+          </div>
+        </div>
+
+        <section class="panel">
+          <!-- TK11 Settings Tabs -->
+          <div class="settings-tabs-container tk11-settings-tabs" style="margin-bottom: 1.5rem;">
+                        <div class="settings-tabs">
+              <button class="tab-btn active" data-tab="tk11-general">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06" />
+                </svg>
+                General
+              </button>
+              <button class="tab-btn" data-tab="tk11-buttons">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <rect x="3" y="8" width="18" height="8" rx="2"></rect>
+                  <circle cx="8" cy="12" r="1"></circle>
+                  <circle cx="16" cy="12" r="1"></circle>
+                </svg>
+                Buttons
+              </button>
+              <button class="tab-btn" data-tab="tk11-startup">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Startup
+              </button>
+              <button class="tab-btn" data-tab="tk11-channel">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M2 12h4l3 9 4-18 3 9h4"></path>
+                </svg>
+                Channel
+              </button>
+              <button class="tab-btn" data-tab="tk11-match">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M2 12h4l3-9 4 18 3-9h4"></path>
+                </svg>
+                Match Freq
+              </button>
+              <button class="tab-btn" data-tab="tk11-noaa">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 6v6l4 2"></path>
+                </svg>
+                NOAA
+              </button>
+              <button class="tab-btn" data-tab="tk11-dtmf">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                  <path d="M9 9h.01M15 9h.01M9 15h.01M15 15h.01M12 12h.01"></path>
+                </svg>
+                DTMF
+              </button>
+              <button class="tab-btn" data-tab="tk11-5tone">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
+                5TONE
+              </button>
+              <button class="tab-btn" data-tab="tk11-fm">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                </svg>
+                Radio FM
+              </button>
+            </div>
+            
+            <!-- Tab 1: General -->
+            <div class="tab-content active" id="tab-tk11-general">
+              <h3>General Settings</h3>
+              <p class="muted">Configure general radio parameters.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11GeneralReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11GeneralWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11TOT">TOT (minutes)</label>
+                  <select id="tk11TOT">
+                    <option value="0">Off</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11VOX">VOX</label>
+                  <select id="tk11VOX">
+                    <option value="0">Off</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Mic">Microphone</label>
+                  <select id="tk11Mic">
+                    <option value="0">1</option>
+                    <option value="1">2</option>
+                    <option value="2">3</option>
+                    <option value="3">4</option>
+                    <option value="4">5</option>
+                    <option value="5">6</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Backlight">Backlight</label>
+                  <select id="tk11Backlight">
+                    <option value="0">Off</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">10</option>
+                    <option value="7">15</option>
+                    <option value="8">20</option>
+                    <option value="9">25</option>
+                    <option value="10">30</option>
+                    <option value="11">Always ON</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Brightness">Brightness (8-200)</label>
+                  <input type="number" id="tk11Brightness" min="8" max="200" value="100">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11ScanMode">Scan Mode</label>
+                  <select id="tk11ScanMode">
+                    <option value="0">TO</option>
+                    <option value="1">CO</option>
+                    <option value="2">SE</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11PowerOnMode">Power ON Mode</label>
+                  <select id="tk11PowerOnMode">
+                    <option value="0">Off</option>
+                    <option value="1">1:1</option>
+                    <option value="2">1:2</option>
+                    <option value="3">1:3</option>
+                    <option value="4">1:4</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Alarm">Alarm</label>
+                  <select id="tk11Alarm">
+                    <option value="0">Local alarm</option>
+                    <option value="1">Remote alarm</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Respond">Respond</label>
+                  <select id="tk11Respond">
+                    <option value="0">OFF</option>
+                    <option value="1">Remind</option>
+                    <option value="2">Reply</option>
+                    <option value="3">Remind & reply</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11CWPitch">CW Pitch Freq (400-1500)</label>
+                  <input type="number" id="tk11CWPitch" min="400" max="1500" step="10" value="700">
+                </div>
+              </div>
+              
+              <div class="tk11-checkboxes" style="margin-top: 1.5rem;">
+                <h4 style="margin-bottom: 0.75rem;">Options</h4>
+                <div class="checkbox-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem;">
+                  <label class="checkbox-label"><input type="checkbox" id="tk11Beep"> Beep Tone</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11Voice"> Voice</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11SBar"> S-Bar</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11KillCode"> Kill Code</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11SideTone"> Side Tone</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11MwSwAGC"> MwSw AGC</label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab 2: Buttons -->
+            <div class="tab-content" id="tab-tk11-buttons">
+              <h3>Buttons Settings</h3>
+              <p class="muted">Configure side key actions and key lock behavior.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11ButtonsReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11ButtonsWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11SideKey1Short">Side Key 1 Short Press</label>
+                  <select id="tk11SideKey1Short">
+                    <option value="0">None</option>
+                    <option value="1">Flashlight</option>
+                    <option value="2">Power selection</option>
+                    <option value="3">Monitor</option>
+                    <option value="4">Scan</option>
+                    <option value="5">VOX</option>
+                    <option value="6">Alarm</option>
+                    <option value="7">FM radio</option>
+                    <option value="8">1750 MHz</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11SideKey1Long">Side Key 1 Long Press</label>
+                  <select id="tk11SideKey1Long">
+                    <option value="0">None</option>
+                    <option value="1">Flashlight</option>
+                    <option value="2">Power selection</option>
+                    <option value="3">Monitor</option>
+                    <option value="4">Scan</option>
+                    <option value="5">VOX</option>
+                    <option value="6">Alarm</option>
+                    <option value="7">FM radio</option>
+                    <option value="8">1750 MHz</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11SideKey2Short">Side Key 2 Short Press</label>
+                  <select id="tk11SideKey2Short">
+                    <option value="0">None</option>
+                    <option value="1">Flashlight</option>
+                    <option value="2">Power selection</option>
+                    <option value="3">Monitor</option>
+                    <option value="4">Scan</option>
+                    <option value="5">VOX</option>
+                    <option value="6">Alarm</option>
+                    <option value="7">FM radio</option>
+                    <option value="8">1750 MHz</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11SideKey2Long">Side Key 2 Long Press</label>
+                  <select id="tk11SideKey2Long">
+                    <option value="0">None</option>
+                    <option value="1">Flashlight</option>
+                    <option value="2">Power selection</option>
+                    <option value="3">Monitor</option>
+                    <option value="4">Scan</option>
+                    <option value="5">VOX</option>
+                    <option value="6">Alarm</option>
+                    <option value="7">FM radio</option>
+                    <option value="8">1750 MHz</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11KeyLock">Key Lock</label>
+                  <select id="tk11KeyLock">
+                    <option value="0">Unlocked</option>
+                    <option value="1">Locked</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label class="checkbox-label" style="margin-top: 1.5rem;">
+                    <input type="checkbox" id="tk11AutoLock"> Auto Lock
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab 3: Startup -->
+            <div class="tab-content" id="tab-tk11-startup">
+              <h3>Startup Settings</h3>
+              <p class="muted">Configure boot screen and display options.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11StartupReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11StartupWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11DeviceName">Device Name (12 chars max)</label>
+                  <input type="text" id="tk11DeviceName" maxlength="12" placeholder="TK11">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11StartString1">Start String 1 (15 chars max)</label>
+                  <input type="text" id="tk11StartString1" maxlength="15" placeholder="">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11StartString2">Start String 2 (15 chars max)</label>
+                  <input type="text" id="tk11StartString2" maxlength="15" placeholder="">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11BootScreen">Boot Screen</label>
+                  <select id="tk11BootScreen">
+                    <option value="0">Fullscreen</option>
+                    <option value="1">Welcome</option>
+                    <option value="2">Battery voltage</option>
+                    <option value="3">Picture</option>
+                    <option value="4">None</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11ADisplay">A Display</label>
+                  <select id="tk11ADisplay">
+                    <option value="0">A-F01</option>
+                    <option value="1">A-F02</option>
+                    <option value="2">A-F03</option>
+                    <option value="3">A-F04</option>
+                    <option value="4">A-F05</option>
+                    <option value="5">A-F06</option>
+                    <option value="6">A-F07</option>
+                    <option value="7">A-F08</option>
+                    <option value="8">A-F09</option>
+                    <option value="9">A-F10</option>
+                    <option value="10">A-F11</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11BDisplay">B Display</label>
+                  <select id="tk11BDisplay">
+                    <option value="0">B-F01</option>
+                    <option value="1">B-F02</option>
+                    <option value="2">B-F03</option>
+                    <option value="3">B-F04</option>
+                    <option value="4">B-F05</option>
+                    <option value="5">B-F06</option>
+                    <option value="6">B-F07</option>
+                    <option value="7">B-F08</option>
+                    <option value="8">B-F09</option>
+                    <option value="9">B-F10</option>
+                    <option value="10">B-F11</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab 4: Channel -->
+            <div class="tab-content" id="tab-tk11-channel">
+              <h3>Channel Settings</h3>
+              <p class="muted">Configure channel and audio parameters.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11ChannelReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11ChannelWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11MainChannel">Main Channel</label>
+                  <select id="tk11MainChannel">
+                    <option value="0">A</option>
+                    <option value="1">B</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11VolumeA">Volume RX Balance A</label>
+                  <select id="tk11VolumeA">
+                    <option value="0">0%</option>
+                    <option value="1">33%</option>
+                    <option value="2">66%</option>
+                    <option value="3">100%</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11VolumeB">Volume RX Balance B</label>
+                  <select id="tk11VolumeB">
+                    <option value="0">0%</option>
+                    <option value="1">33%</option>
+                    <option value="2">66%</option>
+                    <option value="3">100%</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11ChannelDisplayMode">Channel Display Mode</label>
+                  <select id="tk11ChannelDisplayMode">
+                    <option value="0">Frequency</option>
+                    <option value="1">ID</option>
+                    <option value="2">Name</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11RepeaterTail">Repeater Tail Tone</label>
+                  <select id="tk11RepeaterTail">
+                    <option value="0">OFF</option>
+                    <option value="1">100</option>
+                    <option value="2">200</option>
+                    <option value="3">300</option>
+                    <option value="4">400</option>
+                    <option value="5">500</option>
+                    <option value="6">600</option>
+                    <option value="7">700</option>
+                    <option value="8">800</option>
+                    <option value="9">900</option>
+                    <option value="10">1000</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11RemindEOT">Remind End of Talk</label>
+                  <select id="tk11RemindEOT">
+                    <option value="0">OFF</option>
+                    <option value="1">Beep tone</option>
+                    <option value="2">MDC</option>
+                    <option value="3">User1</option>
+                    <option value="4">User2</option>
+                    <option value="5">User3</option>
+                    <option value="6">User4</option>
+                    <option value="7">User5</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Denoise">Denoise</label>
+                  <select id="tk11Denoise">
+                    <option value="0">OFF</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                  </select>
+                  <input type="hidden" id="tk11DenoiseLvl" value="0">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11Transpositional">Transpositional</label>
+                  <select id="tk11Transpositional">
+                    <option value="0">OFF</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                  <input type="hidden" id="tk11TranspositionalLvl" value="0">
+                </div>
+              </div>
+              
+              <div class="tk11-checkboxes" style="margin-top: 1.5rem;">
+                <h4 style="margin-bottom: 0.75rem;">Options</h4>
+                <div class="checkbox-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.5rem;">
+                  <label class="checkbox-label"><input type="checkbox" id="tk11VFOMode"> VFO Mode</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11TailTone"> Tail Tone</label>
+                  <label class="checkbox-label"><input type="checkbox" id="tk11DualReceive"> Dual Receive</label>
+                </div>
+              </div>
+            </div>
+                        
+            <!-- Tab 5: Match Frequency -->
+            <div class="tab-content" id="tab-tk11-match">
+              <h3>Match Frequency Settings</h3>
+              <p class="muted">Configure frequency matching parameters.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11MatchReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11MatchWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11FreqMeterTOT">Frequency Meter TOT (8-32s)</label>
+                  <input type="number" id="tk11FreqMeterTOT" min="8" max="32" value="16">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11FreqMeterMode">Frequency Meter Mode</label>
+                  <select id="tk11FreqMeterMode">
+                    <option value="0">Normal</option>
+                    <option value="1">Expert mode</option>
+                    <option value="2">Auto learning mode</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11MatchDCS">DCS</label>
+                  <select id="tk11MatchDCS">
+                    <option value="0">23bit</option>
+                    <option value="1">24bit</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11MatchThreshold">QT Threshold (10-200)</label>
+                  <input type="number" id="tk11MatchThreshold" min="10" max="200" value="100">
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab 6: NOAA -->
+            <div class="tab-content" id="tab-tk11-noaa">
+              <h3>NOAA Settings</h3>
+              <p class="muted">Configure NOAA weather alert settings.</p>
+              
+              <div class="tk11-settings-actions" style="margin: 1rem 0;">
+                <button id="tk11NOAAReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read
+                </button>
+                <button id="tk11NOAAWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write
+                </button>
+              </div>
+              
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11NOAASameDecode">NOAA SAME Decode</label>
+                  <select id="tk11NOAASameDecode">
+                    <option value="0">Null</option>
+                    <option value="1">1050Hz</option>
+                    <option value="2">SAME decode</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11NOAASameEvent">NOAA SAME Event</label>
+                  <select id="tk11NOAASameEvent">
+                    <option value="0">Default</option>
+                    <option value="1">All open</option>
+                    <option value="2">All off</option>
+                    <option value="3">User</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11NOAASameAddress">NOAA SAME Address</label>
+                  <select id="tk11NOAASameAddress">
+                    <option value="0">Single address</option>
+                    <option value="1">Multiple address</option>
+                    <option value="2">Any address</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11NOAASQ">NOAA SQ (0-9)</label>
+                  <input type="number" id="tk11NOAASQ" min="0" max="9" value="0">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11NOAAScan">NOAA Search</label>
+                  <select id="tk11NOAAScan">
+                    <option value="0">Manual</option>
+                    <option value="1">Auto</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Tab 7: DTMF Settings -->
+            <div class="tab-content" id="tab-tk11-dtmf">
+              <h3>DTMF Settings</h3>
+              <p class="muted">Configure DTMF signaling parameters and contacts (EEPROM: 0x1A000).</p>
+              
+              <div class="dtmf-actions">
+                <button id="tk11DTMFReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read DTMF
+                </button>
+                <button id="tk11DTMFWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write DTMF
+                </button>
+              </div>
+              
+              <!-- DTMF Settings Grid -->
+              <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">DTMF Parameters</h4>
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk11DTMFLocalCode">Local Code (3 digits)</label>
+                  <input type="text" id="tk11DTMFLocalCode" maxlength="3" placeholder="000" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFKillCode">Kill Code (5 digits)</label>
+                  <input type="text" id="tk11DTMFKillCode" maxlength="5" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFReviveCode">Revive Code (5 digits)</label>
+                  <input type="text" id="tk11DTMFReviveCode" maxlength="5" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFSeparateCode">Separate Code</label>
+                  <select id="tk11DTMFSeparateCode">
+                    <option value="0">Null</option>
+                    <option value="1">A</option>
+                    <option value="2">B</option>
+                    <option value="3">C</option>
+                    <option value="4">D</option>
+                    <option value="5">*</option>
+                    <option value="6">#</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFGroupCode">Group Code</label>
+                  <select id="tk11DTMFGroupCode">
+                    <option value="0">A</option>
+                    <option value="1">B</option>
+                    <option value="2">C</option>
+                    <option value="3">D</option>
+                    <option value="4">*</option>
+                    <option value="5">#</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFAutoResetTime">Auto Reset Time (5-60s)</label>
+                  <input type="number" id="tk11DTMFAutoResetTime" min="5" max="60" value="10">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFUpCode">Up Code (14 chars)</label>
+                  <input type="text" id="tk11DTMFUpCode" maxlength="14" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFDownCode">Down Code (14 chars)</label>
+                  <input type="text" id="tk11DTMFDownCode" maxlength="14" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFPreLoadTime">Pre Load Time (ms)</label>
+                  <select id="tk11DTMFPreLoadTime">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFFirstCodePersist">First Code Persist (ms)</label>
+                  <select id="tk11DTMFFirstCodePersist">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFCodePersist">Code Persist Time (ms)</label>
+                  <select id="tk11DTMFCodePersist">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFCodeContinue">Code Continue Time (ms)</label>
+                  <select id="tk11DTMFCodeContinue">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk11DTMFCodeInterval">Code Interval Time (ms)</label>
+                  <select id="tk11DTMFCodeInterval">
+                  </select>
+                </div>
+              </div>
+              
+              <!-- DTMF Contacts Table -->
+              <h4 style="margin-top: 2rem; margin-bottom: 1rem;">DTMF Contacts</h4>
+              <button id="tk11DTMFClearBtn" class="ghost" style="margin-bottom: 1rem;">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </span>
+                Clear All Contacts
+              </button>
+              
+              <table class="dtmf-table">
+                <thead>
+                  <tr>
+                    <th class="index-col">#</th>
+                    <th>Name (8 chars)</th>
+                    <th>Code ID (3 chars)</th>
+                    <th style="width: 60px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="tk11DTMFTableBody">
+                  <!-- 16 DTMF contacts will be generated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Tab 8: 5TONE Settings -->
+            <div class="tab-content" id="tab-tk11-5tone">
+              <h3>5TONE Settings</h3>
+              <p class="muted">Configure 5-Tone signaling parameters and contacts (EEPROM: 0x1A800).</p>
+              
+              <div class="dtmf-actions">
+                <button id="tk115ToneReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read 5TONE
+                </button>
+                <button id="tk115ToneWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write 5TONE
+                </button>
+              </div>
+              
+              <!-- 5TONE Settings Grid -->
+              <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">5TONE Parameters</h4>
+              <div class="tk11-settings-grid">
+                <div class="field-group">
+                  <label for="tk115ToneLocalCode">Local Code (3 digits)</label>
+                  <input type="text" id="tk115ToneLocalCode" maxlength="3" placeholder="000" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneKillCode">Kill Code (5 digits)</label>
+                  <input type="text" id="tk115ToneKillCode" maxlength="5" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneReviveCode">Revive Code (5 digits)</label>
+                  <input type="text" id="tk115ToneReviveCode" maxlength="5" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneSeparateCode">Separate Code</label>
+                  <select id="tk115ToneSeparateCode">
+                    <option value="0">A</option>
+                    <option value="1">B</option>
+                    <option value="2">C</option>
+                    <option value="3">D</option>
+                    <option value="4">E</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneGroupCode">Group Code</label>
+                  <select id="tk115ToneGroupCode">
+                    <option value="0">A</option>
+                    <option value="1">B</option>
+                    <option value="2">C</option>
+                    <option value="3">D</option>
+                    <option value="4">E</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneAutoResetTime">Auto Reset Time (5-60s)</label>
+                  <input type="number" id="tk115ToneAutoResetTime" min="5" max="60" value="10">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneProtocol">Protocol</label>
+                  <select id="tk115ToneProtocol">
+                    <option value="0">EIA</option>
+                    <option value="1">EEA</option>
+                    <option value="2">CCIR</option>
+                    <option value="3">ZVEI1</option>
+                    <option value="4">ZVEI2</option>
+                    <option value="5">User</option>
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneUpCode">Up Code (14 chars)</label>
+                  <input type="text" id="tk115ToneUpCode" maxlength="14" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneDownCode">Down Code (14 chars)</label>
+                  <input type="text" id="tk115ToneDownCode" maxlength="14" placeholder="" pattern="[0-9]*">
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115TonePreLoadTime">Pre Load Time (ms)</label>
+                  <select id="tk115TonePreLoadTime">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneFirstCodePersist">First Code Persist (ms)</label>
+                  <select id="tk115ToneFirstCodePersist">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneCodeContinue">Code Continue Time (ms)</label>
+                  <select id="tk115ToneCodeContinue">
+                  </select>
+                </div>
+                
+                <div class="field-group">
+                  <label for="tk115ToneCodeInterval">Code Interval Time (ms)</label>
+                  <select id="tk115ToneCodeInterval">
+                  </select>
+                </div>
+              </div>
+              
+              <!-- 5TONE User Frequencies -->
+              <h4 style="margin-top: 2rem; margin-bottom: 1rem;">User Frequencies (350-3500 Hz)</h4>
+              <div class="tk11-settings-grid" id="tk115ToneUserFreqs">
+                <!-- Generated by JavaScript -->
+              </div>
+              
+              <!-- 5TONE Contacts Table -->
+              <h4 style="margin-top: 2rem; margin-bottom: 1rem;">5TONE Contacts</h4>
+              <button id="tk115ToneClearBtn" class="ghost" style="margin-bottom: 1rem;">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </span>
+                Clear All Contacts
+              </button>
+              
+              <table class="dtmf-table">
+                <thead>
+                  <tr>
+                    <th class="index-col">#</th>
+                    <th>Name (8 chars)</th>
+                    <th>Code ID (3 chars)</th>
+                    <th style="width: 60px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="tk115ToneTableBody">
+                  <!-- 16 5TONE contacts will be generated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            
+
+            <!-- Tab 9: Radio FM -->
+            <div class="tab-content" id="tab-tk11-fm">
+              <h3>Radio FM Frequencies</h3>
+              <p class="muted">Quick frequency memory slots (EEPROM: 0x12000). Range: 76-108 MHz.</p>
+              
+              <div class="radio-actions">
+                <button id="tk11FMReadBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="7 10 12 15 17 10"></polyline>
+                      <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                  </span>
+                  Read FM
+                </button>
+                <button id="tk11FMWriteBtn">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                      <polyline points="17 8 12 3 7 8"></polyline>
+                      <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                  </span>
+                  Write FM
+                </button>
+                <button id="tk11FMClearBtn" class="ghost">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </span>
+                  Clear All
+                </button>
+              </div>
+              
+              <div class="field-group" style="max-width: 200px; margin-bottom: 1rem;">
+                <label for="tk11FMChannel">Current Channel (1-32)</label>
+                <input type="number" id="tk11FMChannel" min="1" max="32" value="1">
+              </div>
+              
+              <div class="field-group" style="max-width: 200px; margin-bottom: 1rem;">
+                <label for="tk11FMMode">FM Mode</label>
+                <select id="tk11FMMode">
+                  <option value="0">VFO</option>
+                  <option value="1">Memory</option>
+                </select>
+              </div>
+              
+              <div class="field-group" style="max-width: 200px; margin-bottom: 1rem;">
+                <label for="tk11FMVFO">Current VFO (MHz)</label>
+                <input type="number" id="tk11FMVFO" min="76" max="108" step="0.1" value="87.5">
+              </div>
+              
+              <table class="dtmf-table">
+                <thead>
+                  <tr>
+                    <th class="index-col">#</th>
+                    <th>Frequency (MHz)</th>
+                    <th style="width: 60px;"></th>
+                  </tr>
+                </thead>
+                <tbody id="tk11FMTableBody">
+                  <!-- 32 FM frequencies will be generated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            
+          </div>
+        </section>
+      </section>
+
+
+      <!-- Display Mirror Page -->
+      <section class="page" id="mirror" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">MIRROR TOOL</p>
+            <h1>Display mirror</h1>
+            <p class="subtitle">Mirror the radio display in real time.</p>
+            
+          </div>
+
+          <section class="status-card mirror-status">
+            <div class="mirror-status-main">
+              <div class="status-top">
+                <span class="status-dot" id="mirrorStatusDot" data-status="disconnected"></span>
+                <div>
+                  <div id="mirrorStatusTitle">Disconnected</div>
+                  <p class="muted" id="mirrorStatusSubtitle">No radio connected.</p>
+                </div>
+              </div>
+              <div class="mirror-actions">
+                <div class="status-actions">
+                  <button class="ghost" id="mirrorToggle" disabled>
+                    <span class="btn-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="M5 5l14 7-14 7z" />
+                      </svg>
+                    </span>
+                    <span class="btn-label">Start mirror</span>
+                  </button>
+                  <button class="ghost" id="mirrorSave" disabled>
+                    <span class="btn-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="M12 3v12" />
+                        <path d="M7 10l5 5 5-5" />
+                        <path d="M4 20h16" />
+                      </svg>
+                    </span>
+                    <span class="btn-label">Save screenshot</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="mirror-status-side">
+              <div class="mirror-meta">
+                <div>
+                  <div class="muted">Firmware</div>
+                  <div id="mirrorFirmware">-</div>
+                </div>
+              </div>
+              <div class="status-error" id="mirrorError" hidden></div>
+            </div>
+          </section>
+        </header>
+        <section class="panel mirror-host">
+          <label class="mirror-select">
+            <span class="muted">Screen color</span>
+            <select id="mirrorColor" disabled>
+              <option value="amber">Amber</option>
+              <option value="white">White</option>
+            </select>
+          </label>
+          <div class="lcd-shell lcd-amber" id="lcdShell">
+            <canvas id="lcdCanvas" width="512" height="256"></canvas>
+          </div>
+        </section>
+      </section>
+
+      <!-- SMR Page -->
+      <section class="page" id="smr" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">SMR TOOL</p>
+            <h1>SMR</h1>
+            <p class="subtitle">Short message radio for sending and receiving SMS frames.</p>
+            <p class="subtitle">Select the message app in the radio (F+M) to use this tool.</p>
+            
+          </div>
+          <section class="status-card status-split smr-status">
+            <div class="status-main">
+              <div class="status-top">
+                <span class="status-dot" id="smrStatusDot" data-status="disconnected"></span>
+                <div>
+                  <div id="smrStatusTitle">Disconnected</div>
+                  <p class="muted" id="smrStatusSubtitle">No radio connected.</p>
+                </div>
+              </div>
+            </div>
+            <div class="status-side">
+              <div class="status-meta">
+                <div>
+                  <div class="muted">Firmware</div>
+                  <div id="smrFirmware">-</div>
+                </div>
+              </div>
+              <div class="status-error" id="smrError" hidden></div>
+            </div>
+          </section>
+        </header>
+
+        <section class="panel sms-panel">
+          <div class="log-header">
+            <h2>Messages</h2>
+            <button id="smsClear" class="ghost small">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M3 6h18" />
+                  <path d="M8 6V4h8v2" />
+                  <path d="M6 6l1 14h10l1-14" />
+                </svg>
+              </span>
+              Clear
+            </button>
+          </div>
+          <div id="smsLog" class="log-output sms-log" aria-live="polite"></div>
+          <div class="sms-compose">
+            <input id="smsInput" type="text" maxlength="30" placeholder="Type a message" disabled />
+            <button id="smsSend" class="primary" disabled>
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M4 12h16" />
+                  <path d="M14 5l7 7-7 7" />
+                </svg>
+              </span>
+              Send
+            </button>
+          </div>
+          <p class="hint">Use Enter to send.</p>
+        </section>
+      </section>
+
+      <!-- Unbricking Page - K5 Only -->
+      <section class="page k5-only" id="unbricking" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RECOVERY TOOL</p>
+            <h1>🔧 Unbricking UV-K5 V1</h1>
+            <p class="subtitle">Restore a bricked UV-K5 V1 using ST-LINK V2 and OpenOCD</p>
+          </div>
+        </header>
+
+        <!-- Hero Image -->
+        <div style="text-align: center; margin: 20px 0;">
+          <img src="unbrick/pcbite.jpg" alt="UV-K5 V1 Unbricking Setup" style="max-width: 100%; max-height: 400px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        </div>
+
+        <p class="hint" style="margin-bottom: 16px; background: #fff3cd; padding: 12px; border-radius: 8px; border-left: 4px solid #ffc107;">
+          ⚠️ <strong>F4HWN 4.3 Fusion 🔥 Edition is ONLY compatible with UV-K5 V3 and UV-K1.</strong> 
+          When flashed onto a UV-K5 V1, it causes a complete brick. Fortunately, the UV-K5 V1 can be fully restored using OpenOCD and a ST-LINK programmer.
+        </p>
+
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>❌ When do you need this?</h2>
+            <p class="muted">Your UV-K5 V1 may be bricked if:</p>
+            <ul style="margin: 12px 0; padding-left: 20px; color: #c0392b;">
+              <li>❌ The radio does not power on anymore</li>
+              <li>❌ DFU mode is unavailable (PTT + Power ON doesn't work)</li>
+              <li>❌ No LED activity at all</li>
+              <li>❌ Flashing tools cannot detect the device</li>
+            </ul>
+            <p class="muted" style="margin-top: 12px;">This usually happens when you flash a UV-K5 V1 with firmware meant for UV-K1 or UV-K5 V3 (like F4HWN Fusion 🔥 Edition).</p>
+          </section>
+
+          <section class="panel">
+            <h2>📋 Requirements</h2>
+            <ul style="margin: 12px 0; padding-left: 20px; color: #666;">
+              <li>🔌 <strong>ST-LINK V2</strong> programmer (original or clone)</li>
+              <li>🔗 <strong>4 Dupont jumper wires</strong></li>
+              <li>🔧 <strong>Small screwdriver</strong> to open the radio</li>
+              <li>💻 <strong>OpenOCD</strong> installed on your computer (Windows / macOS / Linux)</li>
+            </ul>
+          </section>
+        </section>
+
+        <!-- Installing OpenOCD -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel" style="grid-column: span 2;">
+            <h2>📥 Installing OpenOCD</h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 12px;">
+              <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center;">
+                <strong style="color: #333;">🍎 macOS (Homebrew)</strong>
+                <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-top: 8px; color: #d4d4d4;">brew install openocd</div>
+              </div>
+              <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center;">
+                <strong style="color: #333;">🪟 Windows</strong>
+                <div style="margin-top: 8px; font-size: 13px;">
+                  <a href="https://openocd.org/pages/getting-openocd.html" target="_blank">Official Website</a> or 
+                  <a href="https://github.com/openocd-org/openocd/releases" target="_blank">GitHub Releases</a>
+                </div>
+              </div>
+              <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; text-align: center;">
+                <strong style="color: #333;">🐧 Linux (Ubuntu/Debian)</strong>
+                <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-top: 8px; color: #d4d4d4;">sudo apt install openocd</div>
+              </div>
+            </div>
+            <p style="margin-top: 12px; font-size: 13px;">Verify installation: <code style="background: #1e1e1e; padding: 4px 8px; border-radius: 4px; color: #d4d4d4;">openocd --version</code></p>
+            <div style="text-align: center; margin-top: 16px;">
+              <img src="unbrick/openocd.png" alt="OpenOCD Output" style="max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;">
+              <p style="font-size: 12px; color: #888; margin-top: 4px;">OpenOCD successful output</p>
+            </div>
+          </section>
+        </section>
+
+        <!-- SWD Connection -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel">
+            <h2>🔌 SWD Connection Points</h2>
+            <p class="muted">The radio must be opened to access the front side of the PCB. Connect the ST-LINK V2 to these pins:</p>
+            <table style="width: 100%; margin: 12px 0; border-collapse: collapse; font-size: 14px;">
+              <thead>
+                <tr style="background: #f5f5f5;">
+                  <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">Signal</th>
+                  <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">UV-K5 V1 Pad</th>
+                  <th style="padding: 10px; border: 1px solid #ddd; text-align: center;">ST-LINK Pin</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>GND</strong></td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">GND pad</td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">GND</td></tr>
+                <tr><td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>SWCLK</strong></td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">SWCLK pad</td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">SWCLK</td></tr>
+                <tr><td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>SWDIO</strong></td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">SWDIO pad</td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">SWDIO</td></tr>
+                <tr><td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>3.3V</strong></td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">VCC pad</td><td style="padding: 8px; border: 1px solid #ddd; text-align: center;">3.3V</td></tr>
+              </tbody>
+            </table>
+            <div style="background: #ffebee; padding: 12px; border-radius: 8px; margin-top: 12px; border-left: 4px solid #f44336; color: #b71c1c;">
+              <strong>⚠️ WARNING:</strong> Do NOT connect the battery while using the ST-LINK. The ST-LINK provides 3.3V to the board.
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>📍 PCB Connection Images</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div style="text-align: center;">
+                <img src="unbrick/pinout.jpg" alt="SWD Pinout Location" style="max-width: 100%; border-radius: 8px; border: 1px solid #ddd;">
+                <p style="font-size: 12px; color: #888; margin-top: 4px;">SWD Pinout Location</p>
+              </div>
+              <div style="text-align: center;">
+                <img src="unbrick/bottom.png" alt="PCB Bottom View" style="max-width: 100%; border-radius: 8px; border: 1px solid #ddd;">
+                <p style="font-size: 12px; color: #888; margin-top: 4px;">PCB Connection Points</p>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <!-- Download Toolkit -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel" style="grid-column: span 2;">
+            <h2>📦 Download Unbrick Toolkit</h2>
+            <p class="muted">Download the complete toolkit containing bootloader, OpenOCD configs, and helper script:</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin: 16px 0;">
+              <a href="https://github.com/user-attachments/files/24083102/unbrick_k5_v1.zip" target="_blank" style="text-decoration: none; display: block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">📥</div>
+                <strong>Complete Toolkit (ZIP)</strong>
+                <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">13.5MB - Includes bootloader, configs & video</div>
+              </a>
+              
+              <a href="https://1drv.ms/f/c/5d40488ea2119b08/IgAshx87imRRRLuy6jx0-xCzAY25Zj3vSB3H5TlePGPj5Uw?e=orBJJ6" target="_blank" style="text-decoration: none; display: block; background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%); color: white; padding: 16px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 24px; margin-bottom: 8px;">🪟</div>
+                <strong>Windows Version</strong>
+                <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">by @dguimaraes88 - Easier for Windows users</div>
+              </a>
+            </div>
+            
+            <p style="margin-top: 12px; font-size: 13px;">Or download individual files:</p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <a href="unbrick/bootloader.bin" download style="background: #e9ecef; padding: 8px 16px; border-radius: 4px; text-decoration: none; color: #333; font-size: 13px;">💾 bootloader.bin (4KB)</a>
+              <a href="unbrick/unbrick_k5_v1.sh" download style="background: #e9ecef; padding: 8px 16px; border-radius: 4px; text-decoration: none; color: #333; font-size: 13px;">📜 unbrick_k5_v1.sh</a>
+            </div>
+          </section>
+        </section>
+
+        <!-- Unbrick Procedure -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel" style="grid-column: span 2;">
+            <h2>⚡ Unbrick Procedure</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+              <div>
+                <h3 style="color: #2196f3; font-size: 16px;">Step 1: Connect the ST-LINK</h3>
+                <ol style="margin: 12px 0; padding-left: 20px; color: #666; line-height: 1.8;">
+                  <li>Connect the ST-LINK pins to the SWD pads:
+                    <ul style="margin-left: 16px; color: #27ae60;">
+                      <li>3.3V → 3.3V</li>
+                      <li>SWDIO → SWDIO</li>
+                      <li>SWCLK → SWCLK</li>
+                      <li>GND → GND</li>
+                    </ul>
+                  </li>
+                  <li>Plug the ST-LINK into your computer</li>
+                  <li>Power on your UV-K5 V1 (normal mode, without battery)</li>
+                </ol>
+              </div>
+              
+              <div>
+                <h3 style="color: #2196f3; font-size: 16px;">Step 2: Flash the Bootloader</h3>
+                <p style="font-size: 13px; color: #666;">From the <code>unbrick_k5_v1</code> directory:</p>
+                
+                <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin: 8px 0; border-left: 4px solid #4caf50;">
+                  <strong style="color: #2e7d32;">✨ Option A — Helper script (Recommended)</strong>
+                  <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 12px; margin-top: 8px; color: #d4d4d4;">./unbrick_k5_v1.sh</div>
+                </div>
+                
+                <div style="background: #fff3e0; padding: 12px; border-radius: 8px; margin: 8px 0; border-left: 4px solid #ff9800;">
+                  <strong style="color: #e65100;">🔧 Option B — Manual OpenOCD command</strong>
+                  <div style="background: #1e1e1e; padding: 8px; border-radius: 4px; font-family: monospace; font-size: 11px; margin-top: 8px; color: #d4d4d4; overflow-x: auto; white-space: nowrap;">openocd -f ./interface/stlink.cfg -f ./target/dp32g030.cfg -c "init; reset halt; uv_flash_bl bootloader.bin; shutdown"</div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="background: #e3f2fd; padding: 12px; border-radius: 8px; margin-top: 16px; border-left: 4px solid #2196f3; color: #1565c0;">
+              <strong>💡 Note for Windows users:</strong> You must either run this command with administrator privileges or launch OpenOCD.exe as an Administrator.
+            </div>
+            
+            <h3 style="color: #27ae60; font-size: 16px; margin-top: 20px;">✅ Step 3: After Successful Flash</h3>
+            <p style="color: #666;">If no errors appear, the bootloader has been successfully restored:</p>
+            <ol style="margin: 12px 0; padding-left: 20px; color: #666; line-height: 1.8;">
+              <li>Disconnect and remove the ST-LINK from your UV-K5 V1 SWD port</li>
+              <li>Reinstall the battery</li>
+              <li>Power on the radio in <strong>DFU mode</strong> (hold PTT + Power ON)</li>
+            </ol>
+            <p style="color: #27ae60; margin-top: 12px;">
+              ✅ The device should now start correctly in DFU mode again. You can then flash stock firmware, or the 
+              <a href="https://github.com/armel/uv-k5-firmware-custom" target="_blank" style="color: #2196f3;">F4HWN firmware for UV-K5 V1</a> 
+              (not the Fusion 🔥 Edition).
+            </p>
+          </section>
+        </section>
+
+        <!-- Video Demo -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel" style="grid-column: span 2;">
+            <h2>🎬 Video Demonstration</h2>
+            <p class="muted">Watch the complete unbrick process in action. The video is included in the toolkit download.</p>
+            <div style="text-align: center; margin: 16px 0; background: #f8f9fa; padding: 24px; border-radius: 8px;">
+              <div style="font-size: 48px; margin-bottom: 12px;">🎬</div>
+              <p style="color: #666;">Video demo <strong>unbrick.mov</strong> is included in the Complete Toolkit ZIP</p>
+              <a href="https://github.com/user-attachments/files/24083102/unbrick_k5_v1.zip" target="_blank" style="display: inline-block; margin-top: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none;">
+                📥 Download Toolkit with Video
+              </a>
+            </div>
+          </section>
+        </section>
+
+        <!-- YouTube Tutorials -->
+        <section class="panel-grid" style="margin-top: 24px;">
+          <section class="panel">
+            <h2>📺 Video Tutorials</h2>
+            <p class="muted">If you're new to ST-LINK, OpenOCD, or SWD debugging, these videos will give you a clear visual overview:</p>
+            <div style="margin-top: 12px;">
+              <a href="https://www.youtube.com/watch?v=4cWtYH_bpro" target="_blank" style="display: block; background: #ff0000; color: white; padding: 12px 16px; border-radius: 8px; text-decoration: none; margin-bottom: 8px;">
+                <strong>🎬 Your UV-K5 V1 is bricked? 🫣 Here's how to fix it 😌</strong>
+                <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">by F4HWN</div>
+              </a>
+              <a href="https://www.youtube.com/watch?v=EmF08o5MIE0" target="_blank" style="display: block; background: #ff0000; color: white; padding: 12px 16px; border-radius: 8px; text-decoration: none;">
+                <strong>🎬 UNBRICK - Process Windows Quansheng UV-K5, K6</strong>
+                <div style="font-size: 12px; opacity: 0.9; margin-top: 4px;">by M0FXB</div>
+              </a>
+            </div>
+            <p style="margin-top: 12px; font-size: 12px; color: #888;">ℹ️ These resources are not mandatory, but they can make the procedure much easier to follow.</p>
+          </section>
+
+          <section class="panel">
+            <h2>⚠️ Important Notes</h2>
+            <ul style="margin: 12px 0; padding-left: 20px; color: #666; line-height: 1.8;">
+              <li>This procedure is for <strong>UV-K5 V1 only</strong></li>
+              <li>UV-K5 V3 and UV-K1 use different firmware and don't need this</li>
+              <li>Opening the radio may void warranty</li>
+              <li>Work carefully with the PCB connections</li>
+              <li>Double-check all wiring before powering on</li>
+              <li>Never connect battery while ST-LINK is connected</li>
+            </ul>
+            
+            <div style="background: linear-gradient(135deg, #ff5722 0%, #e64a19 100%); color: white; padding: 16px; border-radius: 8px; margin-top: 16px;">
+              <strong>⚠️ DISCLAIMER</strong>
+              <p style="margin-top: 8px; font-size: 13px;">This procedure requires opening the device and directly manipulating its microcontroller over SWD. <strong>Incorrect use may permanently damage the radio.</strong> Proceed at your own risk.</p>
+            </div>
+          </section>
+        </section>
+
+        <!-- Credits -->
+        <div style="text-align: center; margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px;">
+          <p style="color: #666; margin: 0;">
+            ❤️ Guide and tools by <a href="https://github.com/armel" target="_blank" style="color: #2196f3;">F4HWN (Armel)</a>
+            &nbsp;•&nbsp;
+            Windows version by <a href="https://github.com/dguimaraes88" target="_blank" style="color: #2196f3;">@dguimaraes88</a>
+          </p>
+        </div>
+      </section>
+
+
+            <!-- UV-K5/K1 Flash Tools Section -->
+      <section class="page" id="k1" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">FLASH TOOLS</p>
+            <h1 class="k5-only">UV-K5/K1 Flash Tools</h1>
+            <h1 class="tk11-only" style="display: none;">TK11/RT-890 Flash Tools</h1>
+            <p class="subtitle k5-only">Flash firmware for UV-K5 and UV-K1 radios.</p>
+            <p class="subtitle tk11-only" style="display: none;">Flash firmware for TK11/RT-890 radios.</p>
+          </div>
+        </header>
+
+        <!-- K5 Flash Section - Only visible when K5 is selected -->
+        <div class="k5-only">
+        <h2 class="section-title">UV-K5/K6/5R firmware Firmware</h2>
+        <p class="hint" style="margin-bottom: 16px;">⚠️ Connect the radio in boot mode ( PTT + Power ON ) from the navigation bar before flashing.</p>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Flash Firmware (UV-K5/K6/5R)</h2>
+            <p class="muted">Select a pre-loaded firmware or upload your own.</p>
+            
+            <div class="field-row">
+              <label for="k5FirmwareSelect">Pre-loaded Firmwares</label>
+              <select id="k5FirmwareSelect">
+                <option value="">-- Select firmware --</option>
+                <optgroup label="Matoz Firmware">
+                  <option value="firmware/Custom_Firmware_by_Matoz_V0.34.0C.bin">Matoz v0.34.0C</option>
+                  <option value="firmware/Custom_Firmware_by_Matoz_V0.34.0C_fagci_key_style.bin">Matoz v0.34.0C (Fagci Key Style)</option>
+                  <option value="firmware/Custom_Firmware_by_Matoz_V0.33.0C.bin">Matoz v0.33.0C</option>
+                  <option value="firmware/Custom_Firmware_by_Matoz_V0.33.0C_fagci_keys_style.bin">Matoz v0.33.0C (Fagci Key Style)</option>
+                </optgroup>
+                <optgroup label="Motorko Firmware">
+                  <option value="firmware/motorko_v0.26.packed.bin">Motorko v0.26</option>
+                </optgroup>
+                <optgroup label="Fagci R3b0rn Firmware">
+                  <option value="firmware/k5-fagci-r3b0rn-nightly-n_241111.bin">Fagci R3b0rn Nightly N 241111</option>
+                </optgroup>
+                <optgroup label="kamilsss655 (Nunu) Firmware">
+                  <option value="firmware/kamilsss655_v20.5.bin">kamilsss655 v.20.5</option>
+                </optgroup>
+                <optgroup label="Joaquim.org Firmware">
+                  <option value="https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin">Joaquim.org Rolling Release</option>
+                </optgroup>
+                <optgroup label="Egzumer Firmware">
+                  <option value="https://github.com/egzumer/uv-k5-firmware-custom/releases/download/v0.22/egzumer_v0.22.packed.bin">Egzumer v0.22</option>
+                </optgroup>
+                <optgroup label="IJV Firmwares">
+                  <option value="firmware/IJV-firmware.X3_60.bin">IJV X3.60</option>
+                  <option value="firmware/IJV-firmware.S3_60.bin">IJV S3.60</option>
+                  <option value="firmware/IJV-firmware.N3_60.bin">IJV N3.60</option>
+                  <option value="firmware/IJV-firmware.X3.60_VOX.bin">IJV X3.60 VOX</option>
+                  <option value="firmware/IJV-firmware.S3.60_VOX.bin">IJV S3.60 VOX</option>
+                  <option value="firmware/IJV-firmware.N3.60_VOX.bin">IJV N3.60 VOX</option>
+                </optgroup>
+                <optgroup label="F4HWN Firmware v4.3">
+                  <option value="firmware/f4hwn/f4hwn.bandscope.packed.v4.3.bin">📺 F4HWN Bandscope v4.3</option>
+                  <option value="firmware/f4hwn/f4hwn.broadcast.packed.v4.3.bin">📻 F4HWN Broadcast v4.3</option>
+                  <option value="firmware/f4hwn/f4hwn.rescueops.packed.v4.3.bin">🚨 F4HWN RescueOps v4.3</option>
+                  <option value="firmware/f4hwn/f4hwn.basic.packed.v4.3.bin">☘️ F4HWN Basic v4.3</option>
+                  <option value="firmware/f4hwn/f4hwn.game.packed.v4.3.bin">🎮 F4HWN Game v4.3</option>
+                </optgroup>
+                <optgroup label="QuanSheng Stock Firmware">
+                  <option value="firmware/k5升级_v2.01.31_publish.bin">Quansheng Stock v2.01.31 (UV-K5)</option>
+                  <option value="firmware/K6升级_V3.00.15.bin">Quansheng Stock v3.00.15 (UV-K6)</option>
+                  <option value="firmware/5RPLUS_v4.00.07_publish.bin">Quansheng Stock v4.00.07 (UV-5R Plus)</option>
+                  <option value="firmware/k5_py030_v1.01.07.bin">Quansheng Stock v1.01.07 (UV-K5v2)</option>
+                  <option value="firmware/k5_py030_v1.02.01_publish.bin">Quansheng Stock v1.02.01 (UV-K5v2)</option>
+                </optgroup>
+              </select>
+            </div>
+            
+            <div class="field-row">
+              <label for="firmwareFile">Or upload custom firmware</label>
+              <input type="file" id="firmwareFile" accept=".bin,.hex" />
+            </div>
+            
+            <div class="field-row">
+              <label for="k5FirmwareUrl">Or paste firmware URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="url" id="k5FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
+                <button id="k5LoadUrlBtn" class="secondary" type="button">Load</button>
+              </div>
+            </div>
+            
+            <p class="hint" id="k5FirmwareStatus">No firmware selected</p>
+            
+            <button id="flashBtn" class="primary">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M13 2L3 14h6l-2 8 10-12h-6l2-8z" />
+                </svg>
+              </span>
+              Flash UV-K5/K6/5R
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="flashPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="flashFill"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        </div>
+
+        <!-- K1 Flash Section - Only visible when K5 is selected -->
+        <div class="k5-only">
+        <h2 class="section-title">UV-K5 V3 & UV-K1 Firmware</h2>
+        <p class="hint" style="margin-bottom: 16px;">⚠️ Connect the radio in boot mode ( PTT + Power ON ) from the navigation bar before flashing.</p>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Flash Firmware (UV-K5 V3 & UV-K1)</h2>
+            <p class="muted">Select a pre-loaded firmware or upload your own.</p>
+            
+            <div class="field-row">
+              <label for="k1FirmwareSelect">Pre-loaded Firmwares</label>
+              <select id="k1FirmwareSelect">
+                <option value="">-- Select firmware --</option>
+                <optgroup label="F4HWN Firmware">
+                  <option value="firmware/f4hwn.k5v3.fusion.v4.3.2.bin">F4HWN Fusion v4.3.2 (K5v3)</option>
+                  <option value="firmware/f4hwn.k1.fusion.v4.3.2.bin">F4HWN Fusion v4.3.2 (K1)</option>
+                </optgroup>
+                <optgroup label="Calypso Firmware">
+                  <option value="firmware/f4hwn.calypso_v1.2.bin">Calypso Edition v1.2</option>
+                </optgroup>
+                <optgroup label="Quansheng Stock Firware">
+                  <option value="firmware/quansheng.k5v3.stock.firmware.v7.00.11.bin">Quansheng Stock v7.00.11 (K5v3)</option>
+                  <option value="firmware/quansheng.k1.stock.firmware.v7.02.02.bin">Quansheng Stock v7.02.02 (K1)</option>
+                </optgroup>
+              </select>
+            </div>
+            
+            <div class="field-row">
+              <label for="k1FirmwareFile">Or upload custom firmware</label>
+              <input type="file" id="k1FirmwareFile" accept=".bin" />
+            </div>
+            
+            <div class="field-row">
+              <label for="k1FirmwareUrl">Or paste firmware URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="url" id="k1FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
+                <button id="k1LoadUrlBtn" class="secondary" type="button">Load</button>
+              </div>
+            </div>
+            
+            <p class="hint" id="k1FirmwareStatus">No firmware selected</p>
+            
+            <button id="k1FlashBtn" class="primary">
+              <span class="btn-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M13 2L3 14h6l-2 8 10-12h-6l2-8z" />
+                </svg>
+              </span>
+              Flash UV-K5 V3 & UV-K1
+            </button>
+            <div class="progress">
+              <div class="progress-label">
+                <span>Progress</span>
+                <span id="k1FlashPct">0%</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="k1FlashFill"></div>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        </div>
+
+        
+
+        <!-- RT-890/TK11 Flash Section - Only visible when TK11 is selected -->
+        <div class="tk11-only" id="rt890FlashSection" style="display: none;">
+          <h2 class="section-title">RT-890 / TK11 Firmware</h2>
+          <p class="hint" style="margin-bottom: 16px;">⚠️ Connect the radio in bootloader mode: Turn OFF, hold PTT, then turn ON.</p>
+          <section class="panel-grid">
+            <section class="panel">
+              <h2>Flash Firmware (RT-890)</h2>
+              <p class="muted">Select a pre-loaded firmware or upload your own .bin file.</p>
+              
+              <div class="field-row">
+                <label for="rt890FirmwareSelect">Pre-loaded Firmwares</label>
+                <select id="rt890FirmwareSelect">
+                  <optgroup label="M7OCM Firmware (PCB 2.0)">
+                    <option value="firmware/rt890-m7ocm-v2.2.5X-pcb2.0.bin">M7OCM v2.2.5X (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.4X-pcb2.0.bin">M7OCM v2.2.4X (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.4Q-pcb2.0.bin">M7OCM v2.2.4Q (PCB 2.0) - Spectrum Auto Light</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.3Q-pcb2.0.bin">M7OCM v2.2.3Q (PCB 2.0) - Spectrum Auto Light</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.3-pcb2.0.bin">M7OCM v2.2.3 (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.1-pcb2.0.bin">M7OCM v2.2.1 (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.0-pcb2.0.bin">M7OCM v2.2.0 (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.0.bin">M7OCM v2.2.2 240MHz Filter (PCB 2.0)</option>
+                    <option value="firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.0.bin">M7OCM v2.2.2 280MHz Filter (PCB 2.0)</option>
+                  </optgroup>
+                  <optgroup label="M7OCM Firmware (PCB 2.1)">
+                    <option value="firmware/rt890-m7ocm-v2.2.5X-pcb2.1.bin">M7OCM v2.2.5X (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.4X-pcb2.1.bin">M7OCM v2.2.4X (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.4Q-pcb2.1.bin">M7OCM v2.2.4Q (PCB 2.1) - Spectrum Auto Light</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.3Q-pcb2.1.bin">M7OCM v2.2.3Q (PCB 2.1) - Spectrum Auto Light</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.3-pcb2.1.bin">M7OCM v2.2.3 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.1-pcb2.1.bin">M7OCM v2.2.1 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.2.0-pcb2.1.bin">M7OCM v2.2.0 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.1.9-pcb2.1.bin">M7OCM v2.1.9 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.1.8-pcb2.1.bin">M7OCM v2.1.8 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-v2.1.7-pcb2.1.bin">M7OCM v2.1.7 (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.1.bin">M7OCM v2.2.2 240MHz Filter (PCB 2.1)</option>
+                    <option value="firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.1.bin">M7OCM v2.2.2 280MHz Filter (PCB 2.1)</option>
+                  </optgroup>
+                  <optgroup label="OEFWCOM Base">
+                    <option value="firmware/rt890-oefwcom-21102024.bin">OEFWCOM 21/10/2024</option>
+                  </optgroup>
+                </select>
+              </div>
+              
+              <div class="field-row">
+                <label for="rt890FirmwareFile">Or upload custom firmware</label>
+                <input type="file" id="rt890FirmwareFile" accept=".bin" />
+              </div>
+              
+              <div class="field-row">
+                <label for="rt890FirmwareUrl">Or paste firmware URL</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="url" id="rt890FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
+                  <button id="rt890LoadUrlBtn" class="secondary" type="button">Load</button>
+                </div>
+              </div>
+              
+              <p class="hint" id="rt890FirmwareStatus">No firmware selected</p>
+              
+              <button id="rt890FlashBtn" class="primary">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M13 2L3 14h6l-2 8 10-12h-6l2-8z" />
+                  </svg>
+                </span>
+                Flash RT-890
+              </button>
+              <div class="progress">
+                <div class="progress-label">
+                  <span>Progress</span>
+                  <span id="rt890FlashPct">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="rt890FlashFill"></div>
+                </div>
+              </div>
+            </section>
+            <!-- SPI Backup/Restore Panel -->
+            <section class="panel">
+              <h2>SPI Flash Backup / Restore (RT-890)</h2>
+              <p class="muted">Backup or restore the 4MB SPI flash memory (calibration data, settings).</p>
+              <p class="hint warning-box">⚠️ Radio must be in NORMAL MODE (not bootloader) for SPI operations!</p>
+              
+              <div class="field-row">
+                <label for="spiBaudRate">Connection Speed</label>
+                <select id="spiBaudRate">
+                  <option value="115200" selected>Fast (115200 baud)</option>
+                  <option value="19200">Slow (19200 baud) - More reliable</option>
+                </select>
+              </div>
+              
+              <div class="spi-buttons">
+                <button id="spiBackupBtn" class="primary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </span>
+                  Backup SPI (4MB)
+                </button>
+                
+                <button id="spiCancelBtn" class="secondary" disabled>
+                  Cancel
+                </button>
+              </div>
+              
+              <hr style="margin: 16px 0; border-color: var(--color-border);">
+              
+              <div class="field-row">
+                <label for="spiRestoreFile">Select backup file to restore</label>
+                <input type="file" id="spiRestoreFile" accept=".bin" />
+              </div>
+              
+              <button id="spiRestoreBtn" class="danger" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </span>
+                Restore SPI
+              </button>
+              
+              <div class="progress" style="margin-top: 16px;">
+                <div class="progress-label">
+                  <span id="spiProgressText">Ready</span>
+                  <span id="spiProgressPct">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="spiProgressBar" style="width: 0%"></div>
+                </div>
+              </div>
+            </section>
+            
+            <!-- v7.5: Separate Calibration Panel -->
+            <section class="panel">
+              <h2>📏 RT-890 Calibration (4 KB)</h2>
+              <p class="muted">Dump or restore ONLY the calibration region (0x3BF000 - 0x3BFFFF).</p>
+              <p class="hint" style="background: var(--color-surface-alt); border-left: 3px solid var(--color-warning);">
+                💡 <strong>Tip:</strong> Always backup calibration before flashing firmware!
+                <br>Calibration contains TX power levels, frequency offsets, and radio-specific tuning.
+              </p>
+              
+              <div class="field-row">
+                <label for="spiCalibBaudRate">Connection Speed</label>
+                <select id="spiCalibBaudRate">
+                  <option value="115200" selected>Fast (115200 baud)</option>
+                  <option value="19200">Slow (19200 baud) - More reliable</option>
+                </select>
+              </div>
+              
+              <div class="spi-buttons" style="margin-bottom: 16px;">
+                <button id="spiDumpCalibBtn" class="secondary">
+                  <span class="btn-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                  </span>
+                  Dump Calibration (4 KB)
+                </button>
+              </div>
+              
+              <div class="field-row">
+                <label for="spiRestoreCalibFile">Select calibration file (must be exactly 4096 bytes)</label>
+                <input type="file" id="spiRestoreCalibFile" accept=".bin" />
+              </div>
+              
+              <button id="spiRestoreCalibBtn" class="danger" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                </span>
+                Restore Calibration (4 KB)
+              </button>
+              
+              <div class="progress" style="margin-top: 16px;">
+                <div class="progress-label">
+                  <span id="spiCalibProgressText">Ready</span>
+                  <span id="spiCalibProgressPct">0%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="spiCalibProgressBar" style="width: 0%"></div>
+                </div>
+              </div>
+              
+              <div id="spiCalibStatusLog" class="spi-status-log"></div>
+            </section>
+
+          </section>
+          <div id="rt890Log" class="log-area"></div>
+        </div>
+
+        <!-- K5/K1 Log Area - Only visible when K5 is selected -->
+        <div class="k5-only" id="k1Log" class="log-area"></div>
+      </section>
+
+      <nav class="sidebar">
+        <div class="brand">
+          <span class="brand-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+              <rect x="5" y="2" width="14" height="20" rx="2" />
+              <path d="M9 22v-4h6v4" />
+              <path d="M9 6h6" />
+              <path d="M9 10h6" />
+            </svg>
+          </span>
+          UV-K5
+        </div>
+        <ul class="nav">
+          <li>
+            <a href="#instructions" class="active" id="navInstructions">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+              </span>
+              Home
+            </a>
+          </li>
+          <li>
+            <a href="#home" id="navHome">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+                </svg>
+              </span>
+              Tools
+            </a>
+          </li>
+          <li>
+            <a href="#channels" id="navChannels">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M4 6h16" />
+                  <path d="M4 12h16" />
+                  <path d="M4 18h16" />
+                </svg>
+              </span>
+              Channels
+            </a>
+          </li>
+          <li>
+            <a href="#settings" id="navSettings" class="k5-only">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+              </span>
+              Settings
+            </a></li>
+          <li>
+            <a href="#tk11-settings" id="navTK11Settings" class="tk11-only" style="display: none;">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+              </span>
+              Settings
+            </a>
+          </li>
+          <li>
+            <a href="#mirror" id="navMirror">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <path d="M8 21h8" />
+                  <path d="M12 17v4" />
+                </svg>
+              </span>
+              Mirror
+            </a>
+          </li>
+          <li>
+            <a href="#smr" id="navSmr">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M4 4h16v16H4z" />
+                  <path d="M8 8h8" />
+                  <path d="M8 12h5" />
+                </svg>
+              </span>
+              SMR
+            </a>
+          </li>
+          <li>
+            <a href="#k1" id="navK1">
+              <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <rect x="5" y="2" width="14" height="20" rx="2" />
+                  <path d="M12 18h.01" />
+                </svg>
+              </span>
+              UV-K1
+            </a>
+          </li>
+        </ul>
+        <div class="sidebar-footer">
+          <small id="footerCopyright"></small>
+          <small>
+            Tools intended for use with firmware:
+            <a href="https://github.com/joaquimorg/UV-KX-firmware" target="_blank" rel="noopener">github.com/joaquimorg/UV-KX-firmware</a>
+          </small>
+        </div>
+      </nav>
+    </main>
+
+    <!-- Channel Progress Modal -->
+    <div id="channelModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card">
+        <h2 id="modalTitle">Working...</h2>
+        <p id="modalMessage" class="muted">Communicating with the radio.</p>
+        <div class="progress active">
+          <div class="progress-label">
+            <span>Progress</span>
+            <span id="modalPct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="modalFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Progress Modal -->
+    <div id="settingsModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal-card">
+        <h2 id="settingsModalTitle">Working...</h2>
+        <p id="settingsModalMessage" class="muted">Communicating with the radio.</p>
+        <div class="progress active">
+          <div class="progress-label">
+            <span>Progress</span>
+            <span id="settingsModalPct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="settingsModalFill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Theme Switcher
+      (function() {
+        const themeSelect = document.getElementById('themeSelect');
+        const savedTheme = localStorage.getItem('k5-editor-theme') || 'dark';
+        
+        // Apply saved theme on load
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        themeSelect.value = savedTheme;
+        
+        // Handle theme change
+        themeSelect.addEventListener('change', function() {
+          const theme = this.value;
+          document.documentElement.setAttribute('data-theme', theme);
+          localStorage.setItem('k5-editor-theme', theme);
+        });
+      })();
+    </script>
+    <script src="js/spa.js" type="module"></script>
+    <script src="js/protocol.js" type="module"></script>
+    <script src="js/protocol-tk11.js" type="module"></script>
+    <script src="js/radio-selector.js" type="module"></script>
+    <script src="js/radio-protocol.js" type="module"></script>
+    <script src="js/serial-manager.js" type="module"></script>
+    <script src="js/profile-manager.js" type="module"></script>
+    <script src="js/app.js" type="module"></script>
+    <script src="js/channels.js" type="module"></script>
+    <script src="js/basic-settings.js" type="module"></script>
+    <script src="js/display-mirror.js" type="module"></script>
+    <script src="js/smr.js" type="module"></script>
+    <script src="js/flash-k1.js" type="module"></script>
+    <script src="js/flash-k1-ui.js" type="module"></script>
+    <script src="js/flash-rt890.js" type="module"></script>
+    <script src="js/flash-rt890-ui.js" type="module"></script>
+    <script src="js/tk11-settings.js" type="module"></script>
+    <script src="js/spi-rt890.js"></script>
+    <script src="js/spi-rt890-ui.js"></script>
+    <script src="js/dtmf.js" type="module"></script>
+    <script src="js/radio.js" type="module"></script>
+    <script src="js/hexview.js" type="module"></script>
+    
+    <!-- Tab switching logic -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Settings tabs functionality
+        const tabBtns = document.querySelectorAll('.settings-tabs .tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const settingsProgress = document.querySelector('.settings-tabs-container ~ .progress');
+        
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', function() {
+            const targetTab = this.dataset.tab;
+            
+            // Remove active from all buttons and contents
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked button and corresponding content
+            this.classList.add('active');
+            const targetContent = document.getElementById('tab-' + targetTab);
+            if (targetContent) {
+              targetContent.classList.add('active');
+            }
+            
+            // Show/hide settings panel based on active tab
+            // Only show settingsPanel for firmware-profile tab
+            if (settingsPanel) {
+              if (targetTab === 'firmware-profile') {
+                settingsPanel.style.display = '';
+                if (settingsProgress) settingsProgress.style.display = '';
+              } else {
+                settingsPanel.style.display = 'none';
+                if (settingsProgress) settingsProgress.style.display = 'none';
+              }
+            }
+          });
+        });
+        
+        console.log('Tab switching initialized');
+      });
+    </script>
+  
+                        <footer class="page-footer">
+          <p>Copyright 2026 and <span id="baseline-developed">developed by</span>&nbsp;<a href="https://github.com/spm81" target="_blank">Matoz</a>, based on <a href="https://home.joaquim.org/k5/" target="_blank">Joaquim(joaquim.org).</a><br>Special thanks to <a href="https://github.com/whosmatt/uvmod" target="_blank" rel="noopener">whosmatt</a> (The father of UVMOD, which later gave rise to UVTOOLS)</p>
+        </footer>
+
+  </body>
+</html>

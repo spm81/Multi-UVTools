@@ -1,0 +1,331 @@
+// flash-k1.js
+// Flash protocol for K1 radio (different from K5 EEPROM protocol)
+// K1 uses a bootloader protocol
+
+'use strict';
+
+// ========== CONSTANTS ==========
+const BAUDRATE_K1 = 38400;
+
+// Message types for K1 bootloader
+const MSG_NOTIFY_DEV_INFO = 0x0518;
+const MSG_NOTIFY_BL_VER = 0x0530;
+const MSG_PROG_FW = 0x0519;
+const MSG_PROG_FW_RESP = 0x051A;
+
+// K1 XOR obfuscation table (same as K5 protocol packets)
+const OBFUS_TBL = new Uint8Array([
+  0x16, 0x6c, 0x14, 0xe6, 0x2e, 0x91, 0x0d, 0x40,
+  0x21, 0x35, 0xd5, 0x40, 0x13, 0x03, 0xe9, 0x80
+]);
+
+// ========== CLASS ==========
+export class K1Flash {
+  constructor(port) {
+    this.port = port;
+    this.reader = null;
+    this.writer = null;
+    this.readBuffer = [];
+    this.isReading = false;
+    this.logFn = (msg, type) => console.log(`[K1] ${msg}`);
+  }
+
+  setLogger(fn) {
+    this.logFn = fn;
+  }
+
+  log(message, type = 'info') {
+    this.logFn(message, type);
+  }
+
+  // ========== SERIAL ==========
+  async open() {
+    try {
+      await this.port.open({ baudRate: BAUDRATE_K1 });
+    } catch (e) {
+      if (!e.message.includes('already open')) {
+        throw e;
+      }
+    }
+    this.reader = this.port.readable.getReader();
+    this.writer = this.port.writable.getWriter();
+    this.startReading();
+    await this.sleep(500);
+  }
+
+  async close() {
+    this.isReading = false;
+    if (this.reader) {
+      try { await this.reader.cancel(); } catch {}
+      try { this.reader.releaseLock(); } catch {}
+      this.reader = null;
+    }
+    if (this.writer) {
+      try { await this.writer.close(); } catch {}
+      this.writer = null;
+    }
+    if (this.port) {
+      try { await this.port.close(); } catch {}
+    }
+  }
+
+  startReading() {
+    if (!this.reader || this.isReading) return;
+    this.isReading = true;
+    this.readLoop().catch(e => {
+      if (this.isReading) this.log(`Read loop error: ${e?.message}`, 'error');
+    });
+  }
+
+  async readLoop() {
+    while (this.isReading && this.reader) {
+      try {
+        const { value, done } = await this.reader.read();
+        if (done) break;
+        if (value?.length) {
+          this.readBuffer.push(...value);
+        }
+      } catch (e) {
+        if (this.isReading) break;
+      }
+    }
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // ========== PROTOCOL HELPERS ==========
+  createMessage(msgType, dataLen) {
+    const msg = new Uint8Array(4 + dataLen);
+    const view = new DataView(msg.buffer);
+    view.setUint16(0, msgType, true);
+    view.setUint16(2, dataLen, true);
+    return msg;
+  }
+
+  obfuscate(buf, off, size) {
+    for (let i = 0; i < size; i++) {
+      buf[off + i] ^= OBFUS_TBL[i % OBFUS_TBL.length];
+    }
+  }
+
+  calcCRC(buf, off, size) {
+    let CRC = 0;
+    for (let i = 0; i < size; i++) {
+      const b = buf[off + i] & 0xff;
+      CRC ^= b << 8;
+      for (let j = 0; j < 8; j++) {
+        if (CRC & 0x8000) CRC = ((CRC << 1) ^ 0x1021) & 0xffff;
+        else CRC = (CRC << 1) & 0xffff;
+      }
+    }
+    return CRC;
+  }
+
+  makePacket(msg) {
+    let msgLen = msg.length;
+    if (msgLen % 2 !== 0) msgLen++;
+    const buf = new Uint8Array(8 + msgLen);
+    const view = new DataView(buf.buffer);
+
+    view.setUint16(0, 0xCDAB, true);
+    view.setUint16(2, msgLen, true);
+    view.setUint16(6 + msgLen, 0xBADC, true);
+
+    for (let i = 0; i < msg.length; i++) buf[4 + i] = msg[i];
+
+    const crc = this.calcCRC(buf, 4, msgLen);
+    view.setUint16(4 + msgLen, crc, true);
+
+    this.obfuscate(buf, 4, 2 + msgLen);
+    return buf;
+  }
+
+  fetchMessage() {
+    const buf = this.readBuffer;
+    if (buf.length < 8) return null;
+
+    let packBegin = -1;
+    for (let i = 0; i < buf.length - 1; i++) {
+      if (buf[i] === 0xab && buf[i + 1] === 0xcd) {
+        packBegin = i;
+        break;
+      }
+    }
+    if (packBegin === -1) {
+      if (buf.length > 0 && buf[buf.length - 1] === 0xab) buf.splice(0, buf.length - 1);
+      else buf.length = 0;
+      return null;
+    }
+    if (buf.length - packBegin < 8) return null;
+
+    const msgLen = (buf[packBegin + 3] << 8) | buf[packBegin + 2];
+    const packEnd = packBegin + 6 + msgLen;
+    if (buf.length < packEnd + 2) return null;
+
+    if (buf[packEnd] !== 0xdc || buf[packEnd + 1] !== 0xba) {
+      buf.splice(0, packBegin + 2);
+      return null;
+    }
+
+    const msgBuf = new Uint8Array(msgLen + 2);
+    for (let i = 0; i < msgLen + 2; i++) msgBuf[i] = buf[packBegin + 4 + i];
+    this.obfuscate(msgBuf, 0, msgLen + 2);
+
+    const view = new DataView(msgBuf.buffer);
+    const msgType = view.getUint16(0, true);
+    const data = msgBuf.slice(4);
+
+    buf.splice(0, packEnd + 2);
+    return { msgType, data, rawData: msgBuf };
+  }
+
+  async sendMessage(msg) {
+    const packet = this.makePacket(msg);
+    await this.writer.write(packet);
+  }
+
+  // ========== FLASH FIRMWARE ==========
+  async flashFirmware(firmwareData, onProgress) {
+    this.readBuffer = [];
+    await this.open();
+    await this.sleep(1000);
+
+    this.log('Waiting for K1 bootloader...');
+    const devInfo = await this.waitForDeviceInfo();
+    this.log(`Bootloader version: ${devInfo.blVersion}`);
+
+    this.log('Performing handshake...');
+    await this.performHandshake(devInfo.blVersion);
+    this.log('Handshake complete.');
+
+    await this.programFirmware(firmwareData, onProgress);
+    this.log('Firmware programmed successfully!', 'success');
+  }
+
+  async waitForDeviceInfo() {
+    let lastTimestamp = 0, acc = 0, timeout = 0;
+
+    while (timeout < 500) {
+      await this.sleep(10);
+      timeout++;
+
+      const msg = this.fetchMessage();
+      if (!msg) continue;
+
+      if (msg.msgType === MSG_NOTIFY_DEV_INFO) {
+        const now = Date.now();
+        const dt = now - lastTimestamp;
+        lastTimestamp = now;
+
+        if (lastTimestamp > 0 && dt >= 5 && dt <= 1000) {
+          acc++;
+          if (acc >= 5) {
+            const uid = msg.data.slice(0, 16);
+            let blVersionEnd = -1;
+            for (let i = 16; i < 32; i++) {
+              if (msg.data[i] === 0) {
+                blVersionEnd = i;
+                break;
+              }
+            }
+            if (blVersionEnd === -1) blVersionEnd = 32;
+            const blVersion = new TextDecoder().decode(msg.data.slice(16, blVersionEnd));
+            return { uid, blVersion };
+          }
+        } else {
+          acc = 0;
+        }
+      }
+    }
+    throw new Error('Timeout waiting for K1 device. Put radio in boot mode.');
+  }
+
+  async performHandshake(blVersion) {
+    let acc = 0;
+
+    while (acc < 3) {
+      await this.sleep(50);
+      const msg = this.fetchMessage();
+      if (msg && msg.msgType === MSG_NOTIFY_DEV_INFO) {
+        const blMsg = this.createMessage(MSG_NOTIFY_BL_VER, 4);
+        const blBytes = new TextEncoder().encode(blVersion.substring(0, 4));
+        for (let i = 0; i < Math.min(blBytes.length, 4); i++) blMsg[4 + i] = blBytes[i];
+        await this.sendMessage(blMsg);
+        acc++;
+        await this.sleep(50);
+      }
+    }
+
+    await this.sleep(200);
+    while (this.readBuffer.length > 0) {
+      const msg = this.fetchMessage();
+      if (!msg) break;
+    }
+  }
+
+  async programFirmware(firmwareData, onProgress) {
+    const pageCount = Math.ceil(firmwareData.length / 256);
+    const timestamp = Date.now() & 0xffffffff;
+    this.log(`Programming ${pageCount} pages...`);
+
+    let pageIndex = 0, retryCount = 0;
+    const MAX_RETRIES = 3;
+
+    while (pageIndex < pageCount) {
+      if (onProgress) onProgress((pageIndex / pageCount) * 100);
+
+      const msg = this.createMessage(MSG_PROG_FW, 268);
+      const view = new DataView(msg.buffer);
+      view.setUint32(4, timestamp, true);
+      view.setUint16(8, pageIndex, true);
+      view.setUint16(10, pageCount, true);
+
+      const offset = pageIndex * 256;
+      const len = Math.min(256, firmwareData.length - offset);
+      for (let i = 0; i < len; i++) msg[16 + i] = firmwareData[offset + i];
+
+      await this.sendMessage(msg);
+
+      let gotResponse = false;
+      for (let i = 0; i < 300 && !gotResponse; i++) {
+        await this.sleep(10);
+        const resp = this.fetchMessage();
+        if (!resp) continue;
+        if (resp.msgType === MSG_NOTIFY_DEV_INFO) continue;
+
+        if (resp.msgType === MSG_PROG_FW_RESP) {
+          const dv = new DataView(resp.data.buffer);
+          const respPageIndex = dv.getUint16(4, true);
+          const err = dv.getUint16(6, true);
+
+          if (respPageIndex !== pageIndex) continue;
+          if (err !== 0) {
+            this.log(`Page ${pageIndex + 1}/${pageCount} error: ${err}`, 'error');
+            retryCount++;
+            if (retryCount > MAX_RETRIES) throw new Error(`Too many errors at page ${pageIndex}`);
+            break;
+          }
+
+          gotResponse = true;
+          retryCount = 0;
+          if ((pageIndex + 1) % 10 === 0 || pageIndex === pageCount - 1)
+            this.log(`Page ${pageIndex + 1}/${pageCount} OK`);
+        }
+      }
+
+      if (gotResponse) {
+        pageIndex++;
+      } else {
+        this.log(`Page ${pageIndex + 1}/${pageCount} timeout`, 'error');
+        retryCount++;
+        if (retryCount > MAX_RETRIES) throw new Error(`Too many timeouts at page ${pageIndex}`);
+      }
+    }
+
+    if (onProgress) onProgress(100);
+  }
+}
+
+export { BAUDRATE_K1 };
