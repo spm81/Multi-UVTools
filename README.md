@@ -1,0 +1,101 @@
+# Multi-UVTools
+
+🌐 **[Aceder ao Site / Access the Website](https://spm81.github.io/Multi-UVTools/)**
+
+---
+
+## 🇵🇹 Português
+
+Ferramenta web para flash de firmware em rádios Quansheng diretamente no browser.
+
+### ✨ Funcionalidades
+
+- **Flash de Firmware** para UV-K5, UV-K6 e UV-5R Plus
+- **Flash de Firmware** para UV-K5 V3 e UV-K1
+- **Firmwares Stock** da Quansheng incluídos
+- **Firmwares Custom** (F4HWN, Calypso, e outros)
+- **Leitura/Escrita de EEPROM**
+- Funciona diretamente no browser via **WebSerial API**
+- Não requer instalação de software
+
+### 📻 Rádios Suportados
+
+| Modelo | Flash Firmware | EEPROM |
+|--------|----------------|--------|
+| UV-K5 | ✅ | ✅ |
+| UV-K6 | ✅ | ✅ |
+| UV-5R Plus | ✅ | ✅ |
+| UV-K5 V3 | ✅ | ✅ |
+| UV-K1 | ✅ | ✅ |
+
+### 🚀 Como Usar
+
+1. Acede a **[spm81.github.io/Multi-UVTools](https://spm81.github.io/Multi-UVTools/)**
+2. Conecta o rádio em **modo boot** (pressiona PTT enquanto ligas)
+3. Seleciona o firmware desejado
+4. Clica em Flash!
+
+### 📚 Documentação
+
+- [Wiki Quansheng UV-K5 por Ludwich66](https://github.com/ludwich66/Quansheng_UV-K5_Wiki) - Documentação completa
+
+---
+
+## 🇬🇧 English
+
+Web-based firmware flashing tool for Quansheng radios directly in your browser.
+
+### ✨ Features
+
+- **Firmware Flash** for UV-K5, UV-K6 and UV-5R Plus
+- **Firmware Flash** for UV-K5 V3 and UV-K1
+- **Stock Firmwares** from Quansheng included
+- **Custom Firmwares** (F4HWN, Calypso, and more)
+- **EEPROM Read/Write**
+- Works directly in browser via **WebSerial API**
+- No software installation required
+
+### 📻 Supported Radios
+
+| Model | Flash Firmware | EEPROM |
+|-------|----------------|--------|
+| UV-K5 | ✅ | ✅ |
+| UV-K6 | ✅ | ✅ |
+| UV-5R Plus | ✅ | ✅ |
+| UV-K5 V3 | ✅ | ✅ |
+| UV-K1 | ✅ | ✅ |
+
+### 🚀 How to Use
+
+1. Go to **[spm81.github.io/Multi-UVTools](https://spm81.github.io/Multi-UVTools/)**
+2. Connect the radio in **boot mode** (hold PTT while turning on)
+3. Select the desired firmware
+4. Click Flash!
+
+### 📚 Documentation
+
+- [Quansheng UV-K5 Wiki by Ludwich66](https://github.com/ludwich66/Quansheng_UV-K5_Wiki) - Complete documentation
+
+---
+
+## 🤝 Contribuir / Contributing
+
+Este projeto é open source! Podes contribuir com:
+- Pull requests
+- Reportar bugs
+- Sugerir novos firmwares
+
+This project is open source! You can contribute by:
+- Pull requests
+- Reporting bugs
+- Suggesting new firmwares
+
+---
+
+## 📄 Licença / License
+
+Open Source - Feel free to use and contribute!
+
+---
+
+Made with ❤️ by [spm81](https://github.com/spm81) (Matoz)
