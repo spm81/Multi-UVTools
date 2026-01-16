@@ -4,7 +4,7 @@
  */
 
 import { IJV_PROFILE } from "./profiles/ijv-x360.js";
-import { F4HWN_PROFILE } from "./profiles/f4hwn.js";
+import { F4HWN_V43_PROFILE } from "./profiles/f4hwn-v43.js";
 import { STOCK_PROFILE } from "./profiles/stock.js";
 import { MATOZ_PROFILE } from "./profiles/matoz.js";
 import { JOAQUIM_PROFILE } from "./profiles/joaquim.js";
@@ -14,7 +14,7 @@ import { TK11_PROFILE } from "./profiles/tk11.js";
 // K5/K1 profiles - ordered by popularity/usage
 const K5_PROFILES = {
     joaquim: JOAQUIM_PROFILE,
-    f4hwn: F4HWN_PROFILE,
+    f4hwn_v43: F4HWN_V43_PROFILE,
     ijv: IJV_PROFILE,
     matoz: MATOZ_PROFILE,
     fagci: FAGCI_PROFILE,
@@ -194,8 +194,8 @@ export function getRequiredBlocks(profileId) {
         blocks.logo = { start: 0x0EB0, size: 0x20 };
         blocks.f40 = { start: 0x0F40, size: 0x08 };
         
-        // Extended settings at 0x1FF2 for F4HWN and Joaquim
-        if (profileId === "f4hwn" || profileId === "joaquim") {
+        // Extended settings at 0x1FF2 for F4HWN v4.3 and Joaquim
+        if (profileId === "f4hwn_v43" || profileId === "joaquim") {
             blocks.ff2 = { start: 0x1FF2, size: 0x08 };
         }
     }

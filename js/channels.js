@@ -65,6 +65,20 @@ const K5_CHANNEL_PROFILES = {
     },
     layout: 'split'   // Data split across multiple memory regions
   },
+  f4hwn_v43: {
+    name: 'F4HWN v4.3 (200 Channels)',
+    channelCount: 200,
+    channelSize: 16,  // Bytes per channel in freq area
+    nameSize: 16,     // Bytes per name
+    attrSize: 1,      // Bytes per attribute
+    addresses: {
+      freq: 0x0000,   // Channel frequency data (200 * 16 = 0x0C80)
+      attr: 0x0D60,   // Channel attributes (207 bytes - includes VFO)
+      name: 0x0F50    // Channel names (200 * 16 = 0x0C80)
+    },
+    layout: 'split',  // Data split across multiple memory regions
+    features: ['scrambler', 'compander', 'dtmfDecode', 'txLock', 'busyLock', 'scanlist', 'pttid']
+  },
   ijv_vx3: {
     name: 'IJV_vX3xx (999 Channels)',
     channelCount: 999,
@@ -120,6 +134,7 @@ const POWER_LIST = [
   "5.0W",
 ];
 const PTTID_LIST = ["OFF", "UP CODE", "DOWN CODE", "UP+DOWN CODE", "APOLLO QUINDAR"];
+const K5_COMPANDER_LIST = ["OFF", "TX", "RX", "TX/RX"];
 const SCRAMBLER_LIST = [
   "OFF",
   "2600Hz",
