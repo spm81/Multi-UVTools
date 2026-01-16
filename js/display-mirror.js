@@ -4,6 +4,13 @@ import {
   subscribe,
 } from "./serial-manager.js";
 
+// Check if Joaquim profile is selected (default profile)
+function isProfileActive() {
+  const select = document.getElementById("mirrorProfileSelect");
+  if (!select) return true; // No selector = default to Joaquim
+  return select.value === "joaquim";
+}
+
 const lcdSizeX = 128;
 const lcdSizeY = 64;
 const pixelSize = 3;
@@ -151,8 +158,21 @@ const processSerialBuffer = () => {
   }
 };
 
-const startStreamReader = async () => {
+const startStreamReader = async (retryCount = 0) => {
   if (!port || !port.readable || isReading) return;
+
+  // Check if port is already locked - retry with delay (page transitions need time)
+  if (port.readable.locked) {
+    if (retryCount < 5) {
+      // Wait and retry - allows other modules to release the port
+      setTimeout(() => startStreamReader(retryCount + 1), 100);
+      return;
+    }
+    setError("Serial port is busy. Close other tools first.");
+    return;
+  }
+
+  setError(""); // Clear any previous errors
   reader = port.readable.getReader();
   isReading = true;
 
@@ -225,7 +245,10 @@ const connectToDevice = async () => {};
 
 const disconnectFromDevice = async () => {};
 
+let isPageActive = false;
+
 const updateAttachment = () => {
+  if (!isProfileActive()) return; // Not our profile
   const shouldAttach = isConnected && isPageActive;
   if (shouldAttach === isAttached) {
     updateControls();
@@ -252,6 +275,7 @@ const updateAttachment = () => {
 };
 
 const toggleMirror = async () => {
+  if (!isProfileActive()) return; // Not our profile
   if (isStreaming) {
     await stopMirror();
   } else {
@@ -299,12 +323,37 @@ if (colorSelect) {
   setColorMode(colorSelect.value);
 }
 
-let isPageActive = false;
-
 window.addEventListener("spa:page", (event) => {
   isPageActive = event.detail && event.detail.pageId === "mirror";
+  if (isPageActive && isProfileActive()) {
+    clearCanvas(true); // Draw pixel grid when page becomes active
+  }
   updateAttachment();
 });
+
+// Profile change handler
+const profileSelect = document.getElementById("mirrorProfileSelect");
+if (profileSelect) {
+  profileSelect.addEventListener("change", () => {
+    // Stop streaming if we were active and profile changed away
+    if (isStreaming && !isProfileActive()) {
+      stopMirror();
+      stopStreamReader();
+      isAttached = false;
+    }
+    // Initialize if we're now active
+    if (isProfileActive() && isPageActive) {
+      clearCanvas(true);
+      // Force status update immediately
+      setStatus(isConnected, isConnected ? "Connected" : "Disconnected", 
+               isConnected ? "Ready to start the mirror." : "No radio connected.");
+      updateControls();
+      // Reset isAttached to force updateAttachment to re-evaluate
+      isAttached = false;
+      updateAttachment();
+    }
+  });
+}
 
 subscribe((state) => {
   port = state.port;

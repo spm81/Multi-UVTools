@@ -1,6 +1,16 @@
 let globalWriteReader = null;
 let globalReadReader = null;
 
+
+// Helper function to compare Uint8Arrays properly
+const uint8ArraysEqual = (a, b) => {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) return false;
+  }
+  return true;
+};
+
 const EEPROM_BLOCK_SIZE = 0x40;
 const FLASH_BLOCK_SIZE = 0x100;
 
@@ -272,31 +282,100 @@ const firmwareXor = (fwcontent) => {
   return fwcontent;
 };
 
-const unpackFirmware = (encodedFirmware) => {
-  if (crc16CcittLe(encodedFirmware.slice(0, -2)).toString() !== encodedFirmware.slice(-2).toString()) {
-    throw new Error("Firmware CRC check failed.");
+// Check if firmware has valid CRC (local files) or not (GitHub files)
+const hasCrcValidation = (firmware) => {
+  if (firmware.length < 2) return false;
+  try {
+    const calculatedCrc = crc16CcittLe(firmware.slice(0, -2));
+    const firmwareCrc = firmware.slice(-2);
+    return uint8ArraysEqual(calculatedCrc, firmwareCrc);
+  } catch (e) {
+    return false;
   }
+};
 
-  const decoded = firmwareXor(encodedFirmware.slice(0, -2));
-  const versionInfoOffset = 0x2000;
-  const versionInfoLength = 16;
-  const resultLength = decoded.length - versionInfoLength;
-  const result = new Uint8Array(resultLength);
+// Detect if firmware is raw (unencrypted ARM binary)
+// Raw ARM firmware starts with stack pointer (little-endian) in RAM range
+// Typical pattern: F0 3F 00 20 (stack at 0x20003FF0)
+const isRawFirmware = (firmware) => {
+  if (firmware.length < 8) return false;
+  // Check first 4 bytes - should be stack pointer in 0x20000000-0x20010000 range
+  const stackPointer = firmware[0] | (firmware[1] << 8) | (firmware[2] << 16) | (firmware[3] << 24);
+  // Check if stack pointer is in RAM range (0x20000000 to 0x20010000)
+  return stackPointer >= 0x20000000 && stackPointer <= 0x20010000;
+};
 
-  result.set(decoded.subarray(0, versionInfoOffset));
-  result.set(decoded.subarray(versionInfoOffset + versionInfoLength), versionInfoOffset);
-  return result;
+const unpackFirmware = (encodedFirmware) => {
+  // Check if firmware is raw (unencrypted ARM binary)
+  if (isRawFirmware(encodedFirmware)) {
+    // Raw firmware - return as-is, no processing needed
+    console.log("Detected raw firmware - no unpacking needed");
+    return encodedFirmware;
+  }
+  
+  // Check if firmware has CRC validation (packed files typically have CRC)
+  const hasCrc = hasCrcValidation(encodedFirmware);
+  
+  if (hasCrc) {
+    // Firmware with CRC validation (packed local files)
+    const calculatedCrc = crc16CcittLe(encodedFirmware.slice(0, -2));
+    const firmwareCrc = encodedFirmware.slice(-2);
+    if (!uint8ArraysEqual(calculatedCrc, firmwareCrc)) {
+      throw new Error("Firmware CRC check failed.");
+    }
+    // Remove CRC bytes before processing
+    const decoded = firmwareXor(encodedFirmware.slice(0, -2));
+    const versionInfoOffset = 0x2000;
+    const versionInfoLength = 16;
+    const resultLength = decoded.length - versionInfoLength;
+    const result = new Uint8Array(resultLength);
+    result.set(decoded.subarray(0, versionInfoOffset));
+    result.set(decoded.subarray(versionInfoOffset + versionInfoLength), versionInfoOffset);
+    return result;
+  } else {
+    // Packed firmware without CRC (some GitHub files)
+    const decoded = firmwareXor(encodedFirmware);
+    const versionInfoOffset = 0x2000;
+    const versionInfoLength = 16;
+    const resultLength = decoded.length - versionInfoLength;
+    const result = new Uint8Array(resultLength);
+    result.set(decoded.subarray(0, versionInfoOffset));
+    result.set(decoded.subarray(versionInfoOffset + versionInfoLength), versionInfoOffset);
+    return result;
+  }
 };
 
 const unpackFirmwareVersion = (encodedFirmware) => {
-  if (crc16CcittLe(encodedFirmware.slice(0, -2)).toString() !== encodedFirmware.slice(-2).toString()) {
-    throw new Error("Firmware CRC check failed.");
+  // Check if firmware is raw (unencrypted ARM binary)
+  if (isRawFirmware(encodedFirmware)) {
+    // Raw firmware - version info is at 0x2000 without XOR
+    const versionInfoOffset = 0x2000;
+    const versionInfoLength = 16;
+    return encodedFirmware.subarray(versionInfoOffset, versionInfoOffset + versionInfoLength);
   }
-
-  const decoded = firmwareXor(encodedFirmware.slice(0, -2));
-  const versionInfoOffset = 0x2000;
-  const versionInfoLength = 16;
-  return decoded.subarray(versionInfoOffset, versionInfoOffset + versionInfoLength);
+  
+  // Check if firmware has CRC validation (packed files typically have CRC)
+  const hasCrc = hasCrcValidation(encodedFirmware);
+  
+  if (hasCrc) {
+    // Firmware with CRC validation (packed local files)
+    const calculatedCrc = crc16CcittLe(encodedFirmware.slice(0, -2));
+    const firmwareCrc = encodedFirmware.slice(-2);
+    if (!uint8ArraysEqual(calculatedCrc, firmwareCrc)) {
+      throw new Error("Firmware CRC check failed.");
+    }
+    // Remove CRC bytes before processing
+    const decoded = firmwareXor(encodedFirmware.slice(0, -2));
+    const versionInfoOffset = 0x2000;
+    const versionInfoLength = 16;
+    return decoded.subarray(versionInfoOffset, versionInfoOffset + versionInfoLength);
+  } else {
+    // Packed firmware without CRC (some GitHub files)
+    const decoded = firmwareXor(encodedFirmware);
+    const versionInfoOffset = 0x2000;
+    const versionInfoLength = 16;
+    return decoded.subarray(versionInfoOffset, versionInfoOffset + versionInfoLength);
+  }
 };
 
 const flashGenerateCommand = (data, address, totalSize) => {

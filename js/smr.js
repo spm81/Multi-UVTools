@@ -139,8 +139,21 @@ const flushLines = () => {
   }
 };
 
-const startReader = async () => {
+const startReader = async (retryCount = 0) => {
   if (!port || !port.readable || isReading) return;
+  
+  // Check if port is already locked - retry with delay (page transitions need time)
+  if (port.readable.locked) {
+    if (retryCount < 5) {
+      // Wait and retry - allows other modules to release the port
+      setTimeout(() => startReader(retryCount + 1), 100);
+      return;
+    }
+    setError("Serial port is busy. Close other tools first.");
+    return;
+  }
+  
+  setError(""); // Clear any previous errors
   reader = port.readable.getReader();
   isReading = true;
   try {
@@ -183,6 +196,8 @@ const connectToDevice = async () => {};
 
 const disconnectFromDevice = async () => {};
 
+let isPageActive = false;
+
 const updateAttachment = () => {
   const shouldAttach = isConnected && isPageActive;
   if (shouldAttach === isAttached) {
@@ -213,6 +228,13 @@ const sendMessage = async () => {
   setError("");
   const message = raw.toUpperCase();
   const payload = `SMS:${message}\r\n`;
+  
+  // Check if port is locked
+  if (port.writable.locked) {
+    setError("Serial port is busy. Try again.");
+    return;
+  }
+  
   const writer = port.writable.getWriter();
   try {
     await writer.write(encoder.encode(payload));
@@ -246,8 +268,6 @@ if (inputEl) {
     }
   });
 }
-
-let isPageActive = false;
 
 window.addEventListener("spa:page", (event) => {
   isPageActive = event.detail && event.detail.pageId === "smr";

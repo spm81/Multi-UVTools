@@ -1,41 +1,59 @@
 // serial-manager.js
-// Centralized serial port management
+// Centralized serial port management - compatible with joaquim k5_editor
 
 let port = null;
-let isConnected = false;
+let isConnectedState = false;
 let firmwareVersion = null;
 let currentOwner = null;
 const subscribers = [];
 
 const notify = () => {
-  const state = { connected: isConnected, port, firmwareVersion };
-  subscribers.forEach((fn) => fn(state));
+  const state = { connected: isConnectedState, port, firmwareVersion };
+  subscribers.forEach((fn) => {
+    try { fn(state); } catch (e) { console.error('Subscriber error:', e); }
+  });
 };
 
 export const connect = async (options = {}) => {
   const baudRate = options.baudRate || 38400;
   
-  // If we already have a connected port, just return it
-  if (port && isConnected) {
+  // If already connected with same baud rate, return existing port
+  if (port && isConnectedState && port.readable) {
     return port;
   }
   
   try {
-    // Request a new port if we don't have one
-    if (!port) {
-      port = await navigator.serial.requestPort();
+    // Close existing port if open with different settings
+    if (port) {
+      try {
+        if (port.readable?.locked) {
+          const reader = port.readable.getReader();
+          await reader.cancel().catch(() => {});
+          reader.releaseLock();
+        }
+        if (port.writable?.locked) {
+          const writer = port.writable.getWriter();
+          writer.releaseLock();
+        }
+        await port.close().catch(() => {});
+      } catch (e) {
+        console.warn('Error closing existing port:', e);
+      }
+      port = null;
     }
     
-    // Only open if not already open
-    if (port.readable === null) {
-      await port.open({ baudRate });
-    }
+    // Request new port
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate });
     
-    isConnected = true;
+    isConnectedState = true;
     notify();
     return port;
   } catch (error) {
     console.error('Serial connect error:', error);
+    isConnectedState = false;
+    port = null;
+    notify();
     throw error;
   }
 };
@@ -43,14 +61,15 @@ export const connect = async (options = {}) => {
 export const disconnect = async () => {
   if (port) {
     try {
+      // Cancel any active readers
       if (port.readable?.locked) {
         const reader = port.readable.getReader();
-        await reader.cancel();
+        await reader.cancel().catch(() => {});
         reader.releaseLock();
       }
+      // Release any writers
       if (port.writable?.locked) {
         const writer = port.writable.getWriter();
-        await writer.close();
         writer.releaseLock();
       }
       await port.close();
@@ -59,7 +78,7 @@ export const disconnect = async () => {
     }
     port = null;
   }
-  isConnected = false;
+  isConnectedState = false;
   firmwareVersion = null;
   currentOwner = null;
   notify();
@@ -67,10 +86,9 @@ export const disconnect = async () => {
 
 export const getPort = () => port;
 
-export const isPortConnected = () => isConnected;
+export const isConnected = () => isConnectedState;
 
-// Alias for app.js compatibility (exports function, not variable)
-export { isPortConnected as isConnected };
+export const isPortConnected = () => isConnectedState;
 
 export const setFirmwareVersion = (version) => {
   firmwareVersion = version;
@@ -79,9 +97,10 @@ export const setFirmwareVersion = (version) => {
 
 export const getFirmwareVersion = () => firmwareVersion;
 
-// Claim/release for exclusive access
+// Claim/release for exclusive access (prevents concurrent operations)
 export const claim = (owner) => {
   if (currentOwner && currentOwner !== owner) {
+    console.warn(`Serial port claimed by ${currentOwner}, ${owner} cannot claim`);
     return false;
   }
   currentOwner = owner;
@@ -99,7 +118,11 @@ export const getCurrentOwner = () => currentOwner;
 export const subscribe = (callback) => {
   subscribers.push(callback);
   // Immediately call with current state
-  callback({ connected: isConnected, port, firmwareVersion });
+  try {
+    callback({ connected: isConnectedState, port, firmwareVersion });
+  } catch (e) {
+    console.error('Initial subscriber call error:', e);
+  }
   return () => {
     const index = subscribers.indexOf(callback);
     if (index > -1) {
@@ -108,11 +131,12 @@ export const subscribe = (callback) => {
   };
 };
 
+// For external port setting (used by flash)
 export const setPort = (p) => {
   port = p;
 };
 
 export const setConnected = (connected) => {
-  isConnected = connected;
+  isConnectedState = connected;
   notify();
 };

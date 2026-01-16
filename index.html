@@ -278,7 +278,7 @@
               Open Source Project
             </h3>
             <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
-              This website is available on my GitHub (<a href="https://github.com/spm1981" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm1981</a>) <strong style="color: #fff;">Matoz</strong>.
+              This website is available on my GitHub (<a href="https://github.com/spm81/Multi-UVTools" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm81</a>) <strong style="color: #fff;">Matoz</strong>.
             </p>
             <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
               The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
@@ -306,7 +306,7 @@
               Open Source Project
             </h3>
             <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
-              This website is available on my GitHub (<a href="https://github.com/spm1981" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm1981</a>) <strong style="color: #fff;">Matoz</strong>.
+              This website is available on my GitHub (<a href="https://github.com/spm81/Multi-UVTools" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm81</a>) <strong style="color: #fff;">Matoz</strong>.
             </p>
             <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
               The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
@@ -2476,6 +2476,14 @@
             <p class="eyebrow">MIRROR TOOL</p>
             <h1>Display mirror</h1>
             <p class="subtitle">Mirror the radio display in real time.</p>
+            <div class="profile-selector">
+              <label for="mirrorProfileSelect">Profile:</label>
+              <select id="mirrorProfileSelect">
+                <option value="joaquim" selected>Joaquim UV-KX</option>
+                <option value="f4hwn">F4HWN UV-K5v1/v3 UV-K1</option>
+                <option value="test">Test Pattern</option>
+              </select>
+            </div>
             
           </div>
 
@@ -2543,6 +2551,12 @@
             <p class="eyebrow">SMR TOOL</p>
             <h1>SMR</h1>
             <p class="subtitle">Short message radio for sending and receiving SMS frames.</p>
+            <div class="profile-selector">
+              <label for="smrProfileSelect">Profile:</label>
+              <select id="smrProfileSelect">
+                <option value="joaquim-uv-kx" selected>Joaquim UV-KX / MCFW V0.33.0C &amp; V0.34.0C</option>
+              </select>
+            </div>
             <p class="subtitle">Select the message app in the radio (F+M) to use this tool.</p>
             
           </div>
@@ -2895,6 +2909,7 @@
                 </optgroup>
                 <optgroup label="Fagci R3b0rn Firmware">
                   <option value="firmware/k5-fagci-r3b0rn-nightly-n_241111.bin">Fagci R3b0rn Nightly N 241111</option>
+                  <option value="firmware/fagci-r3b0rn-2025-01-19-buggy-nightly1-SNR-CLOSE-43.bin">FAGCI Nightly 2025-01-19 (any EEPROM)</option>
                 </optgroup>
                 <optgroup label="kamilsss655 (Nunu) Firmware">
                   <option value="firmware/kamilsss655_v20.5.bin">kamilsss655 v.20.5</option>
@@ -2903,7 +2918,7 @@
                   <option value="https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin">Joaquim.org Rolling Release</option>
                 </optgroup>
                 <optgroup label="Egzumer Firmware">
-                  <option value="https://github.com/egzumer/uv-k5-firmware-custom/releases/download/v0.22/egzumer_v0.22.packed.bin">Egzumer v0.22</option>
+                  <option value="firmware/egzumer_v0.22.packed.bin">Egzumer v0.22</option>
                 </optgroup>
                 <optgroup label="IJV Firmwares">
                   <option value="firmware/IJV-firmware.X3_60.bin">IJV X3.60</option>
@@ -3414,6 +3429,10 @@
     <script src="js/basic-settings.js" type="module"></script>
     <script src="js/display-mirror.js" type="module"></script>
     <script src="js/smr.js" type="module"></script>
+    <script src="js/display-mirror-joaquim.js" type="module"></script>
+    <script src="js/display-mirror-test.js" type="module"></script>
+  <script src="js/display-mirror-f4hwn.js" type="module"></script>
+    <script src="js/smr-joaquim-uv-kx.js" type="module"></script>
     <script src="js/flash-k1.js" type="module"></script>
     <script src="js/flash-k1-ui.js" type="module"></script>
     <script src="js/flash-rt890.js" type="module"></script>
