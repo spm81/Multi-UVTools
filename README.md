@@ -22,7 +22,7 @@ Ferramenta web para flash de firmware em rádios Quansheng diretamente no browse
 - **Firmwares Custom** (Matoz, F4HWN, Calypso, Joaquim, Fagci e outros)
 - **Leitura/Escrita de EEPROM**
 - **Display Mirror** - Espelha o ecrã do rádio em tempo real
-- **S-Meter (SMR)** - Monitorização de sinal em tempo real
+- **SMR** - Monitorização de sinal em tempo real
 - **Suporte para TK11 e RT890**
 - Funciona diretamente no browser via **WebSerial API**
 - Não requer instalação de software
@@ -57,9 +57,9 @@ O Display Mirror suporta múltiplos perfis de firmware:
 
 > 💡 **Nota:** O baudrate é flexível - seleciona o baudrate que corresponde à versão do teu firmware.
 
-### 📊 S-Meter (SMR) - Compatibilidade
+### ✉️ SMR - Compatibilidade
 
-O S-Meter suporta os seguintes firmwares:
+O SMR suporta os seguintes firmwares:
 
 | Perfil | Firmwares Compatíveis |
 |--------|----------------------|
@@ -90,7 +90,7 @@ Web-based firmware flashing tool for Quansheng radios directly in your browser.
 - **Custom Firmwares** (Matoz, F4HWN, Calypso, Joaquim, Fagci and more)
 - **EEPROM Read/Write**
 - **Display Mirror** - Mirror the radio display in real time
-- **S-Meter (SMR)** - Real-time signal monitoring
+- **SMR** - Short message radio for sending and receiving SMS frames
 - **Support for TK11 and RT890**
 - Works directly in browser via **WebSerial API**
 - No software installation required
@@ -125,7 +125,7 @@ The Display Mirror supports multiple firmware profiles:
 
 > 💡 **Note:** Baudrate is flexible - select the baudrate that matches your firmware version.
 
-### 📊 S-Meter (SMR) - Compatibility
+### ✉️ SMR - Compatibility
 
 The S-Meter supports the following firmwares:
 

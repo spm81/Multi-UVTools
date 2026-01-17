@@ -27,10 +27,10 @@ const debugLog = (...args) => {
 };
 
 // TK11 Constants
-const TK11_MEMORY_LIMIT = 0x09FFFF;       // 655,359 bytes (~640KB) - WITHOUT calibration
-const TK11_MEMORY_LIMIT_CALIB = 0x0A1000; // 659,456 bytes (~644KB) - WITH calibration
-const TK11_CALIB_START = 0x0A0000;         // Calibration start address
-const TK11_CALIB_END = 0x0A1000;           // Calibration end address (4096 bytes = 4KB)
+const TK11_MEMORY_LIMIT = 0x020000;       // 655,359 bytes (~640KB) - WITHOUT calibration
+const TK11_MEMORY_LIMIT_CALIB = 0x021000; // 659,456 bytes (~644KB) - WITH calibration
+const TK11_CALIB_START = 0x020000;         // Calibration start address
+const TK11_CALIB_END = 0x021000;           // Calibration end address (4096 bytes = 4KB)
 const TK11_CALIB_SIZE = 0x1000;            // 4096 bytes calibration size
 const TK11_MAX_CHUNK_SIZE = 0x100;         // 256 bytes - reduced for stability
 const TK11_ADDRESS_BASE = 0x080000;

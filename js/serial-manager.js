@@ -6,6 +6,26 @@ let isConnectedState = false;
 let firmwareVersion = null;
 let currentOwner = null;
 const subscribers = [];
+// Known USB-Serial device identifiers
+const KNOWN_DEVICES = {
+  '1a86:7523': 'CH340',
+  '1a86:55d4': 'CH9102',
+  '067b:2303': 'PL2303',
+  '10c4:ea60': 'CP2102',
+  '0403:6001': 'FT232R',
+  '0403:6015': 'FT231X',
+};
+
+const formatDeviceName = (info) => {
+  if (!info) return null;
+  const vid = info.usbVendorId?.toString(16).toUpperCase().padStart(4, '0') || '????';
+  const pid = info.usbProductId?.toString(16).toUpperCase().padStart(4, '0') || '????';
+  const key = `${vid.toLowerCase()}:${pid.toLowerCase()}`;
+  const name = KNOWN_DEVICES[key] || 'USB';
+  return `${name} (VID: ${vid} / PID: ${pid})`;
+};
+
+
 
 const notify = () => {
   const state = { connected: isConnectedState, port, firmwareVersion };
@@ -96,6 +116,17 @@ export const setFirmwareVersion = (version) => {
 };
 
 export const getFirmwareVersion = () => firmwareVersion;
+
+// Get device information  
+export const getDeviceInfo = () => {
+  if (!port) return null;
+  const info = port.getInfo();
+  return {
+    raw: info,
+    formatted: formatDeviceName(info)
+  };
+};
+
 
 // Claim/release for exclusive access (prevents concurrent operations)
 export const claim = (owner) => {

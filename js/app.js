@@ -54,7 +54,7 @@ import {
   TK11_CALIB_END,
   TK11_CALIB_SIZE,
 } from "./protocol-tk11.js";
-import { connect, disconnect, getPort, subscribe, isConnected, claim, release } from "./serial-manager.js";
+import { connect, disconnect, getPort, subscribe, isConnected, claim, release, getDeviceInfo } from "./serial-manager.js";
 import { getRadioType, getRadioConfig, onRadioTypeChange } from "./radio-selector.js";
 
 // DEV mode state (global for access in onRadioTypeChange)
@@ -69,6 +69,25 @@ const readEepromBtn = document.getElementById("readEepromBtn");
 const writeEepromBtn = document.getElementById("writeEepromBtn");
 const dumpCalibK5Btn = document.getElementById("dumpCalibK5Btn");
 const restoreCalibK5Btn = document.getElementById("restoreCalibK5Btn");
+const restoreCalibTK11Btn = document.getElementById("restoreCalibTK11Btn");
+const restoreDefaultCalibBtn = document.getElementById("restoreDefaultCalibBtn");
+
+// TK11 Dev buttons
+const dumpCalibTK11Btn = document.getElementById("dumpCalibTK11Btn");
+const dumpCalibTK11Fill = document.getElementById("dumpCalibTK11Fill");
+const dumpCalibTK11Pct = document.getElementById("dumpCalibTK11Pct");
+const devBackupBtnTK11 = document.getElementById("devBackupBtnTK11");
+const devRestoreBtnTK11 = document.getElementById("devRestoreBtnTK11");
+
+// K5 Dev buttons
+const devBackupBtnK5 = document.getElementById("devBackupBtnK5");
+const devRestoreBtnK5 = document.getElementById("devRestoreBtnK5");
+
+// Hex View Dev buttons
+const hexDevCompareBtnK5 = document.getElementById("hexDevCompareBtnK5");
+const hexDevClearBtnK5 = document.getElementById("hexDevClearBtnK5");
+const hexDevCompareBtnTK11 = document.getElementById("hexDevCompareBtnTK11");
+const hexDevClearBtnTK11 = document.getElementById("hexDevClearBtnTK11");
 const backupCalib = document.getElementById("backupCalib");
 const restoreCalib = document.getElementById("restoreCalib");
 const restoreFile = document.getElementById("restoreFile");
@@ -139,6 +158,49 @@ const setProgress = (fill, pct, value) => {
   if (pct) pct.textContent = `${v.toFixed(1)}%`;
 };
 
+// Update Hex Dev Compare buttons based on mode and file selection
+function updateHexDevCompareButtons() {
+  // K5
+  const compareModeK5 = document.getElementById('hexDevCompareModeK5');
+  const file1InputK5 = document.getElementById('hexDevFile1K5');
+  const file2InputK5 = document.getElementById('hexDevFile2K5');
+  const compareBtnK5 = document.getElementById('hexDevCompareBtnK5');
+  
+  if (compareBtnK5 && compareModeK5 && file1InputK5 && file2InputK5) {
+    const mode = compareModeK5.value;
+    const hasFile1 = file1InputK5.files && file1InputK5.files.length > 0;
+    const hasFile2 = file2InputK5.files && file2InputK5.files.length > 0;
+    
+    if (mode === 'files') {
+      // Compare Files: needs both files + not busy
+      compareBtnK5.disabled = !hasFile1 || !hasFile2 || isBusy;
+    } else {
+      // Compare with Radio: needs file1 + connected + not busy
+      compareBtnK5.disabled = !hasFile1 || !isConnected() || isBusy;
+    }
+  }
+  
+  // TK11
+  const compareModeTK11 = document.getElementById('hexDevCompareModeTK11');
+  const file1InputTK11 = document.getElementById('hexDevFile1TK11');
+  const file2InputTK11 = document.getElementById('hexDevFile2TK11');
+  const compareBtnTK11 = document.getElementById('hexDevCompareBtnTK11');
+  
+  if (compareBtnTK11 && compareModeTK11 && file1InputTK11 && file2InputTK11) {
+    const mode = compareModeTK11.value;
+    const hasFile1 = file1InputTK11.files && file1InputTK11.files.length > 0;
+    const hasFile2 = file2InputTK11.files && file2InputTK11.files.length > 0;
+    
+    if (mode === 'files') {
+      // Compare Files: needs both files + not busy
+      compareBtnTK11.disabled = !hasFile1 || !hasFile2 || isBusy;
+    } else {
+      // Compare with Radio: needs file1 + connected + not busy
+      compareBtnTK11.disabled = !hasFile1 || !isConnected() || isBusy;
+    }
+  }
+}
+
 const updateUI = (connected, firmware = "-") => {
   if (homeStatusDot) homeStatusDot.dataset.status = connected ? "connected" : "disconnected";
   if (connectionLabel) connectionLabel.textContent = connected ? "Connected" : "Disconnected";
@@ -151,12 +213,31 @@ const updateUI = (connected, firmware = "-") => {
   if (writeEepromBtn) writeEepromBtn.disabled = !connected || isBusy;
   if (dumpCalibK5Btn) dumpCalibK5Btn.disabled = !connected || isBusy;
   if (restoreCalibK5Btn) restoreCalibK5Btn.disabled = !connected || isBusy;
+  if (restoreCalibTK11Btn) restoreCalibTK11Btn.disabled = !connected || isBusy;
+  if (restoreDefaultCalibBtn) restoreDefaultCalibBtn.disabled = !connected || isBusy;
+  if (dumpCalibTK11Btn) dumpCalibTK11Btn.disabled = !connected || isBusy;
+  if (devBackupBtnK5) devBackupBtnK5.disabled = !connected || isBusy;
+  if (devRestoreBtnK5) devRestoreBtnK5.disabled = !connected || isBusy;
+  if (devBackupBtnTK11) devBackupBtnTK11.disabled = !connected || isBusy;
+  if (devRestoreBtnTK11) devRestoreBtnTK11.disabled = !connected || isBusy;
+  if (hexDevClearBtnK5) hexDevClearBtnK5.disabled = !connected || isBusy;
+  if (hexDevClearBtnTK11) hexDevClearBtnTK11.disabled = !connected || isBusy;
+  
+  // Update Hex Dev Compare buttons with proper logic
+  updateHexDevCompareButtons();
   if (firmwareInfo) firmwareInfo.textContent = firmware;
 };
 
 subscribe((state) => {
   updateUI(state.connected, state.firmwareVersion);
-  if (deviceInfo) deviceInfo.textContent = state.connected ? "Port open" : "No port";
+  if (deviceInfo) {
+    if (state.connected) {
+      const devInfo = getDeviceInfo();
+      deviceInfo.textContent = devInfo && devInfo.formatted ? devInfo.formatted : "Port open";
+    } else {
+      deviceInfo.textContent = "No port";
+    }
+  }
 });
 
 const getConnectedPort = async () => {
@@ -647,9 +728,6 @@ if (restoreCalibK5Btn) {
 // ========== TK11 Calibration Functions ==========
 
 // Dump Calibration TK11
-const dumpCalibTK11Btn = document.getElementById("dumpCalibTK11Btn");
-const dumpCalibTK11Fill = document.getElementById("dumpCalibTK11Fill");
-const dumpCalibTK11Pct = document.getElementById("dumpCalibTK11Pct");
 
 if (dumpCalibTK11Btn) {
   dumpCalibTK11Btn.addEventListener("click", async () => {
@@ -695,7 +773,6 @@ if (dumpCalibTK11Btn) {
 }
 
 // Restore Calibration TK11
-const restoreCalibTK11Btn = document.getElementById("restoreCalibTK11Btn");
 const restoreCalibTK11File = document.getElementById("restoreCalibTK11File");
 const restoreCalibTK11Fill = document.getElementById("restoreCalibTK11Fill");
 const restoreCalibTK11Pct = document.getElementById("restoreCalibTK11Pct");
@@ -946,7 +1023,6 @@ updateUI(false);
 
 // ========== Default Calibration Restore ==========
 const defaultCalibSelect = document.getElementById("defaultCalibSelect");
-const restoreDefaultCalibBtn = document.getElementById("restoreDefaultCalibBtn");
 const defaultCalibFill = document.getElementById("defaultCalibFill");
 const defaultCalibPct = document.getElementById("defaultCalibPct");
 const defaultCalibHint = document.getElementById("defaultCalibHint");
@@ -1128,7 +1204,6 @@ document.addEventListener('keypress', (e) => {
 });
 
 // DEV Backup Button - TK11
-const devBackupBtnTK11 = document.getElementById('devBackupBtnTK11');
 const devBackupStartAddrTK11 = document.getElementById('devBackupStartAddrTK11');
 const devBackupEndAddrTK11 = document.getElementById('devBackupEndAddrTK11');
 const devBackupFillTK11 = document.getElementById('devBackupFillTK11');
@@ -1204,7 +1279,6 @@ if (devBackupBtnTK11) {
 }
 
 // DEV Backup Button - K5
-const devBackupBtnK5 = document.getElementById('devBackupBtnK5');
 const devBackupStartAddrK5 = document.getElementById('devBackupStartAddrK5');
 const devBackupEndAddrK5 = document.getElementById('devBackupEndAddrK5');
 const devBackupFillK5 = document.getElementById('devBackupFillK5');
@@ -1280,7 +1354,6 @@ if (devBackupBtnK5) {
 }
 
 // DEV Restore Button - TK11
-const devRestoreBtnTK11 = document.getElementById('devRestoreBtnTK11');
 const devRestoreStartAddrTK11 = document.getElementById('devRestoreStartAddrTK11');
 const devRestoreFileTK11 = document.getElementById('devRestoreFileTK11');
 const devRestoreFillTK11 = document.getElementById('devRestoreFillTK11');
@@ -1350,7 +1423,6 @@ if (devRestoreBtnTK11) {
 }
 
 // DEV Restore Button - K5
-const devRestoreBtnK5 = document.getElementById('devRestoreBtnK5');
 const devRestoreStartAddrK5 = document.getElementById('devRestoreStartAddrK5');
 const devRestoreFileK5 = document.getElementById('devRestoreFileK5');
 const devRestoreFillK5 = document.getElementById('devRestoreFillK5');
@@ -1423,6 +1495,13 @@ if (devRestoreBtnK5) {
 // HEX View DEV - Compare functionality
 // ============================================
 
+// Helper function to escape HTML special characters
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;')
+             .replace(/</g, '&lt;')
+             .replace(/>/g, '&gt;');
+}
+
 // Helper function to format hex with differences highlighted
 function formatHexComparison(data1, data2, startAddr = 0) {
   const lines1 = [];
@@ -1482,8 +1561,8 @@ function formatHexComparison(data1, data2, startAddr = 0) {
       }
     }
     
-    lines1.push(`<span style="color: #888;">${addr}</span>  ${hex1} |${ascii1}|`);
-    lines2.push(`<span style="color: #888;">${addr}</span>  ${hex2} |${ascii2}|`);
+    lines1.push(`<span style="color: #888;">${addr}</span>  ${hex1} |${escapeHtml(ascii1)}|`);
+    lines2.push(`<span style="color: #888;">${addr}</span>  ${hex2} |${escapeHtml(ascii2)}|`);
   }
   
   return { lines1, lines2, differences };
@@ -1538,7 +1617,16 @@ function setupHexViewDev(suffix) {
     if (file2Group) {
       file2Group.style.display = compareMode.value === 'files' ? '' : 'none';
     }
+    updateHexDevCompareButtons();  // Update button state when mode changes
   });
+  
+  // Update Compare button when files are selected/removed
+  if (file1Input) {
+    file1Input.addEventListener('change', updateHexDevCompareButtons);
+  }
+  if (file2Input) {
+    file2Input.addEventListener('change', updateHexDevCompareButtons);
+  }
   
   // Clear button
   clearBtn.addEventListener('click', () => {
