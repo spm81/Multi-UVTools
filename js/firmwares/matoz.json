@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "Matoz Latest",
+      "url": "https://cdn.jsdelivr.net/gh/OneOfEleven/uv-k5-firmware-custom/compiled-firmware/firmware.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

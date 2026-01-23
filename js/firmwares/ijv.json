@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "IJV vX3xx",
+      "url": "local",
+      "profile": "k5-ijv"
+    }
+  ]
+}

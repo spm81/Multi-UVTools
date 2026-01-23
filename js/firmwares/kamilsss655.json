@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "kamilsss655 Latest",
+      "url": "https://cdn.jsdelivr.net/gh/kamilsss655/uv-k5-firmware/compiled-firmware/firmware.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

@@ -2185,3 +2185,36 @@ section.hidden,
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
 }
+
+/* Memory Size Detector */
+.memory-size-result {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  font-weight: bold;
+  text-align: center;
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memory-size-result.detecting {
+  background: #FFF3CD;
+  color: #856404;
+  border: 1px solid #FFEAA7;
+}
+
+.memory-size-result.success {
+  background: #D4EDDA;
+  color: #155724;
+  border: 1px solid #C3E6CB;
+}
+
+.memory-size-result.error {
+  background: #F8D7DA;
+  color: #721C24;
+  border: 1px solid #F5C6CB;
+}

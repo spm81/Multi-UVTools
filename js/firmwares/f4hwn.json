@@ -1,0 +1,24 @@
+{
+  "firmwares": [
+    {
+      "name": "F4HWN v4.3.2",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_F4HWN_v4.3.2.bin",
+      "profile": "k5-f4hwn"
+    },
+    {
+      "name": "F4HWN v4.3.1",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_F4HWN_v4.3.1.bin",
+      "profile": "k5-f4hwn"
+    },
+    {
+      "name": "F4HWN v4.3",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_F4HWN_v4.3.bin",
+      "profile": "k5-f4hwn"
+    },
+    {
+      "name": "F4HWN v4.2",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_F4HWN_v4.2.bin",
+      "profile": "k5-f4hwn"
+    }
+  ]
+}

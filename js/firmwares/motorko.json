@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "Motorko Latest",
+      "url": "https://cdn.jsdelivr.net/gh/ludwich66/Quansheng_UV-K5_Firmware/compiled-firmware/firmware.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

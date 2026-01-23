@@ -54,8 +54,12 @@ import {
   TK11_CALIB_END,
   TK11_CALIB_SIZE,
 } from "./protocol-tk11.js";
-import { connect, disconnect, getPort, subscribe, isConnected, claim, release, getDeviceInfo } from "./serial-manager.js";
+import { connect, disconnect, getPort, subscribe, isConnected, claim, release, getDeviceInfo, setFirmwareVersion } from "./serial-manager.js";
 import { getRadioType, getRadioConfig, onRadioTypeChange } from "./radio-selector.js";
+import * as LockPassword from "./lock-password.js";
+import * as MemorySizeDetector from "./memory-size-detector.js";
+import * as EepromCleaner from "./eeprom-cleaner.js";
+import { initK5FirmwareDropdown, initK1FirmwareDropdown, initRT890FirmwareDropdown } from "./firmware-loader.js";
 
 // DEV mode state (global for access in onRadioTypeChange)
 let devModeEnabled = false;
@@ -71,6 +75,8 @@ const dumpCalibK5Btn = document.getElementById("dumpCalibK5Btn");
 const restoreCalibK5Btn = document.getElementById("restoreCalibK5Btn");
 const restoreCalibTK11Btn = document.getElementById("restoreCalibTK11Btn");
 const restoreDefaultCalibBtn = document.getElementById("restoreDefaultCalibBtn");
+
+// K5 Lock Password - now handled by lock-password.js module
 
 // TK11 Dev buttons
 const dumpCalibTK11Btn = document.getElementById("dumpCalibTK11Btn");
@@ -88,11 +94,10 @@ const hexDevCompareBtnK5 = document.getElementById("hexDevCompareBtnK5");
 const hexDevClearBtnK5 = document.getElementById("hexDevClearBtnK5");
 const hexDevCompareBtnTK11 = document.getElementById("hexDevCompareBtnTK11");
 const hexDevClearBtnTK11 = document.getElementById("hexDevClearBtnTK11");
-const backupCalib = document.getElementById("backupCalib");
-const restoreCalib = document.getElementById("restoreCalib");
 const restoreFile = document.getElementById("restoreFile");
 const firmwareFile = document.getElementById("firmwareFile");
-const readEepromSize = document.getElementById("readEepromSize");
+const readEepromSizeK5 = document.getElementById("readEepromSizeK5");
+const readEepromSizeTK11 = document.getElementById("readEepromSizeTK11");
 const writeEepromFile = document.getElementById("writeEepromFile");
 const restoreCalibK5File = document.getElementById("restoreCalibK5File");
 const homeStatusDot = document.getElementById("homeStatusDot");
@@ -151,6 +156,9 @@ const log = (msg, tone = "info") => {
   logArea.appendChild(entry);
   logArea.scrollTop = logArea.scrollHeight;
 };
+
+// Make log function globally accessible for all modules
+window.log = log;
 
 const setProgress = (fill, pct, value) => {
   const v = Math.max(0, Math.min(100, value));
@@ -223,9 +231,17 @@ const updateUI = (connected, firmware = "-") => {
   if (hexDevClearBtnK5) hexDevClearBtnK5.disabled = !connected || isBusy;
   if (hexDevClearBtnTK11) hexDevClearBtnTK11.disabled = !connected || isBusy;
   
+  // Update Lock Password buttons (K5 only)
+  LockPassword.updateButtonStates(connected, isBusy);
+  
+  // Update Memory Size Detector button (K5 & TK11)
+  MemorySizeDetector.updateUI();
+  
+  // Update EEPROM Cleaner button (K5 & TK11)
+  EepromCleaner.updateUI(connected, isBusy);
+  
   // Update Hex Dev Compare buttons with proper logic
   updateHexDevCompareButtons();
-  if (firmwareInfo) firmwareInfo.textContent = firmware;
 };
 
 subscribe((state) => {
@@ -233,9 +249,17 @@ subscribe((state) => {
   if (deviceInfo) {
     if (state.connected) {
       const devInfo = getDeviceInfo();
-      deviceInfo.textContent = devInfo && devInfo.formatted ? devInfo.formatted : "Port open";
+      let displayText = devInfo && devInfo.formatted ? devInfo.formatted : "Port open";
+      // Show firmware version in Home card (K5 & TK11)
+      if (state.firmwareVersion) {
+        displayText += ` - ${state.firmwareVersion}`;
+      }
+      deviceInfo.textContent = displayText;
+      // Show firmware in separate field
+      if (firmwareInfo) firmwareInfo.textContent = state.firmwareVersion || "-";
     } else {
       deviceInfo.textContent = "No port";
+      if (firmwareInfo) firmwareInfo.textContent = "-";
     }
   }
 });
@@ -303,6 +327,26 @@ if (connectBtn) {
     try {
       await getConnectedPort();
       log("Connected.", "success");
+      
+      // Auto-detect baud rate and read firmware (K5 only)
+      const port = getPort();
+      if (getRadioType() === "K5") {
+        try {
+          console.log("[app.js] 🔧 Connect: Auto-detecting baud rate...");
+          await new Promise(resolve => setTimeout(resolve, 300));
+          
+          // Import detectBaudRate from serial-manager
+          const { detectBaudRate } = await import('./serial-manager.js');
+          const result = await detectBaudRate([38400, 115200]);
+          
+          console.log(`[app.js] ✅ Connect: Success at ${result.baudRate} baud`);
+          log(`✅ Connected at ${result.baudRate} baud`, "success");
+        } catch (e) {
+          console.warn("[app.js] ⚠️ Connect: Auto-detection FAILED:", e.message);
+          log("⚠️ Could not detect baud rate", "error");
+          setFirmwareVersion("-");
+        }
+      }
     } catch (e) {
       log(`Connect failed: ${e.message}`, "error");
     }
@@ -337,7 +381,12 @@ const backupRange = async (start, length) => {
     const blockSize = getBlockSize();
     
     log(`[${radioType}] Initializing...`);
-    await initRadio(port);
+    const firmwareVersion = await initRadio(port);
+    console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+    if (getRadioType() === "K5") {
+      console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+      setFirmwareVersion(firmwareVersion);
+    }
     
     const buffer = new Uint8Array(length);
     for (let offset = 0; offset < length; offset += blockSize) {
@@ -362,7 +411,12 @@ const restoreRange = async (start, data) => {
     const blockSize = getBlockSize();
     
     log(`[${radioType}] Initializing...`);
-    await initRadio(port);
+    const firmwareVersion = await initRadio(port);
+    console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+    if (getRadioType() === "K5") {
+      console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+      setFirmwareVersion(firmwareVersion);
+    }
     
     for (let offset = 0; offset < data.length; offset += blockSize) {
       const chunk = data.slice(offset, offset + blockSize);
@@ -390,16 +444,22 @@ if (backupBtn) {
     
     try {
       let length;
-      const includeCalib = backupCalib?.checked || false;
       if (radioType === 'TK11') {
-        // TK11: Include calibration checkbox now works!
-        // With calibration: 0x000000 to 0x0A1000 (~644KB)
-        // Without calibration: 0x000000 to 0x09FFFF (~640KB)
-        length = includeCalib ? TK11_MEMORY_LIMIT_CALIB : TK11_MEMORY_LIMIT;
-        log(`[TK11] Backup mode: ${includeCalib ? 'WITH calibration (0x0A1000)' : 'WITHOUT calibration (0x09FFFF)'}`);
+        // TK11: Always backup without calibration (0x09FFFF)
+        length = TK11_MEMORY_LIMIT;
+        log(`[TK11] Backup mode: WITHOUT calibration (0x09FFFF)`);
       } else {
-        // K5: check if including calibration
-        length = includeCalib ? 0x2000 : 0x1d00;
+        // K5: Auto-detect memory size and backup everything
+        log(`[K5] 🔍 Auto-detecting memory size...`, "info");
+        await MemorySizeDetector.detectMemorySize();
+        const detectedSize = MemorySizeDetector.getDetectedMemorySize();
+        
+        if (!detectedSize) {
+          throw new Error('Failed to detect memory size');
+        }
+        
+        length = detectedSize.size;
+        log(`[K5] ✅ Detected ${detectedSize.name} (0x${length.toString(16).toUpperCase()})`, "success");
       }
       
       const buffer = await backupRange(0, length);
@@ -410,7 +470,12 @@ if (backupBtn) {
       a.download = `${radioType.toLowerCase()}_backup_${Date.now()}.bin`;
       a.click();
       URL.revokeObjectURL(url);
-      log(`[${radioType}] Backup complete.`, "success");
+      
+      // Show size in KB or MB
+      const sizeKB = (length / 1024).toFixed(2);
+      const sizeMB = (length / (1024 * 1024)).toFixed(2);
+      const sizeStr = length >= 1048576 ? `${sizeMB} MB` : `${sizeKB} KB`;
+      log(`[${radioType}] ✅ Backup complete! Size: ${sizeStr} (${length} bytes)`, "success");
     } catch (e) {
       log(`Backup failed: ${e.message}`, "error");
     }
@@ -439,17 +504,14 @@ if (restoreBtn) {
       const data = new Uint8Array(arrayBuffer);
       let length;
       
-      const includeCalib = restoreCalib?.checked || false;
       if (radioType === 'TK11') {
-        // TK11: Include calibration checkbox now works!
-        // With calibration: 0x000000 to 0x0A1000 (~644KB)
-        // Without calibration: 0x000000 to 0x09FFFF (~640KB)
-        const maxLength = includeCalib ? TK11_MEMORY_LIMIT_CALIB : TK11_MEMORY_LIMIT;
-        length = Math.min(data.length, maxLength);
-        log(`[TK11] Restore mode: ${includeCalib ? 'WITH calibration (0x0A1000)' : 'WITHOUT calibration (0x09FFFF)'}`);
+        // TK11: Always restore without calibration (0x09FFFF)
+        length = Math.min(data.length, TK11_MEMORY_LIMIT);
+        log(`[TK11] Restore mode: WITHOUT calibration (0x09FFFF)`);
       } else {
-        // K5: check if including calibration
-        length = includeCalib ? Math.min(data.length, 0x2000) : Math.min(data.length, 0x1d00);
+        // K5: Write entire file
+        length = data.length;
+        log(`[K5] Writing complete file (${(length / 1024).toFixed(2)} KB)`);
       }
       
       await restoreRange(0, data.slice(0, length));
@@ -563,13 +625,19 @@ if (readEepromBtn) {
     setProgress(readEepromFill, readEepromPct, 0);
     
     const radioType = getRadioType();
+    const readEepromSize = radioType === 'TK11' ? readEepromSizeTK11 : readEepromSizeK5;
     const size = parseInt(readEepromSize?.value || "8192", 10);
     const blockSize = getBlockSize();  // Uses TK11_MAX_CHUNK_SIZE for TK11
     
     log(`Reading ${size / 1024} KB from ${radioType}...`);
     try {
       const port = getPort();
-      await initRadio(port);  // Uses tk11Init for TK11
+      const firmwareVersion = await initRadio(port);  // Uses tk11Init for TK11
+      console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+      if (getRadioType() === "K5") {
+        console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+        setFirmwareVersion(firmwareVersion);
+      }
       const buffer = new Uint8Array(size);
       
       for (let offset = 0; offset < size; offset += blockSize) {
@@ -620,7 +688,12 @@ if (writeEepromBtn) {
     log(`Writing to ${radioType} from file (${(file.size / 1024).toFixed(1)} KB)...`);
     try {
       const port = getPort();
-      await initRadio(port);  // Uses tk11Init for TK11
+      const firmwareVersion = await initRadio(port);  // Uses tk11Init for TK11
+      console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+      if (getRadioType() === "K5") {
+        console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+        setFirmwareVersion(firmwareVersion);
+      }
       const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
       
@@ -656,7 +729,9 @@ if (dumpCalibK5Btn) {
     log("Dumping calibration (0x1E00 - 0x2000)...");
     try {
       const port = getPort();
-      await eepromInit(port);
+      const firmwareVersion = await eepromInit(port);
+      console.log("[app.js] 🔍 eepromInit returned:", firmwareVersion);
+      setFirmwareVersion(firmwareVersion);
       const buffer = new Uint8Array(0x200);
       for (let offset = 0; offset < 0x200; offset += EEPROM_BLOCK_SIZE) {
         const chunkSize = Math.min(EEPROM_BLOCK_SIZE, 0x200 - offset);
@@ -705,7 +780,9 @@ if (restoreCalibK5Btn) {
     log("Restoring calibration...");
     try {
       const port = getPort();
-      await eepromInit(port);
+      const firmwareVersion = await eepromInit(port);
+      console.log("[app.js] 🔍 eepromInit returned:", firmwareVersion);
+      setFirmwareVersion(firmwareVersion);
       const arrayBuffer = await file.arrayBuffer();
       const data = new Uint8Array(arrayBuffer);
       for (let offset = 0; offset < data.length; offset += 0x40) {
@@ -747,7 +824,7 @@ if (dumpCalibTK11Btn) {
     try {
       const port = getPort();
       await tk11Init(port);
-      const buffer = new Uint8Array(TK11_CALIB_SIZE); // 4096 bytes
+      const buffer = new Uint8Array(TK11_CALIB_SIZE); // 69632 bytes (68 KB)
       for (let offset = 0; offset < TK11_CALIB_SIZE; offset += TK11_MAX_CHUNK_SIZE) {
         const chunkSize = Math.min(TK11_MAX_CHUNK_SIZE, TK11_CALIB_SIZE - offset);
         const data = await tk11Read(port, TK11_CALIB_START + offset, chunkSize);
@@ -761,7 +838,7 @@ if (dumpCalibTK11Btn) {
       a.download = `TK11_calibration_${Date.now()}.bin`;
       a.click();
       URL.revokeObjectURL(url);
-      log("[TK11] Calibration dump complete (4096 bytes).", "success");
+      log("[TK11] Calibration dump complete (69632 bytes = 68 KB).", "success");
     } catch (e) {
       log(`[TK11] Dump calibration failed: ${e.message}`, "error");
     } finally {
@@ -790,7 +867,7 @@ if (restoreCalibTK11Btn) {
       return;
     }
     if (file.size !== TK11_CALIB_SIZE) {
-      log(`[TK11] Invalid calibration file size: expected ${TK11_CALIB_SIZE} bytes (4KB), got ${file.size}`, "error");
+      log(`[TK11] Invalid calibration file size: expected ${TK11_CALIB_SIZE} bytes (68 KB), got ${file.size}`, "error");
       return;
     }
     if (!claim("restoreCalibTK11")) {
@@ -812,7 +889,7 @@ if (restoreCalibTK11Btn) {
         setProgress(restoreCalibTK11Fill, restoreCalibTK11Pct, ((offset + chunk.length) / data.length) * 100);
       }
       await tk11Reboot(port);
-      log("[TK11] Calibration restore complete (4096 bytes).", "success");
+      log("[TK11] Calibration restore complete (69632 bytes = 68 KB).", "success");
     } catch (e) {
       log(`[TK11] Restore calibration failed: ${e.message}`, "error");
     } finally {
@@ -836,16 +913,38 @@ if (k5FirmwareSelect) {
       return;
     }
     try {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error("Failed to load firmware");
-      const buffer = await response.arrayBuffer();
-      k5SelectedFirmware = new Uint8Array(buffer);
-      updateK5FlashButton();
-      const name = path.split('/').pop();
-      if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${name} (${k5SelectedFirmware.length} bytes)`;
+      log(`[K5] Loading firmware from: ${e.target.options[e.target.selectedIndex].text}...`);
+      
+      // Check if it's a GitHub Release URL (needs special handling)
+      if (path.includes('/releases/download/')) {
+        log('[K5] Detected GitHub Release URL - using API loader');
+        k5SelectedFirmware = await loadFirmwareWithCORS(path);
+        updateK5FlashButton();
+        const name = path.split('/').pop();
+        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${name} (${k5SelectedFirmware.length} bytes)`;
+        log(`[K5] ✅ Firmware loaded: ${k5SelectedFirmware.length} bytes`);
+      } else {
+        // Regular URL or GitHub repository file
+        let fetchUrl = path;
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+          fetchUrl = convertGitHubUrl(path);
+          if (fetchUrl !== path) {
+            log(`Converted GitHub URL to: ${fetchUrl}`);
+          }
+        }
+        
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error("Failed to load firmware");
+        const buffer = await response.arrayBuffer();
+        k5SelectedFirmware = new Uint8Array(buffer);
+        updateK5FlashButton();
+        const name = path.split('/').pop();
+        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${name} (${k5SelectedFirmware.length} bytes)`;
+        log(`[K5] ✅ Firmware loaded: ${k5SelectedFirmware.length} bytes`);
+      }
+      
       // Clear file input when selecting from dropdown
       if (firmwareFile) firmwareFile.value = "";
-      log(`K5 firmware loaded: ${name}`);
     } catch (err) {
       k5SelectedFirmware = null;
       updateK5FlashButton();
@@ -892,15 +991,36 @@ if (k1FirmwareSelect) {
       return;
     }
     try {
-      const response = await fetch(path);
-      if (!response.ok) throw new Error("Failed to load firmware");
-      const buffer = await response.arrayBuffer();
-      k1SelectedFirmware = new Uint8Array(buffer);
-      const name = path.split('/').pop();
-      if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+      log(`[K1] Loading firmware from: ${e.target.options[e.target.selectedIndex].text}...`);
+      
+      // Check if it's a GitHub Release URL (needs special handling)
+      if (path.includes('/releases/download/')) {
+        log('[K1] Detected GitHub Release URL - using API loader');
+        k1SelectedFirmware = await loadFirmwareWithCORS(path);
+        const name = path.split('/').pop();
+        if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+        log(`[K1] ✅ Firmware loaded: ${k1SelectedFirmware.length} bytes`);
+      } else {
+        // Regular URL or GitHub repository file
+        let fetchUrl = path;
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+          fetchUrl = convertGitHubUrl(path);
+          if (fetchUrl !== path) {
+            log(`Converted GitHub URL to: ${fetchUrl}`);
+          }
+        }
+        
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error("Failed to load firmware");
+        const buffer = await response.arrayBuffer();
+        k1SelectedFirmware = new Uint8Array(buffer);
+        const name = path.split('/').pop();
+        if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+        log(`[K1] ✅ Firmware loaded: ${k1SelectedFirmware.length} bytes`);
+      }
+      
       // Clear file input when selecting from dropdown
       if (k1FirmwareFile) k1FirmwareFile.value = "";
-      log(`K1 firmware loaded: ${name}`);
     } catch (err) {
       k1SelectedFirmware = null;
       if (k1FirmwareStatus) k1FirmwareStatus.textContent = "Failed to load firmware";
@@ -990,20 +1110,31 @@ if (k1LoadUrlBtn && k1FirmwareUrl) {
       k1LoadUrlBtn.textContent = "Loading...";
       if (k1FirmwareStatus) k1FirmwareStatus.textContent = "Loading firmware from URL...";
       
-      const url = convertGitHubUrl(inputUrl);
-      if (url !== inputUrl) {
-        log(`Converted GitHub URL to: ${url}`);
+      // Check if it's a GitHub Release URL (needs special handling)
+      if (inputUrl.includes('/releases/download/')) {
+        log('[K1] Detected GitHub Release URL - using API loader');
+        k1SelectedFirmware = await loadFirmwareWithCORS(inputUrl);
+        const name = inputUrl.split('/').pop() || 'firmware.bin';
+        if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+        log(`[K1] ✅ Firmware loaded from GitHub Release: ${name} (${k1SelectedFirmware.length} bytes)`);
+      } else {
+        // Regular URL or GitHub repository file
+        const url = convertGitHubUrl(inputUrl);
+        if (url !== inputUrl) {
+          log(`Converted GitHub URL to: ${url}`);
+        }
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const buffer = await response.arrayBuffer();
+        k1SelectedFirmware = new Uint8Array(buffer);
+        const name = url.split('/').pop() || 'firmware.bin';
+        if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+        log(`[K1] ✅ Firmware loaded from URL: ${name} (${k1SelectedFirmware.length} bytes)`);
       }
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      const buffer = await response.arrayBuffer();
-      k1SelectedFirmware = new Uint8Array(buffer);
-      const name = url.split('/').pop() || 'firmware.bin';
-      if (k1FirmwareStatus) k1FirmwareStatus.textContent = `Selected: ${name} (${k1SelectedFirmware.length} bytes)`;
+      
       // Clear other inputs
       if (k1FirmwareSelect) k1FirmwareSelect.value = "";
       if (k1FirmwareFile) k1FirmwareFile.value = "";
-      log(`K1 firmware loaded from URL: ${name}`);
     } catch (err) {
       k1SelectedFirmware = null;
       if (k1FirmwareStatus) k1FirmwareStatus.textContent = "Failed to load firmware from URL";
@@ -1074,7 +1205,9 @@ if (restoreDefaultCalibBtn) {
     log("Restoring default calibration...");
     try {
       const port = getPort();
-      await eepromInit(port);
+      const firmwareVersion = await eepromInit(port);
+      console.log("[app.js] 🔍 eepromInit returned:", firmwareVersion);
+      setFirmwareVersion(firmwareVersion);
       for (let offset = 0; offset < selectedDefaultCalib.length; offset += 0x40) {
         const chunk = selectedDefaultCalib.slice(offset, offset + 0x40);
         await eepromWrite(port, 0x1e00 + offset, chunk, chunk.length);
@@ -1096,12 +1229,20 @@ if (restoreDefaultCalibBtn) {
 onRadioTypeChange((type, config) => {
   const toolsEyebrow = document.getElementById('toolsEyebrow');
   const channelsEyebrow = document.getElementById('channelsEyebrow');
+  const memorySizeLabel = document.querySelector('.memory-type-label');
   
   if (toolsEyebrow) {
-    toolsEyebrow.textContent = type === 'TK11' ? 'TK11/RT-890 TOOLSET' : 'UV-K5/K1 TOOLSET';
+    toolsEyebrow.textContent = type === 'K5' ? 'UV-K5/K1 TOOLSET' : 
+                              type === 'TK11' ? 'TK11 TOOLSET' : 
+                              'RT-890 TOOLSET';
   }
   if (channelsEyebrow) {
-    channelsEyebrow.textContent = type === 'TK11' ? 'TK11 CHANNELS' : 'K5/K1 CHANNELS';
+    channelsEyebrow.textContent = type === 'K5' ? 'K5/K1 CHANNELS' : 
+                                 type === 'TK11' ? 'TK11 CHANNELS' : 
+                                 'RT-890 CHANNELS';
+  }
+  if (memorySizeLabel) {
+    memorySizeLabel.textContent = (type === 'TK11' || type === 'RT890') ? 'Check Flash Size' : 'Check EEPROM Size';
   }
   
   // Show/hide radio-specific elements
@@ -1110,6 +1251,33 @@ onRadioTypeChange((type, config) => {
   });
   document.querySelectorAll('.tk11-only').forEach(el => {
     el.style.display = type === 'TK11' ? '' : 'none';
+  });
+  document.querySelectorAll('.rt890-only').forEach(el => {
+    el.style.display = type === 'RT890' ? '' : 'none';
+  });
+  document.querySelectorAll('.k5-tk11-only').forEach(el => {
+    el.style.display = (type === 'K5' || type === 'TK11') ? '' : 'none';
+  });
+  document.querySelectorAll('.tk11-hidden').forEach(el => {
+    el.style.display = type === 'TK11' ? 'none' : '';
+  });
+  
+  // Control sidebar navigation visibility
+  const sidebarLinks = {
+    navHome: type === 'K5' || type === 'TK11',  // Tools: K5 and TK11
+    navChannels: type === 'K5',
+    navSettings: type === 'K5',
+    navMirror: type === 'K5',
+    navSmr: type === 'K5',
+    navK1: type === 'K5' || type === 'RT890',  // Flash: K5 and RT890
+    navTK11Settings: type === 'TK11'
+  };
+  
+  Object.entries(sidebarLinks).forEach(([id, visible]) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.style.display = visible ? '' : 'none';
+    }
   });
   
   // Hide all DEV panels when switching radios (they require devmode to show)
@@ -1135,24 +1303,7 @@ onRadioTypeChange((type, config) => {
     });
   }
   
-  // Update Read EEPROM size options
-  if (readEepromSize) {
-    if (type === 'TK11') {
-      readEepromSize.innerHTML = `
-        <option value="659456" selected>644 KB (0x0A1000) - Full TK11 with Calibration</option>
-        <option value="655359">640 KB (0x09FFFF) - Full TK11 without Calibration</option>
-        <option value="2097152">2 MB (0x200000) - Full Flash</option>
-      `;
-    } else {
-      readEepromSize.innerHTML = `
-        <option value="8192" selected>8 KB (64Kbit) (0x2000)</option>
-        <option value="65536">64 KB (512Kbit) (0x10000)</option>
-        <option value="131072">128 KB (1Mbit) (0x20000)</option>
-        <option value="262144">256 KB (2Mbit) (0x40000)</option>
-        <option value="524288">512 KB (4Mbit) (0x80000)</option>
-      `;
-    }
-  }
+  // Dropdowns are now static in HTML with k5-only/tk11-only classes
   
   log(`Switched to ${config.name} mode`);
 });
@@ -1318,7 +1469,12 @@ if (devBackupBtnK5) {
     
     try {
       const port = getPort();
-      await initRadio(port);
+      const firmwareVersion = await initRadio(port);
+      console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+      if (getRadioType() === "K5") {
+        console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+        setFirmwareVersion(firmwareVersion);
+      }
       
       const data = new Uint8Array(size);
       const chunkSize = EEPROM_BLOCK_SIZE;
@@ -1466,7 +1622,12 @@ if (devRestoreBtnK5) {
     
     try {
       const port = getPort();
-      await initRadio(port);
+      const firmwareVersion = await initRadio(port);
+      console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+      if (getRadioType() === "K5") {
+        console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+        setFirmwareVersion(firmwareVersion);
+      }
       
       const chunkSize = EEPROM_BLOCK_SIZE;
       let bytesWritten = 0;
@@ -1721,7 +1882,12 @@ function setupHexViewDev(suffix) {
           const blockSize = getBlockSize();
           
           // Initialize radio before reading
-          await initRadio(port);
+          const firmwareVersion = await initRadio(port);
+          console.log("[app.js] 🔍 firmwareVersion =", firmwareVersion, "| radioType =", getRadioType());
+          if (getRadioType() === "K5") {
+            console.log("[app.js] ➡️ Calling setFirmwareVersion...");
+            setFirmwareVersion(firmwareVersion);
+          }
           
           data2 = new Uint8Array(readLength);
           let bytesRead = 0;
@@ -1782,9 +1948,141 @@ function setupHexViewDev(suffix) {
   });
 }
 
+
 // Initialize HEX View DEV for both radio types
 setupHexViewDev('TK11');
 setupHexViewDev('K5');
 
 // Initialize K5 Flash button state (disabled until firmware is selected)
 updateK5FlashButton();
+
+// Initialize Lock Password module (K5 only)
+LockPassword.init(updateUI);
+
+// Initialize Memory Size Detector (K5 & TK11)
+MemorySizeDetector.init();
+EepromCleaner.init();
+
+// Initialize Firmware Dropdowns (K5, K1, RT890)
+initK5FirmwareDropdown();
+initK1FirmwareDropdown();
+initRT890FirmwareDropdown();
+
+// =============================================================================
+// Auto-load firmware from URL parameter (like egzumer's uvtools)
+// Example: ?firmwareURL=https://github.com/.../firmware.bin
+// =============================================================================
+window.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const firmwareURL = urlParams.get('firmwareURL');
+  
+  if (firmwareURL) {
+    console.log(`[URL Param] Firmware URL detected: ${firmwareURL}`);
+    
+    // Wait for UI to be ready
+    setTimeout(async () => {
+      try {
+        // Detect radio type from URL pattern (optional enhancement)
+        let targetRadio = 'K5'; // Default
+        if (firmwareURL.includes('rt890') || firmwareURL.includes('tk11') || firmwareURL.includes('RT-890')) {
+          targetRadio = 'TK11';
+        } else if (firmwareURL.includes('k1') || firmwareURL.includes('K1') || firmwareURL.includes('calypso')) {
+          targetRadio = 'K5'; // K1 uses K5 interface
+        }
+        
+        // Switch to correct radio type if needed
+        const radioSelect = document.getElementById('radioTypeSelect');
+        if (radioSelect && radioSelect.value !== targetRadio) {
+          console.log(`[URL Param] Switching to ${targetRadio}`);
+          radioSelect.value = targetRadio;
+          radioSelect.dispatchEvent(new Event('change'));
+          await new Promise(resolve => setTimeout(resolve, 500)); // Wait for UI update
+        }
+        
+        // Load firmware based on radio type
+        if (targetRadio === 'TK11') {
+          // Load into RT890/TK11
+          console.log('[URL Param] Loading firmware for RT890/TK11...');
+          const data = await loadFirmwareFromURL(firmwareURL);
+          if (data && data.byteLength === 60416) {
+            window.RT890.setFirmwareData(data);
+            console.log(`[URL Param] ✅ RT890 firmware loaded: ${data.byteLength} bytes`);
+          } else {
+            console.error(`[URL Param] ❌ Invalid RT890 firmware size: ${data ? data.byteLength : 0} bytes (expected 60416)`);
+          }
+        } else {
+          // Load into K5/K1
+          console.log('[URL Param] Loading firmware for K5/K1...');
+          const data = await loadFirmwareFromURL(firmwareURL);
+          if (data) {
+            // Detect if it's K1 firmware (>61440 bytes)
+            if (data.byteLength > 61440) {
+              console.log('[URL Param] Detected K1 firmware (>61440 bytes)');
+              k1SelectedFirmware = data;
+              if (k1FirmwareStatus) {
+                k1FirmwareStatus.textContent = `✅ URL firmware loaded: ${data.byteLength} bytes`;
+                k1FirmwareStatus.classList.remove('error');
+                k1FirmwareStatus.classList.add('success');
+              }
+              console.log(`[URL Param] ✅ K1 firmware loaded: ${data.byteLength} bytes`);
+            } else {
+              console.log('[URL Param] Detected K5 firmware (≤61440 bytes)');
+              k5SelectedFirmware = data;
+              updateK5FlashButton();
+              if (k5FirmwareStatus) {
+                k5FirmwareStatus.textContent = `✅ URL firmware loaded: ${data.byteLength} bytes`;
+                k5FirmwareStatus.classList.remove('error');
+                k5FirmwareStatus.classList.add('success');
+              }
+              console.log(`[URL Param] ✅ K5 firmware loaded: ${data.byteLength} bytes`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('[URL Param] ❌ Failed to load firmware from URL:', error);
+      }
+    }, 1000);
+  }
+});
+
+// Helper function to load firmware from any URL
+async function loadFirmwareFromURL(url) {
+  console.log(`[URL Loader] Loading from: ${url}`);
+  
+  // Check if it's a GitHub Release URL
+  if (url.includes('github.com') && url.includes('/releases/download/')) {
+    console.log('[URL Loader] Detected GitHub Release URL - using direct fetch');
+    // GitHub releases still have CORS issues, so try direct first, fallback to error
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.arrayBuffer();
+      console.log(`[URL Loader] ✅ Downloaded ${data.byteLength} bytes`);
+      return data;
+    } catch (error) {
+      console.error('[URL Loader] ❌ GitHub release download failed:', error.message);
+      throw new Error('GitHub release URLs are not supported due to CORS restrictions. Please use a direct download link or jsDelivr CDN URL.');
+    }
+  }
+  
+  // Check if it's a GitHub repository URL (blob/main or raw/main)
+  if (url.includes('github.com') && (url.includes('/blob/') || url.includes('/raw/'))) {
+    console.log('[URL Loader] Detected GitHub repository URL - converting to jsDelivr');
+    const cdnUrl = convertGitHubUrl(url);
+    console.log(`[URL Loader] CDN URL: ${cdnUrl}`);
+    const response = await fetch(cdnUrl);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.arrayBuffer();
+    console.log(`[URL Loader] ✅ Downloaded ${data.byteLength} bytes via CDN`);
+    return data;
+  }
+  
+  // Direct HTTP(S) URL
+  console.log('[URL Loader] Loading via direct fetch');
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  const data = await response.arrayBuffer();
+  console.log(`[URL Loader] ✅ Downloaded ${data.byteLength} bytes`);
+  return data;
+}
+

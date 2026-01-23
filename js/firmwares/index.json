@@ -1,0 +1,49 @@
+{
+  "groups": [
+    {
+      "id": "matoz",
+      "name": "Matoz",
+      "file": "matoz.json"
+    },
+    {
+      "id": "motorko",
+      "name": "Motorko",
+      "file": "motorko.json"
+    },
+    {
+      "id": "fagci",
+      "name": "Fagci",
+      "file": "fagci.json"
+    },
+    {
+      "id": "kamilsss655",
+      "name": "kamilsss655",
+      "file": "kamilsss655.json"
+    },
+    {
+      "id": "joaquim",
+      "name": "Joaquim.org",
+      "file": "joaquim.json"
+    },
+    {
+      "id": "egzumer",
+      "name": "Egzumer",
+      "file": "egzumer.json"
+    },
+    {
+      "id": "ijv",
+      "name": "IJV",
+      "file": "ijv.json"
+    },
+    {
+      "id": "f4hwn",
+      "name": "F4HWN",
+      "file": "f4hwn.json"
+    },
+    {
+      "id": "stock",
+      "name": "QuanSheng Stock",
+      "file": "stock.json"
+    }
+  ]
+}

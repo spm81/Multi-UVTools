@@ -9,6 +9,58 @@
 // RT-890 firmware MUST be exactly 60416 bytes (per GitHub bricky149/rt890-flash-rs)
 const RT890_FIRMWARE_SIZE = 60416;
 
+// Helper function to load GitHub Release assets (CORS-enabled via API)
+async function loadFirmwareWithCORS(releaseUrl) {
+  console.log('[GitHub] Loading release asset from:', releaseUrl);
+  
+  // Parse: github.com/USER/REPO/releases/download/TAG/FILENAME
+  const match = releaseUrl.match(/github\.com\/([^\/]+)\/([^\/]+)\/releases\/download\/([^\/]+)\/(.+)$/);
+  if (!match) {
+    throw new Error('Invalid GitHub release URL');
+  }
+  
+  const [, user, repo, tag, filename] = match;
+  console.log(`[GitHub] Parsed: ${user}/${repo} @ ${tag} → ${filename}`);
+  
+  // Step 1: Get release info from GitHub API
+  const apiUrl = `https://api.github.com/repos/${user}/${repo}/releases/tags/${tag}`;
+  console.log('[GitHub] Fetching release info from API...');
+  
+  const releaseResponse = await fetch(apiUrl);
+  if (!releaseResponse.ok) {
+    throw new Error(`GitHub API error: ${releaseResponse.status}`);
+  }
+  
+  const releaseData = await releaseResponse.json();
+  
+  // Step 2: Find matching asset
+  const asset = releaseData.assets.find(a => a.name === filename);
+  if (!asset) {
+    throw new Error(`Asset "${filename}" not found in release "${tag}"`);
+  }
+  
+  console.log(`[GitHub] Found asset ID ${asset.id}: ${asset.name} (${asset.size} bytes)`);
+  
+  // Step 3: Download via API (has CORS!)
+  const assetUrl = asset.url;
+  console.log('[GitHub] Downloading asset via API...');
+  
+  const assetResponse = await fetch(assetUrl, {
+    headers: {
+      'Accept': 'application/octet-stream'
+    }
+  });
+  
+  if (!assetResponse.ok) {
+    throw new Error(`Asset download failed: ${assetResponse.status}`);
+  }
+  
+  const arrayBuffer = await assetResponse.arrayBuffer();
+  console.log(`[GitHub] ✅ Downloaded ${arrayBuffer.byteLength} bytes`);
+  
+  return new Uint8Array(arrayBuffer);
+}
+
 // Helper function to convert GitHub URLs to jsDelivr (avoids CORS issues)
 function convertGitHubUrl(url) {
   let match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)/);
@@ -169,10 +221,29 @@ function setRt890FirmwareBuffer(buf, name = 'firmware.bin') {
 async function loadRt890FirmwareFromUrl(url, name) {
   try {
     logRt890(`Loading firmware from: ${name}...`);
-    const response = await fetch(url);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const buffer = await response.arrayBuffer();
-    setRt890FirmwareBuffer(buffer, name);
+    
+    // Check if it's a GitHub Release URL (needs special handling)
+    if (url.includes('/releases/download/')) {
+      logRt890('[RT890] Detected GitHub Release URL - using API loader');
+      const firmwareData = await loadFirmwareWithCORS(url);
+      setRt890FirmwareBuffer(firmwareData.buffer, name);
+      logRt890(`[RT890] ✅ Firmware loaded: ${firmwareData.byteLength} bytes`);
+    } else {
+      // Regular URL or GitHub repository file
+      let fetchUrl = url;
+      if (url.startsWith('http://') || url.startsWith('https://')) {
+        fetchUrl = convertGitHubUrl(url);
+        if (fetchUrl !== url) {
+          logRt890(`Converted GitHub URL to: ${fetchUrl}`);
+        }
+      }
+      
+      const response = await fetch(fetchUrl);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const buffer = await response.arrayBuffer();
+      setRt890FirmwareBuffer(buffer, name);
+      logRt890(`[RT890] ✅ Firmware loaded: ${buffer.byteLength} bytes`);
+    }
   } catch (error) {
     logRt890(`Error loading firmware: ${error.message}`, 'error');
     rt890FirmwareData = null;
@@ -481,15 +552,27 @@ if (rt890LoadUrlBtn && rt890FirmwareUrl) {
       if (rt890FirmwareStatus) rt890FirmwareStatus.textContent = 'Loading firmware from URL...';
       logRt890(`Loading firmware from URL...`);
       
-      const url = convertGitHubUrl(inputUrl);
-      if (url !== inputUrl) {
-        logRt890(`Converted GitHub URL to CDN: ${url}`);
+      // Check if it's a GitHub Release URL (needs special handling)
+      if (inputUrl.includes('/releases/download/')) {
+        logRt890('[RT890] Detected GitHub Release URL - using API loader');
+        const firmwareData = await loadFirmwareWithCORS(inputUrl);
+        const name = inputUrl.split('/').pop() || 'firmware.bin';
+        setRt890FirmwareBuffer(firmwareData.buffer, name);
+        logRt890(`[RT890] ✅ Firmware loaded: ${firmwareData.byteLength} bytes`);
+      } else {
+        // Regular URL or GitHub repository file
+        const url = convertGitHubUrl(inputUrl);
+        if (url !== inputUrl) {
+          logRt890(`Converted GitHub URL to CDN: ${url}`);
+        }
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const buffer = await response.arrayBuffer();
+        const name = url.split('/').pop() || 'firmware.bin';
+        setRt890FirmwareBuffer(buffer, name);
+        logRt890(`[RT890] ✅ Firmware loaded: ${buffer.byteLength} bytes`);
       }
-      const response = await fetch(url);
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      const buffer = await response.arrayBuffer();
-      const name = url.split('/').pop() || 'firmware.bin';
-      setRt890FirmwareBuffer(buffer, name);
+      
       // Clear other inputs
       if (rt890FirmwareSelect) rt890FirmwareSelect.value = '';
       if (rt890FirmwareFile) rt890FirmwareFile.value = '';

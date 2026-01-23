@@ -1,0 +1,388 @@
+{
+  "k5_firmwares": [
+    {
+      "group": "Matoz Firmware",
+      "firmwares": [
+        {
+          "name": "Matoz v0.34.0C",
+          "path": "firmware/Custom_Firmware_by_Matoz_V0.34.0C.bin",
+          "profile": "Matoz"
+        },
+        {
+          "name": "Matoz v0.34.0C (Fagci Key Style)",
+          "path": "firmware/Custom_Firmware_by_Matoz_V0.34.0C_fagci_key_style.bin",
+          "profile": "Matoz"
+        },
+        {
+          "name": "Matoz v0.33.0C",
+          "path": "firmware/Custom_Firmware_by_Matoz_V0.33.0C.bin",
+          "profile": "Matoz"
+        },
+        {
+          "name": "Matoz v0.33.0C (Fagci Key Style)",
+          "path": "firmware/Custom_Firmware_by_Matoz_V0.33.0C_fagci_keys_style.bin",
+          "profile": "Matoz"
+        }
+      ]
+    },
+    {
+      "group": "Motorko Firmware",
+      "firmwares": [
+        {
+          "name": "Motorko v0.26",
+          "path": "firmware/motorko_v0.26.packed.bin",
+          "profile": "Motorko"
+        }
+      ]
+    },
+    {
+      "group": "Fagci R3b0rn Firmware",
+      "firmwares": [
+        {
+          "name": "Fagci R3b0rn Nightly N 241111",
+          "path": "firmware/k5-fagci-r3b0rn-nightly-n_241111.bin",
+          "profile": "Fagci"
+        },
+        {
+          "name": "FAGCI Nightly 2025-01-19 (any EEPROM)",
+          "path": "firmware/fagci-r3b0rn-2025-01-19-buggy-nightly1-SNR-CLOSE-43.bin",
+          "profile": "Fagci"
+        }
+      ]
+    },
+    {
+      "group": "kamilsss655 (Nunu) Firmware",
+      "firmwares": [
+        {
+          "name": "kamilsss655 v.20.5",
+          "path": "firmware/kamilsss655_v20.5.bin",
+          "profile": "Nunu"
+        }
+      ]
+    },
+    {
+      "group": "Joaquim.org Firmware",
+      "firmwares": [
+        {
+          "name": "Joaquim.org Rolling Release",
+          "path": "https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin",
+          "profile": "Joaquim UV-KX"
+        }
+      ]
+    },
+    {
+      "group": "Egzumer Firmware",
+      "firmwares": [
+        {
+          "name": "Egzumer v0.22",
+          "path": "firmware/egzumer_v0.22.packed.bin",
+          "profile": "Egzumer"
+        }
+      ]
+    },
+    {
+      "group": "IJV Firmwares",
+      "firmwares": [
+        {
+          "name": "IJV X3.60",
+          "path": "firmware/IJV-firmware.X3_60.bin",
+          "profile": "IJV"
+        },
+        {
+          "name": "IJV S3.60",
+          "path": "firmware/IJV-firmware.S3_60.bin",
+          "profile": "IJV"
+        },
+        {
+          "name": "IJV N3.60",
+          "path": "firmware/IJV-firmware.N3_60.bin",
+          "profile": "IJV"
+        },
+        {
+          "name": "IJV X3.60 VOX",
+          "path": "firmware/IJV-firmware.X3.60_VOX.bin",
+          "profile": "IJV"
+        },
+        {
+          "name": "IJV S3.60 VOX",
+          "path": "firmware/IJV-firmware.S3.60_VOX.bin",
+          "profile": "IJV"
+        },
+        {
+          "name": "IJV N3.60 VOX",
+          "path": "firmware/IJV-firmware.N3.60_VOX.bin",
+          "profile": "IJV"
+        }
+      ]
+    },
+    {
+      "group": "F4HWN Firmware v4.3",
+      "firmwares": [
+        {
+          "name": "F4HWN Bandscope v4.3",
+          "path": "firmware/f4hwn/f4hwn.bandscope.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Broadcast v4.3",
+          "path": "firmware/f4hwn/f4hwn.broadcast.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN RescueOps v4.3",
+          "path": "firmware/f4hwn/f4hwn.rescueops.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Basic v4.3",
+          "path": "firmware/f4hwn/f4hwn.basic.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Game v4.3",
+          "path": "firmware/f4hwn/f4hwn.game.packed.v4.3.bin",
+          "profile": "F4HWN"
+        }
+      ]
+    },
+    {
+      "group": "Quansheng Stock Firmware",
+      "firmwares": [
+        {
+          "name": "Quansheng Stock v2.01.19 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.19_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.23 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.23_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.26 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.26_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.27 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.27_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.31 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.31_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.39 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.39_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.15 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k6_v3.00.15_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.22 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k6_v3.00.22_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v4.00.01 (UV-5R Plus)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v4.00.01_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v4.00.07 (UV-5R Plus)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v4.00.07_publish.bin",
+          "profile": "Stock"
+        }
+      ]
+    }
+  ],
+  "k1_firmwares": [
+    {
+      "group": "Matoz Firmware",
+      "firmwares": [
+        {
+          "name": "Matoz v1.35.0D",
+          "path": "firmware/Custom_Firmware_by_Matoz_V1.35.0D.bin",
+          "profile": "Matoz"
+        }
+      ]
+    },
+    {
+      "group": "F4HWN Firmware",
+      "firmwares": [
+        {
+          "name": "F4HWN Fusion v4.3.2 (K5v3)",
+          "path": "firmware/f4hwn.k5v3.fusion.v4.3.2.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Fusion v4.3.2 (K1)",
+          "path": "firmware/f4hwn.k1.fusion.v4.3.2.bin",
+          "profile": "F4HWN"
+        }
+      ]
+    },
+    {
+      "group": "Calypso Firmware",
+      "firmwares": [
+        {
+          "name": "Calypso Edition v1.2",
+          "path": "firmware/f4hwn.calypso_v1.2.bin",
+          "profile": "Calypso"
+        },
+        {
+          "name": "Calypso Edition v1.2.1",
+          "path": "firmware/f4hwn.calypso_v1.2.1.bin",
+          "profile": "Calypso"
+        }
+      ]
+    },
+    {
+      "group": "Quansheng Stock Firware",
+      "firmwares": [
+        {
+          "name": "Quansheng Stock v7.00.11 (K5v3)",
+          "path": "firmware/quansheng.k5v3.stock.firmware.v7.00.11.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v7.02.02 (K1)",
+          "path": "firmware/quansheng.k1.stock.firmware.v7.02.02.bin",
+          "profile": "Stock"
+        }
+      ]
+    }
+  ],
+  "rt890_firmwares": [
+    {
+      "group": "M7OCM Firmware (PCB 2.0)",
+      "firmwares": [
+        {
+          "name": "M7OCM v2.2.5X (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-v2.2.5X-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.4X (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-v2.2.4X-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.4Q (PCB 2.0) - Spectrum Auto Light",
+          "path": "firmware/rt890-m7ocm-v2.2.4Q-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.3Q (PCB 2.0) - Spectrum Auto Light",
+          "path": "firmware/rt890-m7ocm-v2.2.3Q-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.3 (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-v2.2.3-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.1 (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-v2.2.1-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.0 (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-v2.2.0-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.2 240MHz Filter (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.0.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.2 280MHz Filter (PCB 2.0)",
+          "path": "firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.0.bin",
+          "profile": "M7OCM"
+        }
+      ]
+    },
+    {
+      "group": "M7OCM Firmware (PCB 2.1)",
+      "firmwares": [
+        {
+          "name": "M7OCM v2.2.5X (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.2.5X-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.4X (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.2.4X-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.4Q (PCB 2.1) - Spectrum Auto Light",
+          "path": "firmware/rt890-m7ocm-v2.2.4Q-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.3Q (PCB 2.1) - Spectrum Auto Light",
+          "path": "firmware/rt890-m7ocm-v2.2.3Q-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.3 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.2.3-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.1 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.2.1-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.0 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.2.0-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.1.9 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.1.9-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.1.8 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.1.8-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.1.7 (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-v2.1.7-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.2 240MHz Filter (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.1.bin",
+          "profile": "M7OCM"
+        },
+        {
+          "name": "M7OCM v2.2.2 280MHz Filter (PCB 2.1)",
+          "path": "firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.1.bin",
+          "profile": "M7OCM"
+        }
+      ]
+    },
+    {
+      "group": "OEFWCOM Base",
+      "firmwares": [
+        {
+          "name": "OEFWCOM 21/10/2024",
+          "path": "firmware/rt890-oefwcom-21102024.bin",
+          "profile": "OEFWCOM"
+        }
+      ]
+    }
+  ]
+}

@@ -27,11 +27,11 @@ const debugLog = (...args) => {
 };
 
 // TK11 Constants
-const TK11_MEMORY_LIMIT = 0x020000;       // 655,359 bytes (~640KB) - WITHOUT calibration
-const TK11_MEMORY_LIMIT_CALIB = 0x021000; // 659,456 bytes (~644KB) - WITH calibration
-const TK11_CALIB_START = 0x020000;         // Calibration start address
-const TK11_CALIB_END = 0x021000;           // Calibration end address (4096 bytes = 4KB)
-const TK11_CALIB_SIZE = 0x1000;            // 4096 bytes calibration size
+const TK11_MEMORY_LIMIT = 0x010000;       // WITHOUT calibration
+const TK11_MEMORY_LIMIT_CALIB = 0x021000; // WITH calibration
+const TK11_CALIB_START = 0x010000;         // Calibration start address
+const TK11_CALIB_END = 0x021000;           // Calibration end address (69632 bytes = 68 KB)
+const TK11_CALIB_SIZE = 0x011000;          // 69632 bytes calibration size (68 KB)
 const TK11_MAX_CHUNK_SIZE = 0x100;         // 256 bytes - reduced for stability
 const TK11_ADDRESS_BASE = 0x080000;
 const MAGIC_CODE = 5;
@@ -63,6 +63,7 @@ const XOR_ARRAY = new Uint8Array([
 ]);
 
 const releaseIo = (target = "all") => {
+  console.log('[PROTOCOL] 🔓 releaseIo called:', target, 'globalReadReader:', globalReadReader ? 'EXISTS' : 'null');
   try {
     if (target !== "read" && globalWriteReader) {
       globalWriteReader.releaseLock();
@@ -234,8 +235,11 @@ const sendPacket = async (port, data) => {
 
 // Read packet from TK11 with improved parsing
 const readPacket = async (port, expectedLength, timeout = RESPONSE_TIMEOUT) => {
+  console.log('[PROTOCOL] 📖 readPacket START - expectedLength:', expectedLength);
   releaseIo("read");
+  console.log('[PROTOCOL] 🆕 Creating new reader...');
   const reader = port.readable.getReader();
+  console.log('[PROTOCOL] ✅ Reader created successfully');
   globalReadReader = reader;
   let buffer = new Uint8Array();
   let timeoutId;
@@ -283,6 +287,9 @@ const readPacket = async (port, expectedLength, timeout = RESPONSE_TIMEOUT) => {
       
       function handleData({ value, done }) {
         if (done) {
+          console.error('[PROTOCOL] ❌ handleData: done=true! Reader was cancelled!');
+          console.error('[PROTOCOL] ❌ Stack trace:');
+          console.trace();
           reject(new Error("Reader cancelled."));
           return;
         }
@@ -310,10 +317,13 @@ const readPacket = async (port, expectedLength, timeout = RESPONSE_TIMEOUT) => {
       }, timeout);
     });
   } finally {
+    console.log('[PROTOCOL] 🧹 readPacket FINALLY - cleaning up reader');
     clearTimeout(timeoutId);
     try {
       reader.releaseLock();
+      console.log('[PROTOCOL] ✅ Reader released successfully');
     } catch (e) {
+      console.error('[PROTOCOL] ❌ Reader release error:', e);
       debugLog('Reader release error:', e);
     }
     globalReadReader = null;
@@ -339,6 +349,7 @@ const withRetry = async (operation, operationName) => {
 
 // Initialize connection with TK11
 const tk11Init = async (port) => {
+  console.log('[PROTOCOL] 🔌 tk11Init START');
   debugLog('Initializing TK11 connection...');
   
   // Clear any pending data
@@ -371,6 +382,7 @@ const tk11Init = async (port) => {
     if (versionStr.length > 0) version = versionStr;
   }
   
+  console.log('[PROTOCOL] ✅ tk11Init SUCCESS');
   debugLog('Connected, version:', version);
   return version;
 };
@@ -379,6 +391,7 @@ const tk11Init = async (port) => {
 const tk11Read = async (port, startAddress, length) => {
   const address = TK11_ADDRESS_BASE + startAddress;
   
+  console.log(`[PROTOCOL] 📥 tk11Read START - address: 0x${startAddress.toString(16)}, length: ${length}`);
   debugLog(`Reading ${length} bytes from 0x${startAddress.toString(16)}`);
   
   return await withRetry(async () => {

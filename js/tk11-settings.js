@@ -4,6 +4,7 @@
 
 import { subscribe, getPort, claim, release } from "./serial-manager.js";
 import { tk11Init, tk11Read, tk11Write, tk11Reboot, TK11_MAX_CHUNK_SIZE } from "./protocol-tk11.js";
+import { logoRead, logoWrite, displayLogoOnCanvas, LOGO_ADDRESS } from "./logo-editor.js";
 
 'use strict';
 
@@ -187,7 +188,8 @@ const _5TONE_SINGLE_INTERVAL_TIMES = Array.from({length: 101}, (_, i) => String(
 // ============================================
 // DATA STORAGE
 // ============================================
-let generalData = null;      // 0x13000 data
+let generalData = null;
+let logoData = null;      // 0x0D6008 LOGO data
 let general2Data = null;     // 0x14000 data
 let fmData = null;           // 0x12000 data
 let dtmfContactsData = null; // 0x1A000 data
@@ -1297,6 +1299,14 @@ async function readAllSettings() {
     tone5ContactsData = new Uint8Array(await readMemory(MemoryAddress.TONE5_CONTACTS, ChunkSize.TONE5_CONTACTS));
     setProgress(75);
     
+    // Read Logo
+    logoData = new Uint8Array(await logoRead());
+    setProgress(90);
+    console.log('[TK11 Settings] Logo settings loaded');
+    
+    // Display logo on canvas
+    displayLogoOnCanvas(logoData);
+    
     // Populate all UI
     populateGeneral();
     populateButtons();
@@ -1359,6 +1369,13 @@ async function writeAllSettings() {
     
     if (tone5ContactsData) {
       await writeMemory(MemoryAddress.TONE5_CONTACTS, tone5ContactsData);
+    }
+    setProgress(90);
+    
+    // Write Logo if available
+    if (logoData) {
+      await logoWrite(logoData);
+      console.log('[TK11 Settings] Logo written');
     }
     setProgress(100);
     

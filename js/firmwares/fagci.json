@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "Fagci v0.12",
+      "url": "https://cdn.jsdelivr.net/gh/fagci/uv-k5-firmware-fagci-mod/compiled-firmware/firmware.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

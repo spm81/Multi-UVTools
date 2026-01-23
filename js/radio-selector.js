@@ -1,6 +1,6 @@
 /**
  * Radio Selector Module
- * Manages selection between UV-K5/K1 and TK11 radios
+ * Manages selection between UV-K5/K1, TK11, and RT-890 radios
  * Different radios have different protocols and memory layouts
  */
 
@@ -20,8 +20,20 @@ const RADIO_TYPES = {
   },
   TK11: {
     id: 'TK11',
-    name: 'TK11 / RT-890',
-    description: 'Radtel TK11, RT-890, and compatible',
+    name: 'TK11',
+    description: 'Radtel TK11',
+    protocol: 'tk11',
+    baudRates: [115200],
+    defaultBaud: 115200,
+    memorySize: 0x23000,
+    hasExternalEeprom: false,
+    hasCalibration: false,
+    channelCount: 999
+  },
+  RT890: {
+    id: 'RT890',
+    name: 'RT-890',
+    description: 'RT-890 and compatible',
     protocol: 'tk11',
     baudRates: [115200],
     defaultBaud: 115200,
@@ -94,6 +106,14 @@ const init = () => {
   // Update baud rate selector based on radio type
   updateBaudRates();
   
+  // Save user's baud rate choice to localStorage
+  const baudSelect = document.getElementById('baudSelect');
+  if (baudSelect) {
+    baudSelect.addEventListener('change', () => {
+      localStorage.setItem(`baudRate_${currentRadioType}`, baudSelect.value);
+    });
+  }
+  
   console.log(`Radio selector initialized: ${RADIO_TYPES[currentRadioType].name}`);
 };
 
@@ -103,20 +123,23 @@ const updateBaudRates = () => {
   if (!baudSelect) return;
   
   const config = RADIO_TYPES[currentRadioType];
-  const currentBaud = parseInt(baudSelect.value);
+  
+  // Try to get saved baud from localStorage for this radio type
+  const savedBaud = localStorage.getItem(`baudRate_${currentRadioType}`);
+  const preferredBaud = savedBaud ? parseInt(savedBaud) : config.defaultBaud;
   
   baudSelect.innerHTML = '';
   config.baudRates.forEach(baud => {
     const option = document.createElement('option');
     option.value = baud;
     option.textContent = baud;
-    option.selected = baud === config.defaultBaud;
+    option.selected = baud === preferredBaud;
     baudSelect.appendChild(option);
   });
   
-  // Restore current baud if available
-  if (config.baudRates.includes(currentBaud)) {
-    baudSelect.value = currentBaud;
+  // Set the preferred baud if available
+  if (config.baudRates.includes(preferredBaud)) {
+    baudSelect.value = preferredBaud;
   }
 };
 
@@ -191,9 +214,28 @@ const updateUI = () => {
     el.textContent = config.channelCount;
   });
   
+  // Update memory type labels
+  const memoryTypeLabels = document.querySelectorAll('.memory-type-label');
+  const memoryTypeName = isTK11 ? 'Flash Memory' : 'EEPROM/Flash Memory';
+  memoryTypeLabels.forEach(el => {
+    el.textContent = memoryTypeName;
+  });
+  
+  // Hide K5-only sections when TK11 is selected
+  const memorySizeDetectorSection = document.getElementById('memorySizeDetectorSection');
+  const eepromCleanerSection = document.getElementById('eepromCleanerSection');
+  
+  if (memorySizeDetectorSection) {
+    memorySizeDetectorSection.style.display = isTK11 ? 'none' : '';
+  }
+  if (eepromCleanerSection) {
+    eepromCleanerSection.style.display = isTK11 ? 'none' : '';
+  }
+  
   updateBaudRates();
   
-  console.log(`UI updated for ${config.name}: showing ${isTK11 ? 'TK11' : 'K5'} tabs`);
+  const tabType = currentRadioType === 'K5' ? 'K5' : currentRadioType === 'TK11' ? 'TK11' : 'RT890';
+  console.log(`UI updated for ${config.name}: showing ${tabType} tabs`);
 };
 
 // Initialize when DOM is ready

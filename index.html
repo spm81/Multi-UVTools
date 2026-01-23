@@ -10,6 +10,7 @@
       /* Settings Tabs */
       .settings-tabs {
         display: flex;
+        flex-wrap: wrap;
         gap: 0;
         margin-bottom: 0;
         border-bottom: 2px solid var(--border);
@@ -134,6 +135,24 @@
         gap: 0.5rem;
         margin-bottom: 1rem;
       }
+      
+      /* Danger button (red) */
+      button.danger {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+      }
+      button.danger:hover:not(:disabled) {
+        background: #c62828;
+        border-color: #c62828;
+      }
+      button.danger:disabled {
+        background: var(--bg-secondary);
+        color: var(--text-muted);
+        border-color: var(--border-color);
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
     </style>
   </head>
   <body>
@@ -182,20 +201,21 @@
           <a href="#home" class="nav-brand">Multi-UVTools</a>
           <div class="nav-links">
             <a href="#instructions" class="nav-item" data-nav="instructions">Home</a>
-            <a href="#home" class="nav-item" data-nav="home">Tools</a>
-            <a href="#k1" class="nav-item" data-nav="k1">Flash</a>
-            <a href="#channels" class="nav-item" data-nav="channels">Channels</a>
+            <a href="#home" class="nav-item k5-tk11-only" data-nav="home">Tools</a>
+            <a href="#k1" class="nav-item k5-only" data-nav="k1">Flash</a>
+            <a href="#channels" class="nav-item k5-only" data-nav="channels">Channels</a>
             <a href="#settings" class="nav-item k5-only" data-nav="settings">Settings</a>
             <a href="#tk11-settings" class="nav-item tk11-only" data-nav="tk11-settings" style="display: none;">Settings</a>
-            <a href="#mirror" class="nav-item" data-nav="mirror">Mirror</a>
-            <a href="#smr" class="nav-item" data-nav="smr">SMR</a>
+            <a href="#mirror" class="nav-item k5-only" data-nav="mirror">Mirror</a>
+            <a href="#smr" class="nav-item k5-only" data-nav="smr">SMR</a>
             <a href="#unbricking" class="nav-item k5-only" data-nav="unbricking">Unbricking</a>
           </div>
         </div>
         <div class="nav-status">
           <select id="radioTypeSelect" class="radio-type-select nav-radio-type" title="Select Radio Type">
             <option value="K5" selected>📻 UV-K5/K1</option>
-            <option value="TK11">📻 TK11/RT-890</option>
+            <option value="TK11">📻 TK11</option>
+            <option value="RT890">📻 RT-890</option>
           </select>
           <span class="status-dot" id="homeStatusDot" data-status="disconnected"></span>
           <span id="connectionLabel" class="status-label">Disconnected</span>
@@ -225,7 +245,7 @@
       
       <main class="app tool-scope">
       <section class="page" id="instructions" data-page>
-        <header class="hero">
+        <header class="hero k5-tk11-only">
           <div>
             <p class="eyebrow">INTRO</p>
             <h1>Instructions</h1>
@@ -235,11 +255,15 @@
           </div>
         </header>
 
-        <!-- TK11 Work in Progress Warning -->
-        <section class="panel tk11-only" style="display: none; background: #fff3cd; border: 2px solid #ffc107; border-radius: 8px; margin-bottom: 1rem;">
-          <h2 style="color: #856404;">⚠️ TK11 Support - Work in Progress</h2>
-          <p style="color: #856404;">TK11 support is currently under development. Some features may not work correctly. Use at your own risk.</p>
-        </section>
+        <header class="hero rt890-only" style="display: none;">
+          <div>
+            <p class="eyebrow">INTRO</p>
+            <h1>Instructions</h1>
+            <p class="subtitle">
+              Welcome to Multi-UVTools. This application helps you manage your Radtel radio.
+            </p>
+          </div>
+        </header>
 
         <!-- K5 Instructions -->
         <section class="panel k5-only">
@@ -247,7 +271,7 @@
           <p>Connect your radio via USB. Baud rate: 38400 (Default) / 115200 (Specific firmwares).</p>
           <h3>Available Features:</h3>
           <ul style="list-style: disc; margin-left: 2rem; line-height: 1.8;">
-            <li><strong>Tools:</strong> EEPROM backup/restore, calibration management, and HEX view</li>
+            <li><strong>Tools:</strong> Memory backup/restore, calibration management, and HEX view</li>
             <li><strong>Flash:</strong> Flash firmware for UV-K5/K6/5R and UV-K5 V3/K1 radios</li>
             <li><strong>Channels:</strong> Read, edit and write channels to the radio</li>
             <li><strong>Settings:</strong> Edit basic settings, DTMF contacts, and FM radio frequencies</li>
@@ -295,9 +319,8 @@
           <p>Connect your radio via USB. Baud rate: 115200 (Default).</p>
           <h3>Available Features:</h3>
           <ul style="list-style: disc; margin-left: 2rem; line-height: 1.8;">
-            <li><strong>Tools:</strong> EEPROM backup/restore, calibration management, and HEX view</li>
-            <li><strong>Flash:</strong> Flash firmware for TK11 and RT-890 radios</li>
-            <li><strong>Channels:</strong> Read, edit and write channels to the radio</li>
+            <li><strong>Tools:</strong> Standard radio operations (Dump EEPROM, restore, calibration management, HEX view)</li>
+            <li><strong>Settings:</strong> Read and write TK11 settings</li>
           </ul>
 
           <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
@@ -322,6 +345,32 @@
             </p>
           </div>
         </section>
+        
+        <!-- RT890 Instructions -->
+        <section class="panel rt890-only" style="display: none;">
+          <h2>Getting Started</h2>
+          <p>Connect your radio via USB. Baud rate: 115200 (Default).</p>
+          <h3>Available Features:</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 1.8;">
+            <li><strong>Flash:</strong> Flash firmware for RT-890 radios</li>
+          </ul>
+
+          <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #e94560; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              Open Source Project
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              This website is available on my GitHub (<a href="https://github.com/spm81/Multi-UVTools" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm81</a>) <strong style="color: #fff;">Matoz</strong>.
+            </p>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
+            </p>
+            <p style="color: #e94560; font-weight: bold; font-size: 1.1rem; margin-top: 1rem;">
+              I hope you enjoy my work! 🚀
+            </p>
+          </div>
+        </section>
       </section>
 
       <section class="page" id="home" data-page>
@@ -334,10 +383,10 @@
             </p>
             <p class="subtitle muted" style="font-size: 0.9rem; margin-top: 0.5rem;">
               <span class="k5-only">Memory: 8 KB EEPROM | 200 Channels | External EEPROM</span>
-              <span class="tk11-only" style="display: none;">Memory: 128 KB (~132 KB with calibration) | 999 Channels | Internal Flash</span>
+              <span class="tk11-only" style="display: none;">Memory: 1532 KB (12 Mbit) (0x17EF00) | 999 Channels | Internal Flash</span>
             </p>
             <div class="tk11-only" style="display: none; margin-top: 1rem; padding: 1rem; background: #f59e0b22; border: 1px solid #f59e0b; border-radius: 8px; color: #f59e0b;">
-              ⚠️ <strong>TK11 support is a work in progress.</strong> Some features may not work correctly yet.
+              ⚠️ <strong>TK11 support is a work in progress.</strong> It works but needs fine-tuning (Everything should be working correctly).
             </div>
           </div>
         </header>
@@ -345,14 +394,8 @@
         <section class="panel-grid">
           <!-- 1. EEPROM backup -->
           <section class="panel">
-            <h2>EEPROM backup</h2>
+            <h2><span class="memory-type-label">EEPROM</span> backup</h2>
             <p class="muted">Save the radio's current configuration.</p>
-            <div class="field-row">
-              <label class="toggle">
-                <input type="checkbox" id="backupCalib" />
-                <span>Include calibration</span>
-              </label>
-            </div>
             <button id="backupBtn">
               <span class="btn-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
@@ -377,14 +420,8 @@
 
           <!-- 3. Restore EEPROM -->
           <section class="panel">
-            <h2>Restore EEPROM</h2>
+            <h2>Restore <span class="memory-type-label">EEPROM</span></h2>
             <p class="muted">Restore a backup file to the radio.</p>
-            <div class="field-row">
-              <label class="toggle">
-                <input type="checkbox" id="restoreCalib" />
-                <span>Include calibration</span>
-              </label>
-            </div>
             <div class="field-row">
               <input type="file" id="restoreFile" accept=".bin" />
             </div>
@@ -396,7 +433,7 @@
                   <path d="M4 4h16" />
                 </svg>
               </span>
-              Restore EEPROM
+              Restore <span class="memory-type-label">EEPROM</span>
             </button>
             <div class="progress">
               <div class="progress-label">
@@ -467,7 +504,7 @@
           <!-- TK11 Dump Calibration -->
           <section class="panel tk11-only" style="display: none;">
             <h2>Dump Calibration</h2>
-            <p class="muted">Save the calibration area (0x020000-0x021000) - 4KB.</p>
+            <p class="muted">Save the calibration area (0x010000-0x021000) - 68 KB.</p>
             <button id="dumpCalibTK11Btn">
               <span class="btn-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
@@ -487,13 +524,13 @@
                 <div class="progress-fill" id="dumpCalibTK11Fill"></div>
               </div>
             </div>
-            <p class="hint">TK11 calibration file will be downloaded as .bin (4096 bytes).</p>
+            <p class="hint">TK11 calibration file will be downloaded as .bin (69632 bytes = 68 KB).</p>
           </section>
 
           <!-- TK11 Restore Calibration -->
           <section class="panel tk11-only" style="display: none;">
             <h2>Restore Calibration</h2>
-            <p class="muted">Restore calibration data from a backup file (0x020000-0x021000).</p>
+            <p class="muted">Restore calibration data from a backup file (0x010000-0x021000).</p>
             <div class="field-row">
               <input type="file" id="restoreCalibTK11File" accept=".bin" />
             </div>
@@ -516,7 +553,7 @@
                 <div class="progress-fill" id="restoreCalibTK11Fill"></div>
               </div>
             </div>
-            <p class="hint">Expected size: 4096 bytes (4KB).</p>
+            <p class="hint">Expected size: 69632 bytes (68 KB).</p>
           </section>
 
           <!-- 6. Default Calibrations -->
@@ -559,26 +596,141 @@
             <p class="hint" id="defaultCalibHint">Select a model to restore its default calibration.</p>
           </section>
 
+          <!-- Memory Size Detector (K5 & TK11) -->
+          <section class="panel" id="memorySizeDetectorSection">
+            <h2><span class="memory-type-label">Check EEPROM Size</span></h2>
+            <p class="muted">Automatically detects the size of your radio's memory using wrap-around test. This is safe and non-destructive.</p>
+            
+            <div class="field-row">
+              <button id="detectMemorySizeBtn" class="primary" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                  </svg>
+                </span>
+                Detect Size
+              </button>
+            </div>
+
+            <div id="memorySizeResult" class="memory-size-result"></div>
+
+            <p class="muted" style="margin-top: 1rem;">
+              <strong>Tested sizes:</strong> 8 KB, 64 KB, 128 KB, 256 KB, 512 KB, 1 MB, 2 MB
+            </p>
+          </section>
+
+          <!-- EEPROM/Flash Cleaner (K5 & TK11) -->
+          <section class="panel" id="eepromCleanerSection">
+            <h2><span class="memory-type-label">Clean My EEPROM</span> Memory</h2>
+            <p class="muted">⚠️ <strong>DESTRUCTIVE OPERATION</strong> - Fills entire memory with 0xFF (factory blank state) while protecting calibration areas.</p>
+            
+            <div class="field-row">
+              <button id="cleanEepromBtn" class="danger" disabled>
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                  </svg>
+                </span>
+                Clean Memory
+              </button>
+            </div>
+
+            <div class="progress-bar" id="cleanerProgressBar" style="display: none; margin-top: 15px;">
+              <div class="progress-fill" id="cleanerProgressFill" style="width: 0%;"></div>
+            </div>
+
+            <div id="cleanerStatus" class="status-text"></div>
+
+            <p class="muted" style="margin-top: 1rem;">
+              <strong>Protected areas (NOT erased):</strong><br>
+              <span class="k5-only">K5/K1: 0x1E00-0x2000 (512 bytes)</span>
+              <span class="tk11-only">TK11: 0x010000-0x021000 (68 KB - Calibration)</span>
+            </p>
+          </section>
+
+          <!-- Lock Radio Password (K5 & TK11) -->
+          <section class="panel">
+            <h2>Lock Radio Password</h2>
+            <p class="muted">Manage startup password lock (6-digit PIN).</p>
+            
+            <!-- LCD Display -->
+            <div class="field-row" style="margin-bottom: 15px;">
+              <label>Current Password</label>
+              <div style="font-family: 'Courier New', monospace; font-size: 32px; letter-spacing: 10px; background: #B8D4A8; color: #000; padding: 10px 20px; border-radius: 4px; text-align: center; border: 2px solid #8BA87A;">
+                <span id="passwordLCD">______</span>
+              </div>
+            </div>
+
+            <!-- Password Input -->
+            <div class="field-row">
+              <label for="passwordInput">New Password (6 digits)</label>
+              <input type="text" id="passwordInput" placeholder="000000" maxlength="6" pattern="[0-9]{6}" style="font-family: 'Courier New', monospace; font-size: 18px; letter-spacing: 5px; text-align: center;" />
+            </div>
+
+            <!-- Buttons -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button id="readPasswordBtn">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M12 3v18" />
+                    <path d="M7 10l5 5 5-5" />
+                    <path d="M4 20h16" />
+                  </svg>
+                </span>
+                Read from Radio
+              </button>
+              <button id="writePasswordBtn">
+                <span class="btn-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <path d="M12 21V9" />
+                    <path d="M7 14l5-5 5 5" />
+                    <path d="M4 4h16" />
+                  </svg>
+                </span>
+                Write to Radio
+              </button>
+            </div>
+
+            <p class="hint" style="margin-top: 10px;">
+              <strong>Address:</strong> 
+              <span class="k5-only" style="display: none;">K5 EEPROM: 0x01F000 (INT32 Little Endian)</span>
+              <span class="tk11-only" style="display: none;">TK11 Flash: 0x017000 (INT32 Little Endian)</span>
+              <br>
+              <strong>Tip:</strong> Enter empty password and write to disable lock. Pattern: FF FF FF FF FF FF FF
+            </p>
+          </section>
+
 
         </section>
 
         <!-- Advanced Tools Section -->
         <h2 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">Advanced Tools <span class="collapse-icon">▼</span></h2>
         <section class="panel-grid hidden">
-          <!-- Read EEPROM -->
+          <!-- Read EEPROM / Flash Memory -->
           <section class="panel">
-            <h2>Read EEPROM</h2>
-            <p class="muted">Read full EEPROM contents from the radio.</p>
+            <h2>
+              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="tk11-only" style="display: none;">Read Flash Memory</span>
+            </h2>
+            <p class="muted">
+              <span class="k5-only" style="display: none;">Read EEPROM Memory contents from the radio.</span>
+              <span class="tk11-only" style="display: none;">Read full Flash Memory contents from the radio.</span>
+            </p>
             <div class="field-group">
               <label for="readEepromSize">Size</label>
-              <select id="readEepromSize">
+              <select id="readEepromSizeK5" class="k5-only" style="display: none;">
                 <option value="8192" selected>8 KB (64Kbit) (0x2000)</option>
                 <option value="65536">64 KB (512Kbit) (0x10000)</option>
-                <option value="1568800">1532 KB (0x17F020)</option>
-                <option value="135168">132 KB (TK11 with calib) (0x21000)</option>
                 <option value="262144">256 KB (2Mbit) (0x40000)</option>
                 <option value="524288">512 KB (4Mbit) (0x80000)</option>
-                <option value="659456">644 KB (TK11 old calib) (0xA1000)</option>
+              </select>
+              <select id="readEepromSizeTK11" class="tk11-only" style="display: none;">
+                <option value="1568512" selected>1532 KB (12 Mbit) (0x17EF00) - Full Flash</option>
               </select>
             </div>
             <button id="readEepromBtn">
@@ -589,7 +741,8 @@
                   <path d="M4 20h16" />
                 </svg>
               </span>
-              Read EEPROM
+              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="tk11-only" style="display: none;">Read Flash Memory</span>
             </button>
             <div class="progress">
               <div class="progress-label">
@@ -600,13 +753,22 @@
                 <div class="progress-fill" id="readEepromFill"></div>
               </div>
             </div>
-            <p class="hint">Download full EEPROM as .bin file.</p>
+            <p class="hint">
+              <span class="k5-only" style="display: none;">Read EEPROM Memory as .bin file.</span>
+              <span class="tk11-only" style="display: none;">Download full Flash Memory as .bin file.</span>
+            </p>
           </section>
 
-          <!-- Write EEPROM -->
+          <!-- Write EEPROM / Flash Memory -->
           <section class="panel">
-            <h2>Write EEPROM</h2>
-            <p class="muted">Write a full EEPROM file to the radio.</p>
+            <h2>
+              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="tk11-only" style="display: none;">Write Flash Memory</span>
+            </h2>
+            <p class="muted">
+              <span class="k5-only" style="display: none;">Read EEPROM Memory file to the radio.</span>
+              <span class="tk11-only" style="display: none;">Write a full Flash Memory file to the radio.</span>
+            </p>
             <div class="field-row">
               <input type="file" id="writeEepromFile" accept=".bin" />
             </div>
@@ -618,7 +780,8 @@
                   <path d="M4 4h16" />
                 </svg>
               </span>
-              Write EEPROM
+              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="tk11-only" style="display: none;">Write Flash Memory</span>
             </button>
             <div class="progress">
               <div class="progress-label">
@@ -629,12 +792,15 @@
                 <div class="progress-fill" id="writeEepromFill"></div>
               </div>
             </div>
-            <p class="hint">Write entire EEPROM file to the radio.</p>
+            <p class="hint">
+              <span class="k5-only" style="display: none;">Read EEPROM Memory file to the radio.</span>
+              <span class="tk11-only" style="display: none;">Write entire Flash Memory file to the radio.</span>
+            </p>
           </section>
           <!-- DEV Tools - TK11 (Hidden until devmode) -->
           <section class="panel dev-panel tk11-dev" id="devToolsTK11Backup" style="display: none; border: 2px solid #f59e0b;">
-            <h2 style="color: #f59e0b;">🔧 EEPROM Backup DEV (TK11)</h2>
-            <p class="muted">Read custom EEPROM range from the TK11 radio.</p>
+            <h2 style="color: #f59e0b;">🔧 Flash Memory Backup DEV (TK11)</h2>
+            <p class="muted">Read custom Flash Memory range from the TK11 radio.</p>
             <div class="field-row" style="gap: 1rem; flex-wrap: wrap;">
               <div class="field-group">
                 <label for="devBackupStartAddrTK11">Start Address</label>
@@ -642,7 +808,7 @@
               </div>
               <div class="field-group">
                 <label for="devBackupEndAddrTK11">End Address</label>
-                <input type="text" id="devBackupEndAddrTK11" value="0x021000" placeholder="0x021000" style="width: 120px;">
+                <input type="text" id="devBackupEndAddrTK11" value="0x17EF00" placeholder="0x17EF00" style="width: 120px;">
               </div>
             </div>
             <button id="devBackupBtnTK11" style="background: #f59e0b;">
@@ -653,7 +819,7 @@
                   <path d="M4 20h16" />
                 </svg>
               </span>
-              Read EEPROM Range
+              Read Flash Memory Range
             </button>
             <div class="progress">
               <div class="progress-label">
@@ -664,12 +830,12 @@
                 <div class="progress-fill" id="devBackupFillTK11"></div>
               </div>
             </div>
-            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - use with caution! (TK11: max ~132KB with calibration)</p>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - use with caution! (TK11: 1532 KB (12 Mbit) (0x17EF00) full flash)</p>
           </section>
 
           <section class="panel dev-panel tk11-dev" id="devToolsTK11Restore" style="display: none; border: 2px solid #f59e0b;">
-            <h2 style="color: #f59e0b;">🔧 Restore EEPROM DEV (TK11)</h2>
-            <p class="muted">Write custom EEPROM range to the TK11 radio.</p>
+            <h2 style="color: #f59e0b;">🔧 Restore Flash Memory DEV (TK11)</h2>
+            <p class="muted">Write custom Flash Memory range to the TK11 radio.</p>
             <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
               <div class="field-group">
                 <label for="devRestoreStartAddrTK11">Start Address</label>
@@ -687,7 +853,7 @@
                   <path d="M4 4h16" />
                 </svg>
               </span>
-              Write EEPROM Range
+              Write Flash Memory Range
             </button>
             <div class="progress">
               <div class="progress-label">
@@ -698,7 +864,7 @@
                 <div class="progress-fill" id="devRestoreFillTK11"></div>
               </div>
             </div>
-            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - writes from Start Address! (TK11)</p>
+            <p class="hint" style="color: #f59e0b;">⚠️ Developer mode - writes from Start Address! (TK11: 1532 KB (12 Mbit) (0x17EF00) max)</p>
           </section>
 
           <!-- DEV Tools - K5 (Hidden until devmode) -->
@@ -1489,6 +1655,14 @@
                   <polygon points="10 8 16 12 10 16 10 8"></polygon>
                 </svg>
                 Radio FM
+              </button>
+              <button class="tab-btn" data-tab="tk11-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Logo Editor
               </button>
             </div>
             
@@ -2474,6 +2648,90 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Tab: Logo Editor -->
+            <div class="tab-content" id="tab-tk11-logo">
+              <h3>Logo Editor</h3>
+              <p class="muted">Edit and upload custom 128×64 monochrome logo (Memory: 0x0D6008-0x0D6408).</p>
+              
+              <div class="logo-editor-container" style="margin: 1.5rem 0;">
+                <!-- Canvas Preview -->
+                <div class="logo-preview" style="background: #B8D4A8; padding: 1rem; border-radius: 8px; display: inline-block; margin-bottom: 1rem;">
+                  <canvas id="logoCanvas" width="128" height="64" style="border: 2px solid #333; display: block; image-rendering: pixelated; image-rendering: crisp-edges;"></canvas>
+                </div>
+                
+                <!-- Botões de Controle -->
+                <div class="logo-controls" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                  <button id="logoLoadImageBtn" class="primary">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                      </svg>
+                    </span>
+                    Load Image / .BAK
+                  </button>
+                  
+                  <button id="logoReadBtn" class="primary">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                      </svg>
+                    </span>
+                    Read from Radio
+                  </button>
+                  
+                  <button id="logoWriteBtn">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                      </svg>
+                    </span>
+                    Write to Radio
+                  </button>
+                  
+                  <button id="logoClearBtn" class="ghost">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </span>
+                    Clear
+                  </button>
+                  
+                  <button id="logoInvertBtn" class="ghost">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2 A10 10 0 0 1 12 22 Z"></path>
+                      </svg>
+                    </span>
+                    Invert
+                  </button>
+                  
+                  <button id="logoSaveBAKBtn">
+                    <span class="btn-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                      </svg>
+                    </span>
+                    Save .BAK
+                  </button>
+                </div>
+                
+                <!-- File input (hidden) -->
+                <input type="file" id="logoFileInput" accept=".bak,.png,.jpg,.jpeg,.bmp" style="display: none;">
+              </div>
+            </div>
+
             
           </div>
         </section>
@@ -2890,9 +3148,9 @@
           <div>
             <p class="eyebrow">FLASH TOOLS</p>
             <h1 class="k5-only">UV-K5/K1 Flash Tools</h1>
-            <h1 class="tk11-only" style="display: none;">TK11/RT-890 Flash Tools</h1>
+            <h1 class="rt890-only" style="display: none;">RT-890 Flash Tools</h1>
             <p class="subtitle k5-only">Flash firmware for UV-K5 and UV-K1 radios.</p>
-            <p class="subtitle tk11-only" style="display: none;">Flash firmware for TK11/RT-890 radios.</p>
+            <p class="subtitle rt890-only" style="display: none;">Flash firmware for RT-890 radios.</p>
           </div>
         </header>
 
@@ -2908,51 +3166,7 @@
             <div class="field-row">
               <label for="k5FirmwareSelect">Pre-loaded Firmwares</label>
               <select id="k5FirmwareSelect">
-                <option value="">-- Select firmware --</option>
-                <optgroup label="Matoz Firmware">
-                  <option value="firmware/Custom_Firmware_by_Matoz_V0.34.0C.bin">Matoz v0.34.0C</option>
-                  <option value="firmware/Custom_Firmware_by_Matoz_V0.34.0C_fagci_key_style.bin">Matoz v0.34.0C (Fagci Key Style)</option>
-                  <option value="firmware/Custom_Firmware_by_Matoz_V0.33.0C.bin">Matoz v0.33.0C</option>
-                  <option value="firmware/Custom_Firmware_by_Matoz_V0.33.0C_fagci_keys_style.bin">Matoz v0.33.0C (Fagci Key Style)</option>
-                </optgroup>
-                <optgroup label="Motorko Firmware">
-                  <option value="firmware/motorko_v0.26.packed.bin">Motorko v0.26</option>
-                </optgroup>
-                <optgroup label="Fagci R3b0rn Firmware">
-                  <option value="firmware/k5-fagci-r3b0rn-nightly-n_241111.bin">Fagci R3b0rn Nightly N 241111</option>
-                  <option value="firmware/fagci-r3b0rn-2025-01-19-buggy-nightly1-SNR-CLOSE-43.bin">FAGCI Nightly 2025-01-19 (any EEPROM)</option>
-                </optgroup>
-                <optgroup label="kamilsss655 (Nunu) Firmware">
-                  <option value="firmware/kamilsss655_v20.5.bin">kamilsss655 v.20.5</option>
-                </optgroup>
-                <optgroup label="Joaquim.org Firmware">
-                  <option value="https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin">Joaquim.org Rolling Release</option>
-                </optgroup>
-                <optgroup label="Egzumer Firmware">
-                  <option value="firmware/egzumer_v0.22.packed.bin">Egzumer v0.22</option>
-                </optgroup>
-                <optgroup label="IJV Firmwares">
-                  <option value="firmware/IJV-firmware.X3_60.bin">IJV X3.60</option>
-                  <option value="firmware/IJV-firmware.S3_60.bin">IJV S3.60</option>
-                  <option value="firmware/IJV-firmware.N3_60.bin">IJV N3.60</option>
-                  <option value="firmware/IJV-firmware.X3.60_VOX.bin">IJV X3.60 VOX</option>
-                  <option value="firmware/IJV-firmware.S3.60_VOX.bin">IJV S3.60 VOX</option>
-                  <option value="firmware/IJV-firmware.N3.60_VOX.bin">IJV N3.60 VOX</option>
-                </optgroup>
-                <optgroup label="F4HWN Firmware v4.3">
-                  <option value="firmware/f4hwn/f4hwn.bandscope.packed.v4.3.bin">📺 F4HWN Bandscope v4.3</option>
-                  <option value="firmware/f4hwn/f4hwn.broadcast.packed.v4.3.bin">📻 F4HWN Broadcast v4.3</option>
-                  <option value="firmware/f4hwn/f4hwn.rescueops.packed.v4.3.bin">🚨 F4HWN RescueOps v4.3</option>
-                  <option value="firmware/f4hwn/f4hwn.basic.packed.v4.3.bin">☘️ F4HWN Basic v4.3</option>
-                  <option value="firmware/f4hwn/f4hwn.game.packed.v4.3.bin">🎮 F4HWN Game v4.3</option>
-                </optgroup>
-                <optgroup label="QuanSheng Stock Firmware">
-                  <option value="firmware/k5升级_v2.01.31_publish.bin">Quansheng Stock v2.01.31 (UV-K5)</option>
-                  <option value="firmware/K6升级_V3.00.15.bin">Quansheng Stock v3.00.15 (UV-K6)</option>
-                  <option value="firmware/5RPLUS_v4.00.07_publish.bin">Quansheng Stock v4.00.07 (UV-5R Plus)</option>
-                  <option value="firmware/k5_py030_v1.01.07.bin">Quansheng Stock v1.01.07 (UV-K5v2)</option>
-                  <option value="firmware/k5_py030_v1.02.01_publish.bin">Quansheng Stock v1.02.01 (UV-K5v2)</option>
-                </optgroup>
+                <option value="">Select Firmware</option>
               </select>
             </div>
             
@@ -3059,9 +3273,9 @@
 
         
 
-        <!-- RT-890/TK11 Flash Section - Only visible when TK11 is selected -->
-        <div class="tk11-only" id="rt890FlashSection" style="display: none;">
-          <h2 class="section-title">RT-890 / TK11 Firmware</h2>
+        <!-- RT-890 Flash Section - Only visible when RT-890 is selected -->
+        <div class="rt890-only" id="rt890FlashSection" style="display: none;">
+          <h2 class="section-title">RT-890 Firmware</h2>
           <p class="hint" style="margin-bottom: 16px;">⚠️ Connect the radio in bootloader mode: Turn OFF, hold PTT, then turn ON.</p>
           <section class="panel-grid">
             <section class="panel">
@@ -3454,6 +3668,11 @@
     <script src="js/dtmf.js" type="module"></script>
     <script src="js/radio.js" type="module"></script>
     <script src="js/hexview.js" type="module"></script>
+    <script type="module" src="js/logo-editor.js"></script>
+    <script type="module" src="js/memory-size-detector.js"></script>
+    <script type="module" src="js/lock-password.js"></script>
+    <script src="js/cors-loader.js"></script>
+    <script type="module" src="js/firmware-loader.js"></script>
     
     <!-- Tab switching logic -->
     <script>

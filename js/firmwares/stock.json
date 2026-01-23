@@ -1,0 +1,14 @@
+{
+  "firmwares": [
+    {
+      "name": "QuanSheng Stock v2.01.31",
+      "url": "https://cdn.jsdelivr.net/gh/whosmatt/uvmod/firmwares/k5_v2.01.31_publish.bin",
+      "profile": "k5-stock"
+    },
+    {
+      "name": "QuanSheng Stock v2.01.26",
+      "url": "https://cdn.jsdelivr.net/gh/whosmatt/uvmod/firmwares/k5_v2.01.26_publish.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

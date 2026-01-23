@@ -1,0 +1,14 @@
+{
+  "firmwares": [
+    {
+      "name": "JOAQUIM V1.0",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_joaquim_v1.0.bin",
+      "profile": "k5-f4hwn"
+    },
+    {
+      "name": "JOAQUIM V0.9",
+      "url": "https://cdn.jsdelivr.net/gh/joaquimorg/UV-K5_Firmware_Custom@main/compiled-firmware/firmware_joaquim_v0.9.bin",
+      "profile": "k5-f4hwn"
+    }
+  ]
+}

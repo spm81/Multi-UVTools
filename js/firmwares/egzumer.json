@@ -1,0 +1,9 @@
+{
+  "firmwares": [
+    {
+      "name": "Egzumer v0.20",
+      "url": "https://cdn.jsdelivr.net/gh/egzumer/uv-k5-firmware-custom/compiled-firmware/firmware.bin",
+      "profile": "k5-stock"
+    }
+  ]
+}

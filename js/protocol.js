@@ -159,7 +159,9 @@ const eepromInit = async (port) => {
   const response = await readPacket(port, 0x15);
   const decoder = new TextDecoder();
   const version = new Uint8Array(response.slice(4, 4 + 16));
-  return decoder.decode(version.slice(0, version.indexOf(0)));
+  const firmwareStr = decoder.decode(version.slice(0, version.indexOf(0)));
+  console.log("[eepromInit] ✅ Firmware version:", firmwareStr);
+  return firmwareStr;
 };
 
 const eepromRead = async (port, address, size = EEPROM_BLOCK_SIZE) => {

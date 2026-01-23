@@ -733,7 +733,7 @@ const decodeChannels = (channelBytes, nameBytes, attrBytes) => {
     const txpower = (flagsExtra >> 2) & 0x07;
     channel.power = POWER_LIST[txpower] ?? "USER";
     channel.reverse = Boolean(flagsExtra & 0x01);
-    channel.busy = Boolean(flagsExtra & 0x20);
+    channel.busy = Boolean(flagsExtra & 0x10);  // FIXED: Bit 4 (0x10)
     channel.txLock = Boolean(flagsExtra & 0x40);
 
     channel.pttid = PTTID_LIST[(flagsDtmf >> 1) & 0x07] ?? "OFF";
@@ -1065,7 +1065,7 @@ const encodeChannels = () => {
     flagsExtra |= channel.reverse ? 0x01 : 0;
     flagsExtra |= (bandwidth & 0x01) << 1;
     flagsExtra |= (powerIndex & 0x07) << 2;
-    flagsExtra |= channel.busy ? 0x20 : 0;
+    flagsExtra |= channel.busy ? 0x10 : 0;  // FIXED: Bit 4 (0x10), not bit 5 (0x20)
     flagsExtra |= channel.txLock ? 0x40 : 0;
     channelBytes[base + 12] = flagsExtra;
 
@@ -1362,6 +1362,14 @@ if (channelBody) channelBody.addEventListener("change", (event) => {
   } else if (field === "duplex") {
     channel.duplex = target.value;
     updateDuplexFromOffset(channel);
+    // Enable/disable offset field based on duplex value
+    const row = target.closest('tr');
+    if (row) {
+      const offsetInput = row.querySelector('input[data-field="offset"]');
+      if (offsetInput) {
+        offsetInput.disabled = !target.value; // Disabled if duplex is empty
+      }
+    }
   } else if (field === "offset") {
     const offset = Number.parseFloat(target.value);
     channel.offsetHz = Number.isNaN(offset) ? 0 : Math.round(offset * 1_000_000);

@@ -35,15 +35,16 @@ const notify = () => {
 };
 
 export const connect = async (options = {}) => {
-  const baudRate = options.baudRate || 38400;
+  const requestedBaudRate = options.baudRate || 38400;
+  const autoDetect = options.autoDetect !== false; // Default: true
   
-  // If already connected with same baud rate, return existing port
+  // If already connected and working, return existing port
   if (port && isConnectedState && port.readable) {
     return port;
   }
   
   try {
-    // Close existing port if open with different settings
+    // Close existing port if open
     if (port) {
       try {
         if (port.readable?.locked) {
@@ -64,7 +65,9 @@ export const connect = async (options = {}) => {
     
     // Request new port
     port = await navigator.serial.requestPort();
-    await port.open({ baudRate });
+    
+    // Try to open with requested baud rate
+    await port.open({ baudRate: requestedBaudRate });
     
     isConnectedState = true;
     notify();
@@ -111,7 +114,27 @@ export const isConnected = () => isConnectedState;
 export const isPortConnected = () => isConnectedState;
 
 export const setFirmwareVersion = (version) => {
+  console.log("[serial-manager] ✅ setFirmwareVersion called with:", version);
   firmwareVersion = version;
+  
+  // Update all 6 firmware display locations directly
+  const elements = [
+    'firmwareInfo',         // Navbar
+    'channelsFirmware',     // Channels card
+    'mirrorFirmware',       // Mirror card
+    'smrFirmware',          // SMR card
+    'settingsFirmware',     // K5 Settings card
+    'tk11SettingsFirmware'  // TK11 Settings card
+  ];
+  
+  elements.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = version || '-';
+      console.log(`[serial-manager] ✅ Updated ${id} to: ${version || '-'}`);
+    }
+  });
+  
   notify();
 };
 
@@ -125,6 +148,51 @@ export const getDeviceInfo = () => {
     raw: info,
     formatted: formatDeviceName(info)
   };
+};
+
+// Auto-detect working baud rate
+export const detectBaudRate = async (testBaudRates = [38400, 115200]) => {
+  if (!port) throw new Error('No port connected');
+  
+  window.log?.(`🔍 Auto-detecting baud rate...`, "info");
+  
+  for (const baudRate of testBaudRates) {
+    try {
+      window.log?.(`   Testing ${baudRate} baud...`, "info");
+      
+      // Close and reopen at this baud rate
+      if (port.readable?.locked) {
+        const reader = port.readable.getReader();
+        await reader.cancel().catch(() => {});
+        reader.releaseLock();
+      }
+      if (port.writable?.locked) {
+        const writer = port.writable.getWriter();
+        writer.releaseLock();
+      }
+      
+      await port.close().catch(() => {});
+      await port.open({ baudRate });
+      
+      // Try to init EEPROM to test if baud rate works
+      const { eepromInit } = await import('./protocol.js');
+      const version = await eepromInit(port);
+      
+      if (version) {
+        window.log?.(`✅ Success at ${baudRate} baud!`, "success");
+        window.log?.(`   Firmware: ${version}`, "info");
+        isConnectedState = true;
+        setFirmwareVersion(version);
+        notify();
+        return { baudRate, version };
+      }
+    } catch (e) {
+      window.log?.(`   ${baudRate} baud failed: ${e.message}`, "error");
+      console.error(`Baud rate ${baudRate} test failed:`, e);
+    }
+  }
+  
+  throw new Error('Could not establish communication at any baud rate');
 };
 
 
