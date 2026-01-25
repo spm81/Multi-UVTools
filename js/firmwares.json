@@ -224,6 +224,11 @@
           "name": "F4HWN Fusion v4.3.2 (K1)",
           "path": "firmware/f4hwn.k1.fusion.v4.3.2.bin",
           "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Fusion v5.0.1 Beta",
+          "path": "firmware/f4hwn.fusion.v5.0.1.beta.bin",
+          "profile": "F4HWN"
         }
       ]
     },
@@ -239,6 +244,16 @@
           "name": "Calypso Edition v1.2.1",
           "path": "firmware/f4hwn.calypso_v1.2.1.bin",
           "profile": "Calypso"
+        }
+      ]
+    },
+    {
+      "group": "E25WOP Firmware",
+      "firmwares": [
+        {
+          "name": "E25WOP v4.3.2 Fusion+ V10",
+          "path": "firmware/f4hwn.fusionPlusV10.bin",
+          "profile": "E25WOP"
         }
       ]
     },
