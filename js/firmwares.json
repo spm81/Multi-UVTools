@@ -91,6 +91,16 @@
       ]
     },
     {
+      "group": "Karina",
+      "firmwares": [
+        {
+          "name": "Karina v29.01.26",
+          "path": "firmware/29.01.26fw_1.bin",
+          "profile": "Karina"
+        }
+      ]
+    },
+    {
       "group": "IJV Firmwares",
       "firmwares": [
         {
@@ -149,13 +159,103 @@
       "group": "Robzyl Firmware",
       "firmwares": [
         {
-          "name": "Robzyl v6.3",
+          "name": "Robzyl (Last Version) (FR)",
           "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.fr.packed.bin",
           "profile": "Robzyl"
         },
         {
-          "name": "Robzyl v6.3 (512k)",
+          "name": "Robzyl (Last Version) (FR) (512k)",
           "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.fr.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (BR)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.br.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (BR) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.br.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (CZ)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.cz.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (CZ) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.cz.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (FI)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.fi.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (FI) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.fi.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (IN)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.in.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (IN) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.in.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (KO)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.ko.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (KO) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.ko.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (PL)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.pl.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (PL) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.pl.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (RO)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.ro.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (RO) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.ro.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (RU)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.ru.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (RU) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.ru.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (TU)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.tu.packed.bin",
+          "profile": "Robzyl"
+        },
+        {
+          "name": "Robzyl (Last Version) (TU) (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.tu.packed.bin",
           "profile": "Robzyl"
         }
       ]
@@ -212,6 +312,16 @@
           "name": "Quansheng Stock v4.00.07 (UV-5R Plus)",
           "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v4.00.07_publish.bin",
           "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v1.01.07 (UV-K5 v2)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_py030_v1.01.07.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v1.02.01 (UV-K5 v2)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_py030_v1.02.01_publish.bin",
+          "profile": "Stock"
         }
       ]
     }
@@ -231,13 +341,8 @@
       "group": "Calypso Firmware",
       "firmwares": [
         {
-          "name": "Calypso Edition v1.2",
-          "path": "firmware/f4hwn.calypso_v1.2.bin",
-          "profile": "Calypso"
-        },
-        {
-          "name": "Calypso Edition v1.2.1",
-          "path": "firmware/f4hwn.calypso_v1.2.1.bin",
+          "name": "Calypso Edition v1.3.2",
+          "path": "firmware/f4hwn.calypso_1.3.2.bin",
           "profile": "Calypso"
         }
       ]
@@ -248,6 +353,16 @@
         {
           "name": "E25WOP v4.3.2 Fusion+ V10",
           "path": "firmware/f4hwn.fusionPlusV10.bin",
+          "profile": "E25WOP"
+        },
+        {
+          "name": "E25WOP v4.3.2 Fusion+ V15",
+          "path": "firmware/f4hwn.k1.fusion+V15.v4.3.2.bin",
+          "profile": "E25WOP"
+        },
+        {
+          "name": "E25WOP v5.0.2 Fusion+ V15",
+          "path": "firmware/f4hwn.fusion+V15.v5.0.2.bin",
           "profile": "E25WOP"
         }
       ]
