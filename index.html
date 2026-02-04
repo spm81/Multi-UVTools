@@ -153,6 +153,83 @@
         cursor: not-allowed;
         opacity: 0.5;
       }
+      
+      /* Calibration Section Styles */
+      
+      /* Hidden elements for collapsible sections */
+      .hidden {
+        display: none !important;
+      }
+      
+      .calib-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        background: var(--surface-1);
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      .calib-table th, .calib-table td {
+        padding: 0.5rem;
+        text-align: center;
+        border: 1px solid var(--border-color);
+      }
+      .calib-table th {
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+      }
+      .calib-table tr:nth-child(even) {
+        background: var(--surface-2);
+      }
+      .calib-input {
+        width: 70px;
+        padding: 0.3rem;
+        text-align: center;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        background: var(--surface-1);
+        color: var(--text-primary);
+        font-size: 0.85rem;
+      }
+      .calib-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+      }
+      .calib-group {
+        background: var(--surface-1);
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+      .tab-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        background: var(--surface-1);
+        color: var(--text-primary);
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      .tab-btn:hover {
+        background: var(--surface-2);
+      }
+      .tab-btn.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+      }
+      #calibrationPanel .field-group {
+        margin-bottom: 0.5rem;
+      }
+      #calibrationPanel .field-group label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+      }
     </style>
   </head>
   <body>
@@ -622,7 +699,7 @@
 
           <!-- EEPROM/Flash Cleaner (K5 & TK11) -->
           <section class="panel" id="eepromCleanerSection">
-            <h2><span class="memory-type-label">Clean My EEPROM</span> Memory</h2>
+            <h2><span class="memory-type-label">Clean My EEPROM</span></h2>
             <p class="muted">⚠️ <strong>DESTRUCTIVE OPERATION</strong> - Fills entire memory with 0xFF (factory blank state) while protecting calibration areas.</p>
             
             <div class="field-row">
@@ -762,11 +839,11 @@
           <!-- Write EEPROM / Flash Memory -->
           <section class="panel">
             <h2>
-              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="k5-only" style="display: none;">Write EEPROM Memory</span>
               <span class="tk11-only" style="display: none;">Write Flash Memory</span>
             </h2>
             <p class="muted">
-              <span class="k5-only" style="display: none;">Read EEPROM Memory file to the radio.</span>
+              <span class="k5-only" style="display: none;">Write EEPROM Memory file to the radio.</span>
               <span class="tk11-only" style="display: none;">Write a full Flash Memory file to the radio.</span>
             </p>
             <div class="field-row">
@@ -780,7 +857,7 @@
                   <path d="M4 4h16" />
                 </svg>
               </span>
-              <span class="k5-only" style="display: none;">Read EEPROM Memory</span>
+              <span class="k5-only" style="display: none;">Write EEPROM Memory</span>
               <span class="tk11-only" style="display: none;">Write Flash Memory</span>
             </button>
             <div class="progress">
@@ -793,7 +870,7 @@
               </div>
             </div>
             <p class="hint">
-              <span class="k5-only" style="display: none;">Read EEPROM Memory file to the radio.</span>
+              <span class="k5-only" style="display: none;">Write EEPROM Memory file to the radio.</span>
               <span class="tk11-only" style="display: none;">Write entire Flash Memory file to the radio.</span>
             </p>
           </section>
@@ -938,6 +1015,297 @@
           </section>
         </section>
 
+
+
+        <!-- Calibration Section (K5 Only) -->
+        <h2 class="section-title collapsible collapsed k5-only" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');">Calibration <span class="collapse-icon">▼</span></h2>
+        <section class="panel hidden k5-only" id="calibrationPanel">
+          <p class="muted">⚠️ <strong>WARNING:</strong> Modifying calibration values may damage your radio! Make sure you have a backup before making any changes.</p>
+          
+          <!-- Calibration Controls -->
+          <div class="field-row" style="gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button id="calibReadBtn" class="primary">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7"/>
+                  <path d="m16 19 2 2 4-4"/>
+                </svg>
+              </span>
+              Read Calibration
+            </button>
+            <button id="calibWriteBtn" class="warning" disabled>
+              <span class="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
+                  <path d="M12 21V9"/>
+                  <path d="M7 14l5-5 5 5"/>
+                  <path d="M4 4h16"/>
+                </svg>
+              </span>
+              Write Calibration
+            </button>
+            <input type="file" id="calibFileInput" accept=".bin,.dat" style="display: none;">
+            <button id="calibLoadFileBtn" class="secondary">
+              <span class="icon">📂</span>
+              Load File
+            </button>
+            <button id="calibWriteFileBtn" class="secondary" disabled>
+              <span class="icon">💾</span>
+              Write File
+            </button>
+          </div>
+          
+          <div class="progress" id="calibProgress" style="display: none;">
+            <div class="progress-label">
+              <span id="calibStatus">Reading calibration...</span>
+              <span id="calibPct">0%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="calibFill"></div>
+            </div>
+          </div>
+          
+          <!-- Squelch Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">Squelch Calibration <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="squelchCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">Configure squelch thresholds for different frequency bands.</p>
+            
+            <!-- Band Selection Tabs -->
+            <div class="field-row" style="margin-bottom: 1rem;">
+              <button class="tab-btn active" data-band="sqlBand4_7" onclick="switchSqlBand(this)">Band 4-7 (UHF)</button>
+              <button class="tab-btn" data-band="sqlBand1_3" onclick="switchSqlBand(this)">Band 1-3 (VHF)</button>
+            </div>
+            
+            <!-- Squelch Table -->
+            <div style="overflow-x: auto;">
+              <table class="calib-table" id="squelchTable">
+                <thead>
+                  <tr>
+                    <th>SQL Level</th>
+                    <th>Open RSSI</th>
+                    <th>Close RSSI</th>
+                    <th>Open Noise</th>
+                    <th>Close Noise</th>
+                    <th>Open Glitch</th>
+                    <th>Close Glitch</th>
+                  </tr>
+                </thead>
+                <tbody id="squelchTableBody">
+                  <!-- Generated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- RSSI Levels Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">RSSI Levels <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="rssiCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">RSSI levels for the S-meter bar graph display.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+              <!-- Bands 3-7 -->
+              <div class="calib-group">
+                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Bands 3-7 (UHF)</h4>
+                <div class="field-group">
+                  <label>Level 1</label>
+                  <input type="number" id="rssi37_level1" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 2</label>
+                  <input type="number" id="rssi37_level2" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 4</label>
+                  <input type="number" id="rssi37_level4" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 6</label>
+                  <input type="number" id="rssi37_level6" min="0" max="65535" value="0" class="calib-input">
+                </div>
+              </div>
+              
+              <!-- Bands 1-2 -->
+              <div class="calib-group">
+                <h4 style="color: var(--primary); margin-bottom: 0.5rem;">Bands 1-2 (VHF)</h4>
+                <div class="field-group">
+                  <label>Level 1</label>
+                  <input type="number" id="rssi12_level1" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 2</label>
+                  <input type="number" id="rssi12_level2" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 4</label>
+                  <input type="number" id="rssi12_level4" min="0" max="65535" value="0" class="calib-input">
+                </div>
+                <div class="field-group">
+                  <label>Level 6</label>
+                  <input type="number" id="rssi12_level6" min="0" max="65535" value="0" class="calib-input">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- TX Power Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">TX Power Calibration <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="txPowerCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">Configure TX power levels for each frequency band.</p>
+            
+            <!-- Band Selection -->
+            <div class="field-row" style="margin-bottom: 1rem; flex-wrap: wrap;">
+              <button class="tab-btn active" data-txband="0" onclick="switchTxBand(this)">Band 1</button>
+              <button class="tab-btn" data-txband="1" onclick="switchTxBand(this)">Band 2</button>
+              <button class="tab-btn" data-txband="2" onclick="switchTxBand(this)">Band 3</button>
+              <button class="tab-btn" data-txband="3" onclick="switchTxBand(this)">Band 4</button>
+              <button class="tab-btn" data-txband="4" onclick="switchTxBand(this)">Band 5</button>
+              <button class="tab-btn" data-txband="5" onclick="switchTxBand(this)">Band 6</button>
+              <button class="tab-btn" data-txband="6" onclick="switchTxBand(this)">Band 7</button>
+            </div>
+            
+            <!-- TX Power Table -->
+            <div style="overflow-x: auto;">
+              <table class="calib-table" id="txPowerTable">
+                <thead>
+                  <tr>
+                    <th>Power Level</th>
+                    <th>Lower</th>
+                    <th>Center</th>
+                    <th>Upper</th>
+                  </tr>
+                </thead>
+                <tbody id="txPowerTableBody">
+                  <tr>
+                    <td><strong>Low</strong></td>
+                    <td><input type="number" id="txp_low_lower" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_low_center" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_low_upper" min="0" max="255" value="0" class="calib-input"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Medium</strong></td>
+                    <td><input type="number" id="txp_mid_lower" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_mid_center" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_mid_upper" min="0" max="255" value="0" class="calib-input"></td>
+                  </tr>
+                  <tr>
+                    <td><strong>High</strong></td>
+                    <td><input type="number" id="txp_hi_lower" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_hi_center" min="0" max="255" value="0" class="calib-input"></td>
+                    <td><input type="number" id="txp_hi_upper" min="0" max="255" value="0" class="calib-input"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Battery Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">Battery Calibration <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="batteryCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">Battery level thresholds. Level 3 is the voltage calibration reference.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.5rem;">
+              <div class="field-group">
+                <label>Level 0</label>
+                <input type="number" id="batLvl_0" min="0" max="4999" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 1</label>
+                <input type="number" id="batLvl_1" min="0" max="4999" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 2</label>
+                <input type="number" id="batLvl_2" min="0" max="4999" value="0" class="calib-input">
+              </div>
+              <div class="field-group" style="border: 1px solid var(--primary); padding: 0.3rem; border-radius: 4px;">
+                <label style="color: var(--primary);">Level 3 (Voltage Cal)</label>
+                <input type="number" id="batLvl_3" min="0" max="4999" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 4</label>
+                <input type="number" id="batLvl_4" min="0" max="4999" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 5</label>
+                <input type="number" id="batLvl_5" min="0" max="4999" value="0" class="calib-input">
+              </div>
+            </div>
+          </div>
+          
+          <!-- VOX Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">VOX Calibration <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="voxCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">VOX sensitivity thresholds (On/Off).</p>
+            
+            <div style="overflow-x: auto;">
+              <table class="calib-table" id="voxTable">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>VOX On (vox1Thr)</th>
+                    <th>VOX Off (vox0Thr)</th>
+                  </tr>
+                </thead>
+                <tbody id="voxTableBody">
+                  <!-- Generated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Microphone Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">Microphone Sensitivity <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="micCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">Microphone sensitivity levels (0-31).</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.5rem;">
+              <div class="field-group">
+                <label>Level 0</label>
+                <input type="number" id="micLevel_0" min="0" max="31" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 1</label>
+                <input type="number" id="micLevel_1" min="0" max="31" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 2</label>
+                <input type="number" id="micLevel_2" min="0" max="31" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 3</label>
+                <input type="number" id="micLevel_3" min="0" max="31" value="0" class="calib-input">
+              </div>
+              <div class="field-group">
+                <label>Level 4</label>
+                <input type="number" id="micLevel_4" min="0" max="31" value="0" class="calib-input">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Other Calibration -->
+          <h3 class="section-title collapsible collapsed" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('hidden');" style="font-size: 1rem;">Other Calibration <span class="collapse-icon">▼</span></h3>
+          <div class="hidden" id="otherCalibSection" style="padding: 0.5rem; background: var(--surface-2); border-radius: 8px; margin-bottom: 1rem;">
+            <p class="muted" style="font-size: 0.85rem;">Crystal frequency, volume and DAC gain settings.</p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+              <div class="field-group">
+                <label>Xtal Frequency Low</label>
+                <input type="number" id="xtalFreqLow" min="-1000" max="1000" value="0" class="calib-input">
+                <span class="hint" style="font-size: 0.75rem;">Range: -1000 to 1000</span>
+              </div>
+              <div class="field-group">
+                <label>Volume Gain</label>
+                <input type="number" id="volumeGain" min="0" max="63" value="58" class="calib-input">
+                <span class="hint" style="font-size: 0.75rem;">Range: 0-63 (default: 58)</span>
+              </div>
+              <div class="field-group">
+                <label>DAC Gain</label>
+                <input type="number" id="dacGain" min="0" max="15" value="8" class="calib-input">
+                <span class="hint" style="font-size: 0.75rem;">Range: 0-15 (default: 8)</span>
+              </div>
+            </div>
+          </div>
+          
+          <p class="hint" style="margin-top: 1rem;">💡 Memory addresses: Calibration data is stored at 0x1E00-0x1F90 in EEPROM.</p>
+        </section>
 
 
         <!-- HEX View Section -->
@@ -3663,6 +4031,7 @@
     <script src="js/flash-rt890.js" type="module"></script>
     <script src="js/flash-rt890-ui.js" type="module"></script>
     <script src="js/tk11-settings.js" type="module"></script>
+    <script src="js/calibration.js" type="module"></script>
     <script src="js/spi-rt890.js"></script>
     <script src="js/spi-rt890-ui.js"></script>
     <script src="js/dtmf.js" type="module"></script>
@@ -3714,6 +4083,466 @@
         
         console.log('Tab switching initialized');
       });
+      
+      // ============== CALIBRATION SECTION ==============
+      // Calibration memory addresses (from f4hwn.chirp.v4.3.py)
+      const CAL_START = 0x1E00;
+      const CAL_END = 0x2000;  // Full calibration area (512 bytes)
+      
+      // Memory layout based on f4hwn.chirp.v4.3.py MEM_FORMAT
+      const CAL_LAYOUT = {
+        sqlBand4_7: {
+          openRssiThr: { addr: 0x1E00, size: 10 },
+          closeRssiThr: { addr: 0x1E10, size: 10 },
+          openNoiseThr: { addr: 0x1E20, size: 10 },
+          closeNoiseThr: { addr: 0x1E30, size: 10 },
+          closeGlitchThr: { addr: 0x1E40, size: 10 },
+          openGlitchThr: { addr: 0x1E50, size: 10 }
+        },
+        sqlBand1_3: {
+          openRssiThr: { addr: 0x1E60, size: 10 },
+          closeRssiThr: { addr: 0x1E70, size: 10 },
+          openNoiseThr: { addr: 0x1E80, size: 10 },
+          closeNoiseThr: { addr: 0x1E90, size: 10 },
+          closeGlitchThr: { addr: 0x1EA0, size: 10 },
+          openGlitchThr: { addr: 0x1EB0, size: 10 }
+        },
+        rssiLevelsBands3_7: { addr: 0x1EC0, size: 8 },
+        rssiLevelsBands1_2: { addr: 0x1EC8, size: 8 },
+        txp: { addr: 0x1ED0, size: 112 },
+        batLvl: { addr: 0x1F40, size: 12 },
+        vox1Thr: { addr: 0x1F50, size: 20 },
+        vox0Thr: { addr: 0x1F68, size: 20 },
+        micLevel: { addr: 0x1F80, size: 5 },
+        xtalFreqLow: { addr: 0x1F88, size: 2 },
+        volumeGain: { addr: 0x1F8E, size: 1 },
+        dacGain: { addr: 0x1F8F, size: 1 }
+      };
+      
+      // Calibration data storage - use window.calibData for sharing with module
+      // Initialize if not already set by calibration.js
+      if (!window.calibData) window.calibData = null;
+      let currentSqlBand = 'sqlBand4_7';
+      let currentTxBand = 0;
+      
+      // Getter/setter for calibData that uses window.calibData
+      function getCalibData() { return window.calibData; }
+      function setCalibData(data) { window.calibData = data; }
+      
+      // Make functions globally available for onclick handlers and calibration.js
+      window.switchSqlBand = function(btn) {
+        document.querySelectorAll('[data-band]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentSqlBand = btn.getAttribute('data-band');
+        if (getCalibData()) {
+          updateSqlTableFromData();
+        }
+      };
+      
+      window.switchTxBand = function(btn) {
+        document.querySelectorAll('[data-txband]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTxBand = parseInt(btn.getAttribute('data-txband'));
+        if (getCalibData()) {
+          updateTxPowerFromData();
+        }
+      };
+      
+      // Initialize calibration tables
+      function initCalibrationTables() {
+        // Generate Squelch table
+        const squelchBody = document.getElementById('squelchTableBody');
+        if (squelchBody) {
+          squelchBody.innerHTML = '';
+          for (let i = 0; i < 10; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>SQL ${i}</strong></td>
+              <td><input type="number" id="sql_openRssi_${i}" min="0" max="255" value="0" class="calib-input"></td>
+              <td><input type="number" id="sql_closeRssi_${i}" min="0" max="255" value="0" class="calib-input"></td>
+              <td><input type="number" id="sql_openNoise_${i}" min="0" max="127" value="0" class="calib-input"></td>
+              <td><input type="number" id="sql_closeNoise_${i}" min="0" max="127" value="0" class="calib-input"></td>
+              <td><input type="number" id="sql_openGlitch_${i}" min="0" max="255" value="0" class="calib-input"></td>
+              <td><input type="number" id="sql_closeGlitch_${i}" min="0" max="255" value="0" class="calib-input"></td>
+            `;
+            squelchBody.appendChild(row);
+          }
+        }
+        
+        // Generate VOX table
+        const voxBody = document.getElementById('voxTableBody');
+        if (voxBody) {
+          voxBody.innerHTML = '';
+          for (let i = 0; i < 10; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td><strong>Level ${i + 1}</strong></td>
+              <td><input type="number" id="vox1Thr_${i}" min="0" max="65535" value="0" class="calib-input"></td>
+              <td><input type="number" id="vox0Thr_${i}" min="0" max="65535" value="0" class="calib-input"></td>
+            `;
+            voxBody.appendChild(row);
+          }
+        }
+      }
+      
+      // Load calibration from file
+      function loadCalibrationFile(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const data = new Uint8Array(e.target.result);
+          let loadedData;
+          
+          // Check if it's a full EEPROM dump or just calibration data
+          if (data.length >= 0x2000) {
+            // Full EEPROM, extract calibration area
+            loadedData = data.slice(CAL_START, CAL_END);
+          } else if (data.length >= (CAL_END - CAL_START)) {
+            // Calibration data only
+            loadedData = data.slice(0, CAL_END - CAL_START);
+          } else if (data.length === 512) {
+            // Standard calibration file size
+            loadedData = data;
+          } else {
+            alert('File too small to contain calibration data. Expected at least 512 bytes.');
+            return;
+          }
+          
+          // Store in global window.calibData for sharing with calibration.js module
+          setCalibData(loadedData);
+          
+          updateAllCalibrationFields();
+          document.getElementById('calibWriteBtn').disabled = false;
+          document.getElementById('calibWriteFileBtn').disabled = false;
+          document.getElementById('calibStatus').textContent = 'Loaded from file: ' + file.name;
+          document.getElementById('calibProgress').style.display = 'block';
+          document.getElementById('calibFill').style.width = '100%';
+          document.getElementById('calibPct').textContent = '100%';
+        };
+        reader.readAsArrayBuffer(file);
+      }
+      
+      // Write calibration to file (.bin)
+      function writeCalibrationFile() {
+        const calibData = getCalibData();
+        if (!calibData) {
+          alert('No calibration data to save!');
+          return;
+        }
+        
+        updateDataFromAllFields();
+        
+        const blob = new Blob([getCalibData()], {type: 'application/octet-stream'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'calibration_' + Date.now() + '.bin';
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+      
+      // Helper functions for data extraction
+      function extractSqlBandData(band) {
+        const calibData = getCalibData();
+        const layout = CAL_LAYOUT[band];
+        const result = { levels: [] };
+        for (let i = 0; i < 10; i++) {
+          result.levels.push({
+            openRssi: calibData[layout.openRssiThr.addr - CAL_START + i],
+            closeRssi: calibData[layout.closeRssiThr.addr - CAL_START + i],
+            openNoise: calibData[layout.openNoiseThr.addr - CAL_START + i],
+            closeNoise: calibData[layout.closeNoiseThr.addr - CAL_START + i],
+            openGlitch: calibData[layout.openGlitchThr.addr - CAL_START + i],
+            closeGlitch: calibData[layout.closeGlitchThr.addr - CAL_START + i]
+          });
+        }
+        return result;
+      }
+      
+      function extractRssiLevels(offset) {
+        const calibData = getCalibData();
+        return {
+          level1: getUint16(calibData, offset),
+          level2: getUint16(calibData, offset + 2),
+          level4: getUint16(calibData, offset + 4),
+          level6: getUint16(calibData, offset + 6)
+        };
+      }
+      
+      function extractTxPowerData() {
+        const calibData = getCalibData();
+        const bands = [];
+        for (let b = 0; b < 7; b++) {
+          const baseOffset = (0x1ED0 - CAL_START) + (b * 16);
+          bands.push({
+            low: { lower: calibData[baseOffset], center: calibData[baseOffset + 1], upper: calibData[baseOffset + 2] },
+            mid: { lower: calibData[baseOffset + 3], center: calibData[baseOffset + 4], upper: calibData[baseOffset + 5] },
+            hi: { lower: calibData[baseOffset + 6], center: calibData[baseOffset + 7], upper: calibData[baseOffset + 8] }
+          });
+        }
+        return bands;
+      }
+      
+      function extractBatteryData() {
+        const calibData = getCalibData();
+        const levels = [];
+        for (let i = 0; i < 6; i++) {
+          levels.push(getUint16(calibData, (0x1F40 - CAL_START) + (i * 2)));
+        }
+        return levels;
+      }
+      
+      function extractVoxData() {
+        const calibData = getCalibData();
+        const vox = { on: [], off: [] };
+        for (let i = 0; i < 10; i++) {
+          vox.on.push(getUint16(calibData, (0x1F50 - CAL_START) + (i * 2)));
+          vox.off.push(getUint16(calibData, (0x1F68 - CAL_START) + (i * 2)));
+        }
+        return vox;
+      }
+      
+      function extractMicData() {
+        const calibData = getCalibData();
+        const levels = [];
+        for (let i = 0; i < 5; i++) {
+          levels.push(calibData[(0x1F80 - CAL_START) + i]);
+        }
+        return levels;
+      }
+      
+      // Update UI from calibData
+      // Make this function globally available for calibration.js
+      window.updateAllCalibrationFields = function() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        
+        updateSqlTableFromData();
+        updateRssiFromData();
+        updateTxPowerFromData();
+        updateBatteryFromData();
+        updateVoxFromData();
+        updateMicFromData();
+        updateOtherFromData();
+      }
+      
+      function updateSqlTableFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        const layout = CAL_LAYOUT[currentSqlBand];
+        for (let i = 0; i < 10; i++) {
+          setValue('sql_openRssi_' + i, calibData[layout.openRssiThr.addr - CAL_START + i]);
+          setValue('sql_closeRssi_' + i, calibData[layout.closeRssiThr.addr - CAL_START + i]);
+          setValue('sql_openNoise_' + i, calibData[layout.openNoiseThr.addr - CAL_START + i]);
+          setValue('sql_closeNoise_' + i, calibData[layout.closeNoiseThr.addr - CAL_START + i]);
+          setValue('sql_openGlitch_' + i, calibData[layout.openGlitchThr.addr - CAL_START + i]);
+          setValue('sql_closeGlitch_' + i, calibData[layout.closeGlitchThr.addr - CAL_START + i]);
+        }
+      }
+      
+      function updateRssiFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        // Bands 3-7 (0x1EC0)
+        setValue('rssi37_level1', getUint16(calibData, 0x1EC0 - CAL_START));
+        setValue('rssi37_level2', getUint16(calibData, 0x1EC2 - CAL_START));
+        setValue('rssi37_level4', getUint16(calibData, 0x1EC4 - CAL_START));
+        setValue('rssi37_level6', getUint16(calibData, 0x1EC6 - CAL_START));
+        
+        // Bands 1-2 (0x1EC8)
+        setValue('rssi12_level1', getUint16(calibData, 0x1EC8 - CAL_START));
+        setValue('rssi12_level2', getUint16(calibData, 0x1ECA - CAL_START));
+        setValue('rssi12_level4', getUint16(calibData, 0x1ECC - CAL_START));
+        setValue('rssi12_level6', getUint16(calibData, 0x1ECE - CAL_START));
+      }
+      
+      function updateTxPowerFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        const baseOffset = (0x1ED0 - CAL_START) + (currentTxBand * 16);
+        setValue('txp_low_lower', calibData[baseOffset]);
+        setValue('txp_low_center', calibData[baseOffset + 1]);
+        setValue('txp_low_upper', calibData[baseOffset + 2]);
+        setValue('txp_mid_lower', calibData[baseOffset + 3]);
+        setValue('txp_mid_center', calibData[baseOffset + 4]);
+        setValue('txp_mid_upper', calibData[baseOffset + 5]);
+        setValue('txp_hi_lower', calibData[baseOffset + 6]);
+        setValue('txp_hi_center', calibData[baseOffset + 7]);
+        setValue('txp_hi_upper', calibData[baseOffset + 8]);
+      }
+      
+      function updateBatteryFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 6; i++) {
+          setValue('batLvl_' + i, getUint16(calibData, (0x1F40 - CAL_START) + (i * 2)));
+        }
+      }
+      
+      function updateVoxFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 10; i++) {
+          setValue('vox1Thr_' + i, getUint16(calibData, (0x1F50 - CAL_START) + (i * 2)));
+          setValue('vox0Thr_' + i, getUint16(calibData, (0x1F68 - CAL_START) + (i * 2)));
+        }
+      }
+      
+      function updateMicFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 5; i++) {
+          setValue('micLevel_' + i, calibData[(0x1F80 - CAL_START) + i]);
+        }
+      }
+      
+      function updateOtherFromData() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        setValue('xtalFreqLow', getInt16(calibData, 0x1F88 - CAL_START));
+        setValue('volumeGain', calibData[0x1F8E - CAL_START]);
+        setValue('dacGain', calibData[0x1F8F - CAL_START]);
+      }
+      
+      // Update calibData from UI fields
+      // Make this function globally available for calibration.js
+      window.updateDataFromAllFields = function() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        
+        updateSqlDataFromTable();
+        updateRssiDataFromFields();
+        updateTxPowerDataFromFields();
+        updateBatteryDataFromFields();
+        updateVoxDataFromFields();
+        updateMicDataFromFields();
+        updateOtherDataFromFields();
+      }
+      
+      function updateSqlDataFromTable() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        ['sqlBand4_7', 'sqlBand1_3'].forEach(band => {
+          const layout = CAL_LAYOUT[band];
+          for (let i = 0; i < 10; i++) {
+            if (band === currentSqlBand) {
+              calibData[layout.openRssiThr.addr - CAL_START + i] = getValue('sql_openRssi_' + i);
+              calibData[layout.closeRssiThr.addr - CAL_START + i] = getValue('sql_closeRssi_' + i);
+              calibData[layout.openNoiseThr.addr - CAL_START + i] = getValue('sql_openNoise_' + i);
+              calibData[layout.closeNoiseThr.addr - CAL_START + i] = getValue('sql_closeNoise_' + i);
+              calibData[layout.openGlitchThr.addr - CAL_START + i] = getValue('sql_openGlitch_' + i);
+              calibData[layout.closeGlitchThr.addr - CAL_START + i] = getValue('sql_closeGlitch_' + i);
+            }
+          }
+        });
+      }
+      
+      function updateRssiDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        setUint16(calibData, 0x1EC0 - CAL_START, getValue('rssi37_level1'));
+        setUint16(calibData, 0x1EC2 - CAL_START, getValue('rssi37_level2'));
+        setUint16(calibData, 0x1EC4 - CAL_START, getValue('rssi37_level4'));
+        setUint16(calibData, 0x1EC6 - CAL_START, getValue('rssi37_level6'));
+        setUint16(calibData, 0x1EC8 - CAL_START, getValue('rssi12_level1'));
+        setUint16(calibData, 0x1ECA - CAL_START, getValue('rssi12_level2'));
+        setUint16(calibData, 0x1ECC - CAL_START, getValue('rssi12_level4'));
+        setUint16(calibData, 0x1ECE - CAL_START, getValue('rssi12_level6'));
+      }
+      
+      function updateTxPowerDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        const baseOffset = (0x1ED0 - CAL_START) + (currentTxBand * 16);
+        calibData[baseOffset] = getValue('txp_low_lower');
+        calibData[baseOffset + 1] = getValue('txp_low_center');
+        calibData[baseOffset + 2] = getValue('txp_low_upper');
+        calibData[baseOffset + 3] = getValue('txp_mid_lower');
+        calibData[baseOffset + 4] = getValue('txp_mid_center');
+        calibData[baseOffset + 5] = getValue('txp_mid_upper');
+        calibData[baseOffset + 6] = getValue('txp_hi_lower');
+        calibData[baseOffset + 7] = getValue('txp_hi_center');
+        calibData[baseOffset + 8] = getValue('txp_hi_upper');
+      }
+      
+      function updateBatteryDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 6; i++) {
+          setUint16(calibData, (0x1F40 - CAL_START) + (i * 2), getValue('batLvl_' + i));
+        }
+      }
+      
+      function updateVoxDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 10; i++) {
+          setUint16(calibData, (0x1F50 - CAL_START) + (i * 2), getValue('vox1Thr_' + i));
+          setUint16(calibData, (0x1F68 - CAL_START) + (i * 2), getValue('vox0Thr_' + i));
+        }
+      }
+      
+      function updateMicDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        for (let i = 0; i < 5; i++) {
+          calibData[(0x1F80 - CAL_START) + i] = getValue('micLevel_' + i);
+        }
+      }
+      
+      function updateOtherDataFromFields() {
+        const calibData = getCalibData();
+        if (!calibData) return;
+        setInt16(calibData, 0x1F88 - CAL_START, getValue('xtalFreqLow'));
+        calibData[0x1F8E - CAL_START] = getValue('volumeGain');
+        calibData[0x1F8F - CAL_START] = getValue('dacGain');
+      }
+      
+      // Utility functions
+      function setValue(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      }
+      
+      function getValue(id) {
+        const el = document.getElementById(id);
+        return el ? parseInt(el.value) || 0 : 0;
+      }
+      
+      function getUint16(data, offset) {
+        return data[offset] | (data[offset + 1] << 8);
+      }
+      
+      function setUint16(data, offset, value) {
+        data[offset] = value & 0xFF;
+        data[offset + 1] = (value >> 8) & 0xFF;
+      }
+      
+      function getInt16(data, offset) {
+        const val = getUint16(data, offset);
+        return val > 32767 ? val - 65536 : val;
+      }
+      
+      function setInt16(data, offset, value) {
+        if (value < 0) value = 65536 + value;
+        setUint16(data, offset, value);
+      }
+      
+      // Initialize calibration on page load
+      document.addEventListener('DOMContentLoaded', function() {
+        initCalibrationTables();
+        
+        // Bind buttons
+        const loadBtn = document.getElementById('calibLoadFileBtn');
+        const fileInput = document.getElementById('calibFileInput');
+        const writeFileBtn = document.getElementById('calibWriteFileBtn');
+        
+        if (loadBtn) loadBtn.addEventListener('click', () => fileInput.click());
+        if (fileInput) fileInput.addEventListener('change', (e) => {
+          if (e.target.files[0]) loadCalibrationFile(e.target.files[0]);
+        });
+        if (writeFileBtn) writeFileBtn.addEventListener('click', writeCalibrationFile);
+      });
+      // ============== END CALIBRATION SECTION ==============
     </script>
   
                         <footer class="page-footer">

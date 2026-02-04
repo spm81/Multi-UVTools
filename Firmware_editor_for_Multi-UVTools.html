@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firmware Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h1 i {
+            color: #3498db;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+            transform: translateY(-3px);
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d68910;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(243, 156, 18, 0.3);
+        }
+
+        .btn-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #138496;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(23, 162, 184, 0.3);
+        }
+
+        .content-area {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .json-viewer {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .editor-panel {
+            flex: 2;
+            min-width: 500px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #3498db;
+        }
+
+        .json-display {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 65vh;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .firmware-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+        }
+
+        .firmware-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .firmware-item:last-child {
+            border-bottom: none;
+        }
+
+        .firmware-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .firmware-info {
+            flex: 1;
+        }
+
+        .firmware-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .firmware-path {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+
+        .firmware-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .edit-btn {
+            color: #3498db;
+        }
+
+        .edit-btn:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+        }
+
+        .delete-btn {
+            color: #e74c3c;
+        }
+
+        .delete-btn:hover {
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+
+        .move-btn {
+            color: #f39c12;
+        }
+
+        .move-btn:hover {
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+
+        .group-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .group-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .group-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 2px solid #3498db;
+            background-color: white;
+            color: #3498db;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .category-btn.active {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .category-btn:hover:not(.active) {
+            background-color: #f0f7ff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1001;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #2ecc71;
+        }
+
+        .notification.error {
+            background-color: #e74c3c;
+        }
+
+        .notification.info {
+            background-color: #3498db;
+        }
+
+        .notification.warning {
+            background-color: #f39c12;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .file-input-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .file-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #7f8c8d;
+        }
+
+        .group-order-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .order-btn {
+            padding: 8px 15px;
+            border: 1px solid #3498db;
+            background-color: white;
+            color: #3498db;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .order-btn:hover:not(:disabled) {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .order-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .group-order-info {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .drag-handle {
+            cursor: move;
+            color: #95a5a6;
+            padding: 5px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .drag-handle:hover {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .dragging {
+            opacity: 0.5;
+            border: 2px dashed #3498db;
+        }
+
+        @media (max-width: 1100px) {
+            .content-area {
+                flex-direction: column;
+            }
+            
+            .editor-panel, .json-viewer {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .group-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .group-actions {
+                align-self: flex-end;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .group-order-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1><i class="fas fa-microchip"></i> Firmware Manager</h1>
+                <div class="controls">
+                    <div class="file-input-container">
+                        <button class="btn btn-warning" id="loadJsonBtn">
+                            <i class="fas fa-folder-open"></i> Load JSON File
+                        </button>
+                        <input type="file" id="jsonFileInput" class="file-input" accept=".json">
+                    </div>
+                    <button class="btn btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button class="btn btn-success" id="addGroupBtn">
+                        <i class="fas fa-plus-circle"></i> Add Group
+                    </button>
+                    <button class="btn btn-secondary" id="downloadBtn">
+                        <i class="fas fa-download"></i> Download JSON
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="category-selector">
+            <button class="category-btn active" data-category="k5_firmwares">UV-K5 Firmwares</button>
+            <button class="category-btn" data-category="k1_firmwares">UV-K1 Firmwares</button>
+            <button class="category-btn" data-category="rt890_firmwares">RT890 Firmwares</button>
+        </div>
+        
+        <div class="content-area">
+            <div class="json-viewer">
+                <h2><i class="fas fa-code"></i> JSON Viewer</h2>
+                <div class="json-display" id="jsonDisplay">
+                    <div class="empty-state">
+                        <i class="fas fa-file-code"></i>
+                        <h3>No JSON Data Loaded</h3>
+                        <p>Load a JSON file using the "Load JSON File" button above to start editing.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="editor-panel">
+                <h2><i class="fas fa-edit"></i> Firmware Editor</h2>
+                
+                <div class="form-group">
+                    <label for="groupSelect">Select Group:</label>
+                    <select id="groupSelect">
+                        <option value="">-- Select a group --</option>
+                    </select>
+                </div>
+                
+                <div id="groupEditor" style="display: none;">
+                    <div id="groupOrderControls" class="group-order-controls">
+                        <button class="order-btn" id="moveGroupUp">
+                            <i class="fas fa-arrow-up"></i> Move Up
+                        </button>
+                        <button class="order-btn" id="moveGroupDown">
+                            <i class="fas fa-arrow-down"></i> Move Down
+                        </button>
+                        <div class="group-order-info">
+                            <i class="fas fa-sort"></i>
+                            <span id="groupPosition">Position: -/-</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="groupName">Group Name:</label>
+                            <input type="text" id="groupName" placeholder="Enter group name">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileName">Profile Name:</label>
+                            <input type="text" id="profileName" placeholder="Enter profile name">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Firmwares in this group:</label>
+                        <div class="firmware-list" id="firmwareList">
+                            <!-- Firmware list will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firmwareName">Firmware Name:</label>
+                            <input type="text" id="firmwareName" placeholder="Enter firmware name">
+                        </div>
+                        <div class="form-group">
+                            <label for="firmwarePath">Firmware Path:</label>
+                            <input type="text" id="firmwarePath" placeholder="Enter firmware path">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-success" id="addFirmwareBtn">
+                            <i class="fas fa-plus"></i> Add Firmware
+                        </button>
+                        <button class="btn btn-danger" id="deleteGroupBtn">
+                            <i class="fas fa-trash"></i> Delete Group
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="noDataMessage" class="empty-state">
+                    <i class="fas fa-database"></i>
+                    <h3>No Firmware Data Available</h3>
+                    <p>Load a JSON file to start editing firmware data.</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Firmware Manager &copy; 2023 - Manage your firmware collections with ease</p>
+        </footer>
+    </div>
+    
+    <!-- Modals -->
+    <div class="modal" id="addGroupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Add New Group</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="newGroupName">Group Name:</label>
+                <input type="text" id="newGroupName" placeholder="Enter group name">
+            </div>
+            <div class="form-group">
+                <label for="newGroupProfile">Default Profile:</label>
+                <input type="text" id="newGroupProfile" placeholder="Enter default profile name">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn btn-success" id="confirmAddGroup">Add Group</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="editFirmwareModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-edit"></i> Edit Firmware</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="form-group">
+                <label for="editFirmwareName">Firmware Name:</label>
+                <input type="text" id="editFirmwareName" placeholder="Enter firmware name">
+            </div>
+            <div class="form-group">
+                <label for="editFirmwarePath">Firmware Path:</label>
+                <input type="text" id="editFirmwarePath" placeholder="Enter firmware path">
+            </div>
+            <div class="form-group">
+                <label for="editFirmwareProfile">Firmware Profile:</label>
+                <input type="text" id="editFirmwareProfile" placeholder="Enter firmware profile">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Cancel</button>
+                <button class="btn btn-primary" id="confirmEditFirmware">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Operation completed successfully!</span>
+    </div>
+
+    <script>
+        // Global firmware data variable
+        let firmwareData = null;
+
+        // State variables
+        let currentCategory = 'k5_firmwares';
+        let currentGroupIndex = -1;
+        let currentFirmwareIndex = -1;
+        let editingFirmware = null;
+        let dragStartIndex = -1;
+
+        // DOM Elements
+        const jsonDisplay = document.getElementById('jsonDisplay');
+        const groupSelect = document.getElementById('groupSelect');
+        const groupEditor = document.getElementById('groupEditor');
+        const groupName = document.getElementById('groupName');
+        const profileName = document.getElementById('profileName');
+        const firmwareList = document.getElementById('firmwareList');
+        const firmwareName = document.getElementById('firmwareName');
+        const firmwarePath = document.getElementById('firmwarePath');
+        const addFirmwareBtn = document.getElementById('addFirmwareBtn');
+        const deleteGroupBtn = document.getElementById('deleteGroupBtn');
+        const addGroupBtn = document.getElementById('addGroupBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const loadJsonBtn = document.getElementById('loadJsonBtn');
+        const jsonFileInput = document.getElementById('jsonFileInput');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const addGroupModal = document.getElementById('addGroupModal');
+        const editFirmwareModal = document.getElementById('editFirmwareModal');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const confirmAddGroupBtn = document.getElementById('confirmAddGroup');
+        const confirmEditFirmwareBtn = document.getElementById('confirmEditFirmware');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const moveGroupUpBtn = document.getElementById('moveGroupUp');
+        const moveGroupDownBtn = document.getElementById('moveGroupDown');
+        const groupPosition = document.getElementById('groupPosition');
+
+        // Initialize the application
+        function init() {
+            // Check if there's data in local storage
+            const savedData = localStorage.getItem('firmwareData');
+            if (savedData) {
+                try {
+                    firmwareData = JSON.parse(savedData);
+                    loadCategory(currentCategory);
+                    updateJSONDisplay();
+                    showNotification('Loaded data from local storage', 'info');
+                } catch (e) {
+                    console.error('Error loading from local storage:', e);
+                    showEmptyState();
+                }
+            } else {
+                showEmptyState();
+            }
+            
+            setupEventListeners();
+        }
+
+        // Show empty state when no data is loaded
+        function showEmptyState() {
+            noDataMessage.style.display = 'block';
+            groupEditor.style.display = 'none';
+            jsonDisplay.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-file-code"></i>
+                    <h3>No JSON Data Loaded</h3>
+                    <p>Load a JSON file using the "Load JSON File" button above to start editing.</p>
+                </div>
+            `;
+        }
+
+        // Hide empty state when data is loaded
+        function hideEmptyState() {
+            noDataMessage.style.display = 'none';
+        }
+
+        // Load JSON data from file
+        function loadJSONFile(file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // Validate the JSON structure
+                    if (!data.k5_firmwares && !data.k1_firmwares && !data.rt890_firmwares) {
+                        throw new Error('Invalid firmware JSON structure');
+                    }
+                    
+                    firmwareData = data;
+                    
+                    // Load the default category
+                    loadCategory(currentCategory);
+                    updateJSONDisplay();
+                    hideEmptyState();
+                    
+                    showNotification(`Loaded ${file.name} successfully`, 'success');
+                    
+                    // Save to local storage
+                    localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+                    
+                } catch (error) {
+                    showNotification(`Error parsing JSON: ${error.message}`, 'error');
+                    console.error('Error parsing JSON:', error);
+                }
+            };
+            
+            reader.onerror = function() {
+                showNotification('Error reading file', 'error');
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // Update the JSON display with formatted data
+        function updateJSONDisplay() {
+            if (!firmwareData) {
+                showEmptyState();
+                return;
+            }
+            
+            const formattedJson = JSON.stringify(firmwareData, null, 2);
+            jsonDisplay.textContent = formattedJson;
+            
+            // Apply syntax highlighting (simple version)
+            jsonDisplay.innerHTML = formattedJson
+                .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, match => {
+                    let cls = 'number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'key';
+                        } else {
+                            cls = 'string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'null';
+                    }
+                    return `<span class="${cls}">${match}</span>`;
+                });
+        }
+
+        // Load a category (k5_firmwares, k1_firmwares, rt890_firmwares)
+        function loadCategory(category) {
+            if (!firmwareData || !firmwareData[category]) {
+                showEmptyState();
+                return;
+            }
+            
+            currentCategory = category;
+            updateCategoryButtons();
+            
+            // Clear the group select
+            groupSelect.innerHTML = '<option value="">-- Select a group --</option>';
+            
+            // Add groups from the selected category
+            firmwareData[category].forEach((group, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = group.group;
+                groupSelect.appendChild(option);
+            });
+            
+            // Hide the editor initially
+            groupEditor.style.display = 'none';
+            
+            updateJSONDisplay();
+        }
+
+        // Update active category button
+        function updateCategoryButtons() {
+            categoryBtns.forEach(btn => {
+                if (btn.dataset.category === currentCategory) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Load a group for editing
+        function loadGroup(groupIndex) {
+            if (!firmwareData) return;
+            
+            if (groupIndex === -1 || groupIndex === '') {
+                groupEditor.style.display = 'none';
+                return;
+            }
+            
+            currentGroupIndex = parseInt(groupIndex);
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            
+            // Set group values
+            groupName.value = group.group;
+            profileName.value = group.firmwares.length > 0 ? group.firmwares[0].profile : '';
+            
+            // Update group position info
+            updateGroupPositionInfo();
+            
+            // Load firmwares
+            loadFirmwares();
+            
+            // Show the editor
+            groupEditor.style.display = 'block';
+            hideEmptyState();
+        }
+
+        // Update group position information
+        function updateGroupPositionInfo() {
+            if (!firmwareData || currentGroupIndex === -1) return;
+            
+            const totalGroups = firmwareData[currentCategory].length;
+            const currentPosition = currentGroupIndex + 1;
+            
+            groupPosition.textContent = `Position: ${currentPosition}/${totalGroups}`;
+            
+            // Enable/disable move buttons based on position
+            moveGroupUpBtn.disabled = currentGroupIndex === 0;
+            moveGroupDownBtn.disabled = currentGroupIndex === totalGroups - 1;
+        }
+
+        // Move group up (earlier in the list)
+        function moveGroupUp() {
+            if (!firmwareData || currentGroupIndex <= 0) return;
+            
+            const groups = firmwareData[currentCategory];
+            
+            // Swap the current group with the one above it
+            [groups[currentGroupIndex], groups[currentGroupIndex - 1]] = 
+            [groups[currentGroupIndex - 1], groups[currentGroupIndex]];
+            
+            // Update the current group index
+            currentGroupIndex--;
+            
+            // Reload the category to update the dropdown
+            loadCategory(currentCategory);
+            
+            // Reselect the moved group
+            groupSelect.value = currentGroupIndex;
+            
+            // Update position info
+            updateGroupPositionInfo();
+            
+            // Update JSON display
+            updateJSONDisplay();
+            
+            // Save to local storage
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            
+            showNotification('Group moved up', 'success');
+        }
+
+        // Move group down (later in the list)
+        function moveGroupDown() {
+            if (!firmwareData || currentGroupIndex >= firmwareData[currentCategory].length - 1) return;
+            
+            const groups = firmwareData[currentCategory];
+            
+            // Swap the current group with the one below it
+            [groups[currentGroupIndex], groups[currentGroupIndex + 1]] = 
+            [groups[currentGroupIndex + 1], groups[currentGroupIndex]];
+            
+            // Update the current group index
+            currentGroupIndex++;
+            
+            // Reload the category to update the dropdown
+            loadCategory(currentCategory);
+            
+            // Reselect the moved group
+            groupSelect.value = currentGroupIndex;
+            
+            // Update position info
+            updateGroupPositionInfo();
+            
+            // Update JSON display
+            updateJSONDisplay();
+            
+            // Save to local storage
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            
+            showNotification('Group moved down', 'success');
+        }
+
+        // Load firmwares for the current group
+        function loadFirmwares() {
+            if (!firmwareData) return;
+            
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            firmwareList.innerHTML = '';
+            
+            if (group.firmwares.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'firmware-item';
+                emptyMsg.innerHTML = '<div class="firmware-info"><span class="firmware-name" style="color: #95a5a6; font-style: italic;">No firmwares in this group</span></div>';
+                firmwareList.appendChild(emptyMsg);
+                return;
+            }
+            
+            group.firmwares.forEach((firmware, index) => {
+                const firmwareItem = document.createElement('div');
+                firmwareItem.className = 'firmware-item';
+                firmwareItem.setAttribute('data-index', index);
+                
+                firmwareItem.innerHTML = `
+                    <div class="firmware-info">
+                        <div class="firmware-name">${firmware.name}</div>
+                        <div class="firmware-path">${firmware.path}</div>
+                    </div>
+                    <div class="firmware-actions">
+                        <button class="action-btn edit-btn" data-index="${index}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                firmwareList.appendChild(firmwareItem);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    editFirmware(index);
+                });
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    deleteFirmware(index);
+                });
+            });
+        }
+
+        // Add a new firmware to the current group
+        function addFirmware() {
+            if (!firmwareData) return;
+            
+            const name = firmwareName.value.trim();
+            const path = firmwarePath.value.trim();
+            
+            if (!name || !path) {
+                showNotification('Please enter both firmware name and path', 'error');
+                return;
+            }
+            
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            const profile = profileName.value.trim() || group.group;
+            
+            const newFirmware = {
+                name,
+                path,
+                profile
+            };
+            
+            group.firmwares.push(newFirmware);
+            
+            // Clear input fields
+            firmwareName.value = '';
+            firmwarePath.value = '';
+            
+            // Reload firmwares and update JSON display
+            loadFirmwares();
+            updateJSONDisplay();
+            
+            showNotification('Firmware added successfully', 'success');
+            
+            // Save to local storage
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+        }
+
+        // Edit a firmware
+        function editFirmware(index) {
+            if (!firmwareData) return;
+            
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            const firmware = group.firmwares[index];
+            
+            editingFirmware = { groupIndex: currentGroupIndex, firmwareIndex: index };
+            
+            // Populate modal fields
+            document.getElementById('editFirmwareName').value = firmware.name;
+            document.getElementById('editFirmwarePath').value = firmware.path;
+            document.getElementById('editFirmwareProfile').value = firmware.profile;
+            
+            // Show modal
+            editFirmwareModal.style.display = 'flex';
+        }
+
+        // Save edited firmware
+        function saveEditedFirmware() {
+            if (!firmwareData) return;
+            
+            const name = document.getElementById('editFirmwareName').value.trim();
+            const path = document.getElementById('editFirmwarePath').value.trim();
+            const profile = document.getElementById('editFirmwareProfile').value.trim();
+            
+            if (!name || !path) {
+                showNotification('Please enter both firmware name and path', 'error');
+                return;
+            }
+            
+            const group = firmwareData[currentCategory][editingFirmware.groupIndex];
+            group.firmwares[editingFirmware.firmwareIndex] = { name, path, profile };
+            
+            // Close modal
+            editFirmwareModal.style.display = 'none';
+            
+            // Reload firmwares and update JSON display
+            loadFirmwares();
+            updateJSONDisplay();
+            
+            showNotification('Firmware updated successfully', 'success');
+            
+            // Save to local storage
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+        }
+
+        // Delete a firmware from the current group
+        function deleteFirmware(index) {
+            if (!firmwareData) return;
+            
+            if (confirm('Are you sure you want to delete this firmware?')) {
+                const group = firmwareData[currentCategory][currentGroupIndex];
+                group.firmwares.splice(index, 1);
+                
+                // Reload firmwares and update JSON display
+                loadFirmwares();
+                updateJSONDisplay();
+                
+                showNotification('Firmware deleted successfully', 'success');
+                
+                // Save to local storage
+                localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            }
+        }
+
+        // Delete the current group
+        function deleteGroup() {
+            if (!firmwareData) return;
+            
+            if (confirm(`Are you sure you want to delete the group "${firmwareData[currentCategory][currentGroupIndex].group}"? This will delete all firmwares in this group.`)) {
+                firmwareData[currentCategory].splice(currentGroupIndex, 1);
+                
+                // Reload category
+                loadCategory(currentCategory);
+                updateJSONDisplay();
+                
+                showNotification('Group deleted successfully', 'success');
+                
+                // Save to local storage
+                localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            }
+        }
+
+        // Add a new group
+        function addGroup() {
+            if (!firmwareData) {
+                // Initialize empty firmware data structure
+                firmwareData = {
+                    k5_firmwares: [],
+                    k1_firmwares: [],
+                    rt890_firmwares: []
+                };
+                hideEmptyState();
+            }
+            
+            addGroupModal.style.display = 'flex';
+        }
+
+        // Confirm adding a new group
+        function confirmAddGroup() {
+            const groupName = document.getElementById('newGroupName').value.trim();
+            const groupProfile = document.getElementById('newGroupProfile').value.trim();
+            
+            if (!groupName) {
+                showNotification('Please enter a group name', 'error');
+                return;
+            }
+            
+            // Make sure the category exists
+            if (!firmwareData[currentCategory]) {
+                firmwareData[currentCategory] = [];
+            }
+            
+            const newGroup = {
+                group: groupName,
+                firmwares: []
+            };
+            
+            firmwareData[currentCategory].push(newGroup);
+            
+            // Close modal and clear fields
+            addGroupModal.style.display = 'none';
+            document.getElementById('newGroupName').value = '';
+            document.getElementById('newGroupProfile').value = '';
+            
+            // Reload category and select the new group
+            loadCategory(currentCategory);
+            
+            // Select the new group (last one)
+            groupSelect.value = firmwareData[currentCategory].length - 1;
+            loadGroup(firmwareData[currentCategory].length - 1);
+            
+            updateJSONDisplay();
+            
+            showNotification('Group added successfully', 'success');
+            
+            // Save to local storage
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+        }
+
+        // Save changes (in a real app, this would send to a server)
+        function saveChanges() {
+            if (!firmwareData) {
+                showNotification('No data to save. Please load a JSON file first.', 'warning');
+                return;
+            }
+            
+            try {
+                localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+                showNotification('Changes saved successfully to local storage', 'success');
+            } catch (e) {
+                showNotification('Error saving changes: ' + e.message, 'error');
+            }
+        }
+
+        // Download JSON file
+        function downloadJSON() {
+            if (!firmwareData) {
+                showNotification('No data to download. Please load a JSON file first.', 'warning');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(firmwareData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const downloadUrl = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'firmwares.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(downloadUrl);
+            
+            showNotification('JSON file downloaded', 'info');
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            notificationText.textContent = message;
+            
+            // Set icon based on type
+            let icon = 'fas fa-check-circle';
+            if (type === 'error') icon = 'fas fa-exclamation-circle';
+            if (type === 'warning') icon = 'fas fa-exclamation-triangle';
+            if (type === 'info') icon = 'fas fa-info-circle';
+            
+            notification.innerHTML = `<i class="${icon}"></i><span id="notificationText">${message}</span>`;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Load JSON file button
+            loadJsonBtn.addEventListener('click', () => {
+                jsonFileInput.click();
+            });
+            
+            // JSON file input change
+            jsonFileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    loadJSONFile(file);
+                }
+                // Reset the input so the same file can be loaded again
+                e.target.value = '';
+            });
+            
+            // Category buttons
+            categoryBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    loadCategory(btn.dataset.category);
+                });
+            });
+            
+            // Group select
+            groupSelect.addEventListener('change', (e) => {
+                loadGroup(e.target.value);
+            });
+            
+            // Add firmware button
+            addFirmwareBtn.addEventListener('click', addFirmware);
+            
+            // Delete group button
+            deleteGroupBtn.addEventListener('click', deleteGroup);
+            
+            // Add group button
+            addGroupBtn.addEventListener('click', addGroup);
+            
+            // Save button
+            saveBtn.addEventListener('click', saveChanges);
+            
+            // Download button
+            downloadBtn.addEventListener('click', downloadJSON);
+            
+            // Move group buttons
+            moveGroupUpBtn.addEventListener('click', moveGroupUp);
+            moveGroupDownBtn.addEventListener('click', moveGroupDown);
+            
+            // Close modal buttons
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    addGroupModal.style.display = 'none';
+                    editFirmwareModal.style.display = 'none';
+                });
+            });
+            
+            // Confirm add group button
+            confirmAddGroupBtn.addEventListener('click', confirmAddGroup);
+            
+            // Confirm edit firmware button
+            confirmEditFirmwareBtn.addEventListener('click', saveEditedFirmware);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === addGroupModal) {
+                    addGroupModal.style.display = 'none';
+                }
+                if (e.target === editFirmwareModal) {
+                    editFirmwareModal.style.display = 'none';
+                }
+            });
+            
+            // Allow pressing Enter to add firmware
+            firmwareName.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addFirmware();
+            });
+            
+            firmwarePath.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') addFirmware();
+            });
+        }
+
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

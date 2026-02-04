@@ -26,12 +26,12 @@
       ]
     },
     {
-      "group": "Motorko Firmware",
+      "group": "Egzumer Firmware",
       "firmwares": [
         {
-          "name": "Motorko v0.26",
-          "path": "firmware/motorko_v0.26.packed.bin",
-          "profile": "Motorko"
+          "name": "Egzumer v0.22",
+          "path": "firmware/egzumer_v0.22.packed.bin",
+          "profile": "Egzumer"
         }
       ]
     },
@@ -51,32 +51,42 @@
       ]
     },
     {
+      "group": "F4HWN Firmware v4.3",
+      "firmwares": [
+        {
+          "name": "F4HWN Bandscope v4.3",
+          "path": "firmware/f4hwn/f4hwn.bandscope.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Broadcast v4.3",
+          "path": "firmware/f4hwn/f4hwn.broadcast.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN RescueOps v4.3",
+          "path": "firmware/f4hwn/f4hwn.rescueops.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Basic v4.3",
+          "path": "firmware/f4hwn/f4hwn.basic.packed.v4.3.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Game v4.3",
+          "path": "firmware/f4hwn/f4hwn.game.packed.v4.3.bin",
+          "profile": "F4HWN"
+        }
+      ]
+    },
+    {
       "group": "kamilsss655 (Nunu) Firmware",
       "firmwares": [
         {
           "name": "kamilsss655 v.20.5",
           "path": "firmware/kamilsss655_v20.5.bin",
           "profile": "Nunu"
-        }
-      ]
-    },
-    {
-      "group": "Joaquim.org Firmware",
-      "firmwares": [
-        {
-          "name": "Joaquim.org Rolling Release",
-          "path": "https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin",
-          "profile": "Joaquim UV-KX"
-        }
-      ]
-    },
-    {
-      "group": "Egzumer Firmware",
-      "firmwares": [
-        {
-          "name": "Egzumer v0.22",
-          "path": "firmware/egzumer_v0.22.packed.bin",
-          "profile": "Egzumer"
         }
       ]
     },
@@ -116,32 +126,37 @@
       ]
     },
     {
-      "group": "F4HWN Firmware v4.3",
+      "group": "Joaquim.org Firmware",
       "firmwares": [
         {
-          "name": "F4HWN Bandscope v4.3",
-          "path": "firmware/f4hwn/f4hwn.bandscope.packed.v4.3.bin",
-          "profile": "F4HWN"
+          "name": "Joaquim.org Rolling Release",
+          "path": "https://github.com/joaquimorg/UV-KX-firmware/blob/main/firmware/uv-kx_V1.0.bin",
+          "profile": "Joaquim UV-KX"
+        }
+      ]
+    },
+    {
+      "group": "Motorko Firmware",
+      "firmwares": [
+        {
+          "name": "Motorko v0.26",
+          "path": "firmware/motorko_v0.26.packed.bin",
+          "profile": "Motorko"
+        }
+      ]
+    },
+    {
+      "group": "Robzyl Firmware",
+      "firmwares": [
+        {
+          "name": "Robzyl v6.3",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads8K/robzyl.8k.fr.packed.bin",
+          "profile": "Robzyl"
         },
         {
-          "name": "F4HWN Broadcast v4.3",
-          "path": "firmware/f4hwn/f4hwn.broadcast.packed.v4.3.bin",
-          "profile": "F4HWN"
-        },
-        {
-          "name": "F4HWN RescueOps v4.3",
-          "path": "firmware/f4hwn/f4hwn.rescueops.packed.v4.3.bin",
-          "profile": "F4HWN"
-        },
-        {
-          "name": "F4HWN Basic v4.3",
-          "path": "firmware/f4hwn/f4hwn.basic.packed.v4.3.bin",
-          "profile": "F4HWN"
-        },
-        {
-          "name": "F4HWN Game v4.3",
-          "path": "firmware/f4hwn/f4hwn.game.packed.v4.3.bin",
-          "profile": "F4HWN"
+          "name": "Robzyl v6.3 (512k)",
+          "path": "https://github.com/Robby69400/Robzyl/blob/main/Downloads/Downloads512K/robzyl.512k.fr.packed.bin",
+          "profile": "Robzyl"
         }
       ]
     },
@@ -213,26 +228,6 @@
       ]
     },
     {
-      "group": "F4HWN Firmware",
-      "firmwares": [
-        {
-          "name": "F4HWN Fusion v4.3.2 (K5v3)",
-          "path": "firmware/f4hwn.k5v3.fusion.v4.3.2.bin",
-          "profile": "F4HWN"
-        },
-        {
-          "name": "F4HWN Fusion v4.3.2 (K1)",
-          "path": "firmware/f4hwn.k1.fusion.v4.3.2.bin",
-          "profile": "F4HWN"
-        },
-        {
-          "name": "F4HWN Fusion v5.0.1 Beta",
-          "path": "firmware/f4hwn.fusion.v5.0.1.beta.bin",
-          "profile": "F4HWN"
-        }
-      ]
-    },
-    {
       "group": "Calypso Firmware",
       "firmwares": [
         {
@@ -254,6 +249,41 @@
           "name": "E25WOP v4.3.2 Fusion+ V10",
           "path": "firmware/f4hwn.fusionPlusV10.bin",
           "profile": "E25WOP"
+        }
+      ]
+    },
+    {
+      "group": "F4HWN Firmware",
+      "firmwares": [
+        {
+          "name": "F4HWN Fusion v4.3.2 (K5v3)",
+          "path": "firmware/f4hwn.k5v3.fusion.v4.3.2.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Fusion v4.3.2 (K1)",
+          "path": "firmware/f4hwn.k1.fusion.v4.3.2.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Fusion v5.0.1 Beta",
+          "path": "firmware/f4hwn.fusion.v5.0.1.beta.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Fusion v5.0.2 Beta",
+          "path": "https://github.com/armel/uv-k1-k5v3-firmware-custom/blob/cd79144a25dd6480877581aa242ae726ffc3c347/archive/f4hwn.fusion.v5.0.2.beta.bin",
+          "profile": "F4HWN"
+        }
+      ]
+    },
+    {
+      "group": "N7SIX Firmware",
+      "firmwares": [
+        {
+          "name": "N7SIX DX1ARM Edition v7.6.1",
+          "path": "firmware/n7six.dx1arm-k1_v7.6.1.bin",
+          "profile": "N7SIX"
         }
       ]
     },
