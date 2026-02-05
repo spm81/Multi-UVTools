@@ -77,6 +77,31 @@
           "name": "F4HWN Game v4.3",
           "path": "firmware/f4hwn/f4hwn.game.packed.v4.3.bin",
           "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Bandscope v4.3 (UV-K5 v2)",
+          "path": "https://github.com/muzkr/uv-k5-firmware-custom/tree/v2/archive_V2/v4.3/f4hwn.bandscope.packed.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Broadcast v4.3 (UV-K5 v2)",
+          "path": "https://github.com/muzkr/uv-k5-firmware-custom/tree/v2/archive_V2/v4.3/f4hwn.broadcast.packed.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN RescueOps v4.3 (UV-K5 v2)",
+          "path": "https://github.com/muzkr/uv-k5-firmware-custom/tree/v2/archive_V2/v4.3/f4hwn.rescueops.packed.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Basic v4.3 (UV-K5 v2)",
+          "path": "https://github.com/muzkr/uv-k5-firmware-custom/tree/v2/archive_V2/v4.3/f4hwn.basic.packed.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN Game v4.3 (UV-K5 v2)",
+          "path": "https://github.com/muzkr/uv-k5-firmware-custom/tree/v2/archive_V2/v4.3/f4hwn.game.packed.bin",
+          "profile": "F4HWN"
         }
       ]
     },
@@ -265,52 +290,92 @@
       "firmwares": [
         {
           "name": "Quansheng Stock v2.01.19 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.19_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.19_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v2.01.23 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.23_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.23_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v2.01.26 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.26_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.26_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v2.01.27 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.27_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.27_flashable.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v2.01.31 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.31_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.31_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.33 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.33_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.35 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.35_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v2.01.36 (UV-K5)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.36_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v2.01.39 (UV-K5)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v2.01.39_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v2.01.39_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.10 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.10_flashable.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v3.00.15 (UV-K6/K5(8))",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k6_v3.00.15_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.15_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.17 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.17_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.18 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.18_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v3.00.19 (UV-K6/K5(8))",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.19_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v3.00.22 (UV-K6/K5(8))",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k6_v3.00.22_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k6_v3.00.22_publish.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v4.00.01 (UV-5R Plus)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v4.00.01_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v4.00.01_flashable.bin",
           "profile": "Stock"
         },
         {
           "name": "Quansheng Stock v4.00.07 (UV-5R Plus)",
-          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/raw/main/firmware/k5_v4.00.07_publish.bin",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v4.00.07_publish.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v4.00.09 (UV-5R Plus)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/k5_v4.00.09_publish.bin",
           "profile": "Stock"
         },
         {
@@ -408,6 +473,11 @@
         {
           "name": "Quansheng Stock v7.00.11 (K5v3)",
           "path": "firmware/quansheng.k5v3.stock.firmware.v7.00.11.bin",
+          "profile": "Stock"
+        },
+        {
+          "name": "Quansheng Stock v7.01.09 (K5v3) (Chinese)",
+          "path": "https://github.com/amnemonic/Quansheng_UV-K5_Firmware/blob/main/firmware/K5CHI-071%20V.7.01.09.bin",
           "profile": "Stock"
         },
         {

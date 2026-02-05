@@ -1,34 +1,25 @@
 
 // Helper function to convert GitHub URLs to jsDelivr (avoids CORS issues)
 function convertGitHubUrl(url) {
-  // Convert github.com/user/repo/blob/branch/path to jsDelivr
-  // Example: github.com/M7OCM/890/blob/binary/file.bin -> cdn.jsdelivr.net/gh/M7OCM/890@binary/file.bin
-  let match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)/);
+  // Convert github.com URLs to raw.githubusercontent.com to avoid CORS issues
+  // and ensure we can access both /blob/ and /tree/ paths
+  
+  // Handle /blob/branch/path or /tree/branch/path or /raw/branch/path
+  let match = url.match(/https?:\/\/github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree|raw)\/([^\/]+)\/(.+)/);
+  if (match) {
+    const [, user, repo, type, branch, path] = match;
+    return `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
+  }
+  
+  // Handle /raw/refs/heads/branch/path
+  match = url.match(/https?:\/\/github\.com\/([^\/]+)\/([^\/]+)\/raw\/refs\/heads\/([^\/]+)\/(.+)/);
   if (match) {
     const [, user, repo, branch, path] = match;
-    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+    return `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
   }
-  // Convert github.com/user/repo/raw/refs/heads/branch/path
-  match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/raw\/refs\/heads\/([^\/]+)\/(.+)/);
-  if (match) {
-    const [, user, repo, branch, path] = match;
-    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
-  }
-  // Convert github.com/user/repo/raw/branch/path
-  match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/raw\/([^\/]+)\/(.+)/);
-  if (match) {
-    const [, user, repo, branch, path] = match;
-    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
-  }
-  // Convert raw.githubusercontent.com/user/repo/branch/path
-  match = url.match(/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)/);
-  if (match) {
-    const [, user, repo, branch, path] = match;
-    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
-  }
-  return url; // Return as-is if not a GitHub URL
+  
+  return url;
 }
-
 import {
   EEPROM_BLOCK_SIZE,
   FLASH_BLOCK_SIZE,

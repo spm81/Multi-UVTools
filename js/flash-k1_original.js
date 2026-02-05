@@ -19,32 +19,6 @@ const OBFUS_TBL = new Uint8Array([
   0x21, 0x35, 0xd5, 0x40, 0x13, 0x03, 0xe9, 0x80
 ]);
 
-// ========== MODEL DETECTION ==========
-const MODEL_UNKNOWN = 0;
-const MODEL_UV_K5_V1 = 1;
-const MODEL_UV_K5_V3 = 2;
-const MODEL_UV_K1 = 3;
-
-// ========== BOOTLOADER BLOCKLIST ==========
-// CRITICALLY DANGEROUS versions - ALWAYS BLOCK
-const BLOCKED_BOOTLOADERS = [
-    "5.00.01",  // UV-K5 V1 - GUARANTEED BRICK with K1 firmware
-    "2.00.06",  // UV-K5 V3 - Not compatible with K1
-];
-
-// MINIMUM SAFE version for UV-K1
-const MIN_K1_BOOTLOADER = "7.03.01";
-
-// Known bootloader to model mapping
-const BOOTLOADER_TO_MODEL = {
-    "5.00.01": "UV-K5 V1",
-    "2.00.06": "UV-K5 V3", 
-    "7.03.01": "UV-K1",
-    "7.03.02": "UV-K1",
-    "7.03.03": "UV-K1",
-    // Add more as discovered
-};
-
 // ========== CLASS ==========
 export class K1Flash {
   constructor(port) {
@@ -62,64 +36,6 @@ export class K1Flash {
 
   log(message, type = 'info') {
     this.logFn(message, type);
-  }
-
-  // ========== BOOTLOADER VALIDATION ==========
-  validateBootloader(blVersion) {
-    // Normalize version
-    const version = blVersion.trim();
-    
-    // ===== 1. ABSOLUTE BLOCK CHECK =====
-    if (BLOCKED_BOOTLOADERS.includes(version)) {
-      const model = BOOTLOADER_TO_MODEL[version] || "unknown model";
-      return {
-        valid: false,
-        critical: true,
-        message: `🚨🚨🚨 BOOTLOADER BLOCKED 🚨🚨🚨\n\n` +
-                 `Detected version: ${version}\n` +
-                 `This bootloader belongs to: ${model}\n\n` +
-                 `❌ NOT COMPATIBLE with UV-K1 firmware!\n` +
-                 `❌ Flashing will BRICK the radio!\n\n` +
-                 `Operation BLOCKED for safety.`,
-        allowed: false
-      };
-    }
-    
-    // ===== 2. MINIMUM VERSION CHECK =====
-    // Convert versions to comparable numbers (e.g., 7.03.01 -> 70301)
-    function versionToNumber(ver) {
-      const parts = ver.split('.').map(Number);
-      if (parts.length < 3) return 0;
-      return parts[0] * 10000 + parts[1] * 100 + parts[2];
-    }
-    
-    const currentVersionNum = versionToNumber(version);
-    const minVersionNum = versionToNumber(MIN_K1_BOOTLOADER);
-    
-    if (currentVersionNum < minVersionNum) {
-      return {
-        valid: false,
-        critical: true,
-        message: `⚠️ INSUFFICIENT BOOTLOADER VERSION ⚠️\n\n` +
-                 `Detected version: ${version}\n` +
-                 `Minimum required: ${MIN_K1_BOOTLOADER}\n\n` +
-                 `This version is too old or belongs to another model.\n` +
-                 `Update bootloader before flashing UV-K1 firmware.`,
-        allowed: false
-      };
-    }
-    
-    // ===== 3. BOOTLOADER APPROVED =====
-    const model = BOOTLOADER_TO_MODEL[version] || "UV-K1 (assumed)";
-    return {
-      valid: true,
-      critical: false,
-      message: `✅ Compatible bootloader detected!\n\n` +
-               `Version: ${version}\n` +
-               `Model: ${model}\n` +
-               `Status: Approved for flash`,
-      allowed: true
-    };
   }
 
   // ========== SERIAL ==========
@@ -278,28 +194,7 @@ export class K1Flash {
 
     this.log('Waiting for K1 bootloader...');
     const devInfo = await this.waitForDeviceInfo();
-    const blVersion = devInfo.blVersion;
-    
-    this.log(`Bootloader version: ${blVersion}`);
-
-    // ===== CRITICAL BOOTLOADER VALIDATION =====
-    const bootloaderCheck = this.validateBootloader(blVersion);
-    
-    if (!bootloaderCheck.allowed) {
-      await this.close();
-      
-      // Log to console
-      this.log(bootloaderCheck.message, 'error');
-      
-      // For critical errors, throw to be caught by UI
-      if (bootloaderCheck.critical) {
-        throw new Error(`BOOTLOADER_BLOCKED: ${bootloaderCheck.message}`);
-      }
-      
-      return;
-    }
-    
-    this.log(bootloaderCheck.message, 'success');
+    this.log(`Bootloader version: ${devInfo.blVersion}`);
 
     this.log('Performing handshake...');
     await this.performHandshake(devInfo.blVersion);
