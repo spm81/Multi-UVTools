@@ -1,6 +1,7 @@
 // flash-k1.js
 // Flash protocol for K1 radio (different from K5 EEPROM protocol)
 // K1 uses a bootloader protocol
+// FIXED VERSION - With critical security & integrity checks
 
 'use strict';
 
@@ -22,14 +23,14 @@ const OBFUS_TBL = new Uint8Array([
 // ========== MODEL DETECTION ==========
 const MODEL_UNKNOWN = 0;
 const MODEL_UV_K5_V1 = 1;
-const MODEL_UV_K5_V3 = 2;
+const MODEL_UV_K5_V2 = 2;
 const MODEL_UV_K1 = 3;
 
 // ========== BOOTLOADER BLOCKLIST ==========
 // CRITICALLY DANGEROUS versions - ALWAYS BLOCK
 const BLOCKED_BOOTLOADERS = [
-    "5.00.01",  // UV-K5 V1 - GUARANTEED BRICK with K1 firmware
-    "2.00.06",  // UV-K5 V3 - Not compatible with K1
+    "5.00.01",  // UV-K5 V2 - GUARANTEED BRICK with K1 firmware
+    "2.00.06",  // UV-K5 V1 - GUARANTEED BRICK with K1 firmware
 ];
 
 // MINIMUM SAFE version for UV-K1
@@ -37,8 +38,8 @@ const MIN_K1_BOOTLOADER = "7.03.01";
 
 // Known bootloader to model mapping
 const BOOTLOADER_TO_MODEL = {
-    "5.00.01": "UV-K5 V1",
-    "2.00.06": "UV-K5 V3", 
+    "5.00.01": "UV-K5 V2",
+    "2.00.06": "UV-K5 V1", 
     "7.03.01": "UV-K1",
     "7.03.02": "UV-K1",
     "7.03.03": "UV-K1",
@@ -66,6 +67,19 @@ export class K1Flash {
 
   // ========== BOOTLOADER VALIDATION ==========
   validateBootloader(blVersion) {
+    // ===== FIX #1: VALIDATE NULL/UNDEFINED INPUT =====
+    // Check if blVersion is valid before processing
+    if (!blVersion || typeof blVersion !== 'string' || blVersion.length === 0) {
+      return {
+        valid: false,
+        critical: true,
+        message: `❌ Invalid bootloader version received\\n\\n` +
+                 `Version is null, undefined, or empty.\\n` +
+                 `Cannot safely validate bootloader.`,
+        allowed: false
+      };
+    }
+
     // Normalize version
     const version = blVersion.trim();
     
@@ -75,11 +89,11 @@ export class K1Flash {
       return {
         valid: false,
         critical: true,
-        message: `🚨🚨🚨 BOOTLOADER BLOCKED 🚨🚨🚨\n\n` +
-                 `Detected version: ${version}\n` +
-                 `This bootloader belongs to: ${model}\n\n` +
-                 `❌ NOT COMPATIBLE with UV-K1 firmware!\n` +
-                 `❌ Flashing will BRICK the radio!\n\n` +
+        message: `🚨🚨🚨 BOOTLOADER BLOCKED 🚨🚨🚨\\n\\n` +
+                 `Detected version: ${version}\\n` +
+                 `This bootloader belongs to: ${model}\\n\\n` +
+                 `❌ NOT COMPATIBLE with UV-K1 firmware!\\n` +
+                 `❌ Flashing will BRICK the radio!\\n\\n` +
                  `Operation BLOCKED for safety.`,
         allowed: false
       };
@@ -100,10 +114,10 @@ export class K1Flash {
       return {
         valid: false,
         critical: true,
-        message: `⚠️ INSUFFICIENT BOOTLOADER VERSION ⚠️\n\n` +
-                 `Detected version: ${version}\n` +
-                 `Minimum required: ${MIN_K1_BOOTLOADER}\n\n` +
-                 `This version is too old or belongs to another model.\n` +
+        message: `⚠️ INSUFFICIENT BOOTLOADER VERSION ⚠️\\n\\n` +
+                 `Detected version: ${version}\\n` +
+                 `Minimum required: ${MIN_K1_BOOTLOADER}\\n\\n` +
+                 `This version is too old or belongs to another model.\\n` +
                  `Update bootloader before flashing UV-K1 firmware.`,
         allowed: false
       };
@@ -114,9 +128,9 @@ export class K1Flash {
     return {
       valid: true,
       critical: false,
-      message: `✅ Compatible bootloader detected!\n\n` +
-               `Version: ${version}\n` +
-               `Model: ${model}\n` +
+      message: `✅ Compatible bootloader detected!\\n\\n` +
+               `Version: ${version}\\n` +
+               `Model: ${model}\\n` +
                `Status: Approved for flash`,
       allowed: true
     };
@@ -253,16 +267,51 @@ export class K1Flash {
       return null;
     }
 
-    const msgBuf = new Uint8Array(msgLen + 2);
-    for (let i = 0; i < msgLen + 2; i++) msgBuf[i] = buf[packBegin + 4 + i];
-    this.obfuscate(msgBuf, 0, msgLen + 2);
+    // ===== FIX #2: VALIDATE CRC BEFORE ACCEPTING MESSAGE =====
+    // Extract data and CRC separately
+    const dataBuf = new Uint8Array(msgLen);
+    const crcBuf = new Uint8Array(2);
+    
+    for (let i = 0; i < msgLen; i++) {
+      dataBuf[i] = buf[packBegin + 4 + i];
+    }
+    for (let i = 0; i < 2; i++) {
+      crcBuf[i] = buf[packBegin + 4 + msgLen + i];
+    }
+    
+    // Deobfuscate separately to preserve integrity check
+    this.obfuscate(dataBuf, 0, msgLen);
+    this.obfuscate(crcBuf, 0, 2);
+    
+    // Extract received CRC
+    const crcView = new DataView(crcBuf.buffer);
+    const receivedCRC = crcView.getUint16(0, true);
+    
+    // Calculate CRC over the message data
+    let calculatedCRC = 0;
+    for (let i = 0; i < msgLen; i++) {
+      const b = dataBuf[i] & 0xff;
+      calculatedCRC ^= b << 8;
+      for (let j = 0; j < 8; j++) {
+        if (calculatedCRC & 0x8000) calculatedCRC = ((calculatedCRC << 1) ^ 0x1021) & 0xffff;
+        else calculatedCRC = (calculatedCRC << 1) & 0xffff;
+      }
+    }
+    
+    // Validate CRC
+    if (receivedCRC !== calculatedCRC) {
+      this.log(`CRC mismatch: expected 0x${calculatedCRC.toString(16)}, got 0x${receivedCRC.toString(16)}`, 'error');
+      buf.splice(0, packEnd + 2);
+      return null; // Discard corrupted packet
+    }
 
-    const view = new DataView(msgBuf.buffer);
-    const msgType = view.getUint16(0, true);
-    const data = msgBuf.slice(4);
+    // Extract message type from deobfuscated data
+    const dataView = new DataView(dataBuf.buffer);
+    const msgType = dataView.getUint16(0, true);
+    const msgData = dataBuf.slice(4);
 
     buf.splice(0, packEnd + 2);
-    return { msgType, data, rawData: msgBuf };
+    return { msgType, data: msgData, rawData: dataBuf };
   }
 
   async sendMessage(msg) {
@@ -311,6 +360,7 @@ export class K1Flash {
 
   async waitForDeviceInfo() {
     let lastTimestamp = 0, acc = 0, timeout = 0;
+    let isFirstMessage = true; // ===== FIX #3: FLAG FOR FIRST MESSAGE =====
 
     while (timeout < 500) {
       await this.sleep(10);
@@ -324,23 +374,31 @@ export class K1Flash {
         const dt = now - lastTimestamp;
         lastTimestamp = now;
 
-        if (lastTimestamp > 0 && dt >= 5 && dt <= 1000) {
+        // ===== FIX #3: IMPROVED TIMESTAMP LOGIC =====
+        // First message should not require timing validation
+        if (isFirstMessage) {
+          isFirstMessage = false;
+          acc = 1; // Start accumulation
+        } else if (dt >= 5 && dt <= 1000) {
+          // Subsequent messages must have reasonable timing
           acc++;
-          if (acc >= 5) {
-            const uid = msg.data.slice(0, 16);
-            let blVersionEnd = -1;
-            for (let i = 16; i < 32; i++) {
-              if (msg.data[i] === 0) {
-                blVersionEnd = i;
-                break;
-              }
-            }
-            if (blVersionEnd === -1) blVersionEnd = 32;
-            const blVersion = new TextDecoder().decode(msg.data.slice(16, blVersionEnd));
-            return { uid, blVersion };
-          }
         } else {
+          // Timing out of range, reset counter
           acc = 0;
+        }
+        
+        if (acc >= 5) {
+          const uid = msg.data.slice(0, 16);
+          let blVersionEnd = -1;
+          for (let i = 16; i < 32; i++) {
+            if (msg.data[i] === 0) {
+              blVersionEnd = i;
+              break;
+            }
+          }
+          if (blVersionEnd === -1) blVersionEnd = 32;
+          const blVersion = new TextDecoder().decode(msg.data.slice(16, blVersionEnd));
+          return { uid, blVersion };
         }
       }
     }

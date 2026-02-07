@@ -454,6 +454,11 @@
           "name": "F4HWN Fusion v5.0.2 Beta",
           "path": "https://github.com/armel/uv-k1-k5v3-firmware-custom/blob/cd79144a25dd6480877581aa242ae726ffc3c347/archive/f4hwn.fusion.v5.0.2.beta.bin",
           "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN v5.1.0",
+          "path": "firmware/f4hwn.fusion.v5.1.0",
+          "profile": "F4HWN"
         }
       ]
     },
@@ -463,6 +468,11 @@
         {
           "name": "N7SIX DX1ARM Edition v7.6.1",
           "path": "firmware/n7six.dx1arm-k1_v7.6.1.bin",
+          "profile": "N7SIX"
+        },
+        {
+          "name": "N7SIX v7.6.2 Beta Revision 5 ApeX Edition",
+          "path": "firmware/n7six.ApeX-k1.v7.6.2br5",
           "profile": "N7SIX"
         }
       ]
