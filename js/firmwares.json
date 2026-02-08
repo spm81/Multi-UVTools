@@ -286,6 +286,21 @@
       ]
     },
     {
+      "group": "SU-75 Firmware",
+      "firmwares": [
+        {
+          "name": "SU-75 CFW (Last Verison)",
+          "path": "https://github.com/igimalek/Port/blob/main/compiled-firmware/su75.ru.packed.bin",
+          "profile": "SU-75"
+        },
+        {
+          "name": "SU-75 CFW (Last Verison) (512k)",
+          "path": "https://github.com/igimalek/Port/blob/main/compiled-firmware/su75.512k.ru.packed.bin",
+          "profile": "SU-75"
+        }
+      ]
+    },
+    {
       "group": "Quansheng Stock Firmware",
       "firmwares": [
         {
@@ -406,8 +421,8 @@
       "group": "Calypso Firmware",
       "firmwares": [
         {
-          "name": "Calypso Edition v1.3.2",
-          "path": "firmware/f4hwn.calypso_1.3.2.bin",
+          "name": "Calypso Edition (Last Version)",
+          "path": "https://github.com/igimalek/uv-k1-k5v3-calypso/blob/main/compiled-firmware/ouro.calypso.bin",
           "profile": "Calypso"
         }
       ]
