@@ -1,0 +1,129 @@
+{
+  "k5_firmwares": [
+    {
+      "group": "Official Quansheng",
+      "firmwares": [
+        {"name": "K5 v2.01.31 (Stock)", "url": "firmware/k5升级_v2.01.31_publish.bin"},
+        {"name": "K6 v3.00.15 (Stock)", "url": "firmware/K6升级_V3.00.15.bin"},
+        {"name": "5R Plus v4.00.07 (Stock)", "url": "firmware/5RPLUS_v4.00.07_publish.bin"}
+      ]
+    },
+    {
+      "group": "Egzumer",
+      "firmwares": [
+        {"name": "Egzumer v0.22", "url": "firmware/egzumer_v0.22.packed.bin"}
+      ]
+    },
+    {
+      "group": "F4HWN",
+      "firmwares": [
+        {"name": "F4HWN Fusion v5.1.0", "url": "firmware/f4hwn.fusion.v5.1.0.bin"},
+        {"name": "F4HWN Fusion+ V15 v5.0.2", "url": "firmware/f4hwn.fusion+V15.v5.0.2.bin"},
+        {"name": "F4HWN Calypso v1.3.2", "url": "firmware/f4hwn.calypso_1.3.2.bin"}
+      ]
+    },
+    {
+      "group": "IJV",
+      "firmwares": [
+        {"name": "IJV N3.60", "url": "firmware/IJV-firmware.N3_60.bin"},
+        {"name": "IJV N3.60 VOX", "url": "firmware/IJV-firmware.N3.60_VOX.bin"},
+        {"name": "IJV S3.60", "url": "firmware/IJV-firmware.S3_60.bin"},
+        {"name": "IJV X3.60", "url": "firmware/IJV-firmware.X3_60.bin"}
+      ]
+    },
+    {
+      "group": "Matoz (MCFW)",
+      "firmwares": [
+        {"name": "Matoz MCFW v1.35.0D", "url": "firmware/Custom_Firmware_by_Matoz_V1.35.0D.bin"},
+        {"name": "Matoz v0.34.0C", "url": "firmware/Custom_Firmware_by_Matoz_V0.34.0C.bin"},
+        {"name": "Matoz v0.33.0C", "url": "firmware/Custom_Firmware_by_Matoz_V0.33.0C.bin"}
+      ]
+    },
+    {
+      "group": "Fagci",
+      "firmwares": [
+        {"name": "Fagci R3B0RN Nightly 241111", "url": "firmware/k5-fagci-r3b0rn-nightly-n_241111.bin"},
+        {"name": "Fagci R3B0RN 2025-01-19", "url": "firmware/fagci-r3b0rn-2025-01-19-buggy-nightly1-SNR-CLOSE-43.bin"}
+      ]
+    },
+    {
+      "group": "Other",
+      "firmwares": [
+        {"name": "Kamilsss655 v20.5", "url": "firmware/kamilsss655_v20.5.bin"},
+        {"name": "Motorko v0.26", "url": "firmware/motorko_v0.26.packed.bin"}
+      ]
+    }
+  ],
+  "k1_firmwares": [
+    {
+      "group": "Official Quansheng",
+      "firmwares": [
+        {"name": "K1 Stock v7.02.02", "url": "firmware/quansheng.k1.stock.firmware.v7.02.02.bin"},
+        {"name": "K5v3 Stock v7.00.11", "url": "firmware/quansheng.k5v3.stock.firmware.v7.00.11.bin"}
+      ]
+    },
+    {
+      "group": "F4HWN",
+      "firmwares": [
+        {"name": "F4HWN K1 Fusion+ V15 v4.3.2", "url": "firmware/f4hwn.k1.fusion+V15.v4.3.2.bin"},
+        {"name": "F4HWN K1 Fusion v4.3.2", "url": "firmware/f4hwn.k1.fusion.v4.3.2.bin"},
+        {"name": "F4HWN K5v3 Fusion v4.3.2", "url": "firmware/f4hwn.k5v3.fusion.v4.3.2.bin"}
+      ]
+    },
+    {
+      "group": "N7SIX",
+      "firmwares": [
+        {"name": "N7SIX ApeX K1 v7.6.2br5", "url": "firmware/n7six.ApeX-k1.v7.6.2br5.bin"},
+        {"name": "N7SIX DX1ARM K1 v7.6.1", "url": "firmware/n7six.dx1arm-k1_v7.6.1.bin"}
+      ]
+    }
+  ],
+  "rt890_firmwares": [
+    {
+      "group": "M7OCM Custom Firmware",
+      "firmwares": [
+        {"name": "M7OCM v2.2.5X PCB2.0", "url": "firmware/rt890-m7ocm-v2.2.5X-pcb2.0.bin"},
+        {"name": "M7OCM v2.2.5X PCB2.1", "url": "firmware/rt890-m7ocm-v2.2.5X-pcb2.1.bin"},
+        {"name": "M7OCM v2.2.4X PCB2.0", "url": "firmware/rt890-m7ocm-v2.2.4X-pcb2.0.bin"},
+        {"name": "M7OCM v2.2.4X PCB2.1", "url": "firmware/rt890-m7ocm-v2.2.4X-pcb2.1.bin"},
+        {"name": "M7OCM v2.2.4Q PCB2.0", "url": "firmware/rt890-m7ocm-v2.2.4Q-pcb2.0.bin"},
+        {"name": "M7OCM v2.2.4Q PCB2.1", "url": "firmware/rt890-m7ocm-v2.2.4Q-pcb2.1.bin"},
+        {"name": "M7OCM v2.2.3 PCB2.0", "url": "firmware/rt890-m7ocm-v2.2.3-pcb2.0.bin"},
+        {"name": "M7OCM v2.2.3 PCB2.1", "url": "firmware/rt890-m7ocm-v2.2.3-pcb2.1.bin"}
+      ]
+    },
+    {
+      "group": "M7OCM 240/280 Filter",
+      "firmwares": [
+        {"name": "M7OCM 280filter v2.2.2 PCB2.0", "url": "firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.0.bin"},
+        {"name": "M7OCM 280filter v2.2.2 PCB2.1", "url": "firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.1.bin"},
+        {"name": "M7OCM 240filter v2.2.2 PCB2.0", "url": "firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.0.bin"},
+        {"name": "M7OCM 240filter v2.2.2 PCB2.1", "url": "firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.1.bin"}
+      ]
+    },
+    {
+      "group": "OEFW",
+      "firmwares": [
+        {"name": "OEFW.com 21-10-2024", "url": "firmware/rt890-oefwcom-21102024.bin"}
+      ]
+    }
+  ],
+  "h3_firmwares": [
+    {
+      "group": "nicFW Official",
+      "firmwares": [
+        {"name": "nicFW Latest (GitHub)", "url": "https://raw.githubusercontent.com/nicFW/TD-H3/main/firmware/TD-H3.bin"}
+      ]
+    }
+  ],
+  "rt880_firmwares": [
+    {
+      "group": "Official Firmwares",
+      "firmwares": [
+        {"name": "RT-880 V1.16", "url": "https://nicsure.github.io/RT880-WebSerial-Firmware-Flasher/RT-880-V1.16.bin"},
+        {"name": "RT-880 V1.15", "url": "https://nicsure.github.io/RT880-WebSerial-Firmware-Flasher/RT-880-V1.15.bin"},
+        {"name": "RT-880 V1.14", "url": "https://nicsure.github.io/RT880-WebSerial-Firmware-Flasher/RT-880-V1.14.bin"}
+      ]
+    }
+  ]
+}

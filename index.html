@@ -6,6 +6,7 @@
     <title>Multi-UVTools</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="css/styles.css" />
+    <link rel="stylesheet" href="css/spectrum.css" />
     <style>
       /* Settings Tabs */
       .settings-tabs {
@@ -280,11 +281,21 @@
             <a href="#instructions" class="nav-item" data-nav="instructions">Home</a>
             <a href="#home" class="nav-item k5-tk11-only" data-nav="home">Tools</a>
             <a href="#k1" class="nav-item k5-only" data-nav="k1">Flash</a>
-            <a href="#channels" class="nav-item k5-only" data-nav="channels">Channels</a>
+            <a href="#channels" class="nav-item k5-tk11-only" data-nav="channels">Channels</a>
             <a href="#settings" class="nav-item k5-only" data-nav="settings">Settings</a>
             <a href="#tk11-settings" class="nav-item tk11-only" data-nav="tk11-settings" style="display: none;">Settings</a>
             <a href="#mirror" class="nav-item k5-only" data-nav="mirror">Mirror</a>
             <a href="#smr" class="nav-item k5-only" data-nav="smr">SMR</a>
+            <a href="#rt890-flash" class="nav-item rt890-only" data-nav="rt890-flash" style="display: none;">Flash</a>
+            <a href="#rt890-tools" class="nav-item rt890-only" data-nav="rt890-tools" style="display: none;">Tools</a>
+            <a href="#h3-flash" class="nav-item h3-only" data-nav="h3-flash" style="display: none;">Flash</a>
+            <a href="#h3-channels" class="nav-item h3-only" data-nav="h3-channels" style="display: none;">Channels</a>
+            <a href="#h3-bandplan" class="nav-item h3-only" data-nav="h3-bandplan" style="display: none;">Band Plan</a>
+            <a href="#h3-codeplug" class="nav-item h3-only" data-nav="h3-codeplug" style="display: none;">Codeplug</a>
+            <a href="#rt880-flash" class="nav-item rt880-only" data-nav="rt880-flash" style="display: none;">Flash</a>
+            <a href="#rt880-monitor" class="nav-item rt880-only" data-nav="rt880-monitor" style="display: none;">Monitor</a>
+            <a href="#rt880-spi" class="nav-item rt880-only" data-nav="rt880-spi" style="display: none;">SPI Backup</a>
+            <a href="#spectrum" class="nav-item k5-only" data-nav="spectrum">Spectrum</a>
             <a href="#unbricking" class="nav-item k5-only" data-nav="unbricking">Unbricking</a>
           </div>
         </div>
@@ -293,6 +304,8 @@
             <option value="K5" selected>📻 UV-K5/K1</option>
             <option value="TK11">📻 TK11</option>
             <option value="RT890">📻 RT-890</option>
+            <option value="H3">📻 TD-H3/H8</option>
+            <option value="RT880">📻 RT-880</option>
           </select>
           <span class="status-dot" id="homeStatusDot" data-status="disconnected"></span>
           <span id="connectionLabel" class="status-label">Disconnected</span>
@@ -3641,210 +3654,641 @@
 
         
 
-        <!-- RT-890 Flash Section - Only visible when RT-890 is selected -->
-        <div class="rt890-only" id="rt890FlashSection" style="display: none;">
-          <h2 class="section-title">RT-890 Firmware</h2>
-          <p class="hint" style="margin-bottom: 16px;">⚠️ Connect the radio in bootloader mode: Turn OFF, hold PTT, then turn ON.</p>
-          <section class="panel-grid">
-            <section class="panel">
-              <h2>Flash Firmware (RT-890)</h2>
-              <p class="muted">Select a pre-loaded firmware or upload your own .bin file.</p>
-              
-              <div class="field-row">
-                <label for="rt890FirmwareSelect">Pre-loaded Firmwares</label>
-                <select id="rt890FirmwareSelect">
-                  <optgroup label="M7OCM Firmware (PCB 2.0)">
-                    <option value="firmware/rt890-m7ocm-v2.2.5X-pcb2.0.bin">M7OCM v2.2.5X (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.4X-pcb2.0.bin">M7OCM v2.2.4X (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.4Q-pcb2.0.bin">M7OCM v2.2.4Q (PCB 2.0) - Spectrum Auto Light</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.3Q-pcb2.0.bin">M7OCM v2.2.3Q (PCB 2.0) - Spectrum Auto Light</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.3-pcb2.0.bin">M7OCM v2.2.3 (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.1-pcb2.0.bin">M7OCM v2.2.1 (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.0-pcb2.0.bin">M7OCM v2.2.0 (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.0.bin">M7OCM v2.2.2 240MHz Filter (PCB 2.0)</option>
-                    <option value="firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.0.bin">M7OCM v2.2.2 280MHz Filter (PCB 2.0)</option>
-                  </optgroup>
-                  <optgroup label="M7OCM Firmware (PCB 2.1)">
-                    <option value="firmware/rt890-m7ocm-v2.2.5X-pcb2.1.bin">M7OCM v2.2.5X (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.4X-pcb2.1.bin">M7OCM v2.2.4X (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.4Q-pcb2.1.bin">M7OCM v2.2.4Q (PCB 2.1) - Spectrum Auto Light</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.3Q-pcb2.1.bin">M7OCM v2.2.3Q (PCB 2.1) - Spectrum Auto Light</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.3-pcb2.1.bin">M7OCM v2.2.3 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.1-pcb2.1.bin">M7OCM v2.2.1 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.2.0-pcb2.1.bin">M7OCM v2.2.0 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.1.9-pcb2.1.bin">M7OCM v2.1.9 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.1.8-pcb2.1.bin">M7OCM v2.1.8 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-v2.1.7-pcb2.1.bin">M7OCM v2.1.7 (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-240filter-v2.2.2-pcb2.1.bin">M7OCM v2.2.2 240MHz Filter (PCB 2.1)</option>
-                    <option value="firmware/rt890-m7ocm-280filter-v2.2.2-pcb2.1.bin">M7OCM v2.2.2 280MHz Filter (PCB 2.1)</option>
-                  </optgroup>
-                  <optgroup label="OEFWCOM Base">
-                    <option value="firmware/rt890-oefwcom-21102024.bin">OEFWCOM 21/10/2024</option>
-                  </optgroup>
-                </select>
-              </div>
-              
-              <div class="field-row">
-                <label for="rt890FirmwareFile">Or upload custom firmware</label>
-                <input type="file" id="rt890FirmwareFile" accept=".bin" />
-              </div>
-              
-              <div class="field-row">
-                <label for="rt890FirmwareUrl">Or paste firmware URL</label>
-                <div style="display: flex; gap: 8px;">
-                  <input type="url" id="rt890FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
-                  <button id="rt890LoadUrlBtn" class="secondary" type="button">Load</button>
-                </div>
-              </div>
-              
-              <p class="hint" id="rt890FirmwareStatus">No firmware selected</p>
-              
-              <button id="rt890FlashBtn" class="primary">
-                <span class="btn-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                    <path d="M13 2L3 14h6l-2 8 10-12h-6l2-8z" />
-                  </svg>
-                </span>
-                Flash RT-890
-              </button>
-              <div class="progress">
-                <div class="progress-label">
-                  <span>Progress</span>
-                  <span id="rt890FlashPct">0%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="rt890FlashFill"></div>
-                </div>
-              </div>
-            </section>
-            <!-- SPI Backup/Restore Panel -->
-            <section class="panel">
-              <h2>SPI Flash Backup / Restore (RT-890)</h2>
-              <p class="muted">Backup or restore the 4MB SPI flash memory (calibration data, settings).</p>
-              <p class="hint warning-box">⚠️ Radio must be in NORMAL MODE (not bootloader) for SPI operations!</p>
-              
-              <div class="field-row">
-                <label for="spiBaudRate">Connection Speed</label>
-                <select id="spiBaudRate">
-                  <option value="115200" selected>Fast (115200 baud)</option>
-                  <option value="19200">Slow (19200 baud) - More reliable</option>
-                </select>
-              </div>
-              
-              <div class="spi-buttons">
-                <button id="spiBackupBtn" class="primary">
-                  <span class="btn-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7 10 12 15 17 10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                  </span>
-                  Backup SPI (4MB)
-                </button>
-                
-                <button id="spiCancelBtn" class="secondary" disabled>
-                  Cancel
-                </button>
-              </div>
-              
-              <hr style="margin: 16px 0; border-color: var(--color-border);">
-              
-              <div class="field-row">
-                <label for="spiRestoreFile">Select backup file to restore</label>
-                <input type="file" id="spiRestoreFile" accept=".bin" />
-              </div>
-              
-              <button id="spiRestoreBtn" class="danger" disabled>
-                <span class="btn-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                </span>
-                Restore SPI
-              </button>
-              
-              <div class="progress" style="margin-top: 16px;">
-                <div class="progress-label">
-                  <span id="spiProgressText">Ready</span>
-                  <span id="spiProgressPct">0%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="spiProgressBar" style="width: 0%"></div>
-                </div>
-              </div>
-            </section>
-            
-            <!-- v7.5: Separate Calibration Panel -->
-            <section class="panel">
-              <h2>📏 RT-890 Calibration (4 KB)</h2>
-              <p class="muted">Dump or restore ONLY the calibration region (0x3BF000 - 0x3BFFFF).</p>
-              <p class="hint" style="background: var(--color-surface-alt); border-left: 3px solid var(--color-warning);">
-                💡 <strong>Tip:</strong> Always backup calibration before flashing firmware!
-                <br>Calibration contains TX power levels, frequency offsets, and radio-specific tuning.
-              </p>
-              
-              <div class="field-row">
-                <label for="spiCalibBaudRate">Connection Speed</label>
-                <select id="spiCalibBaudRate">
-                  <option value="115200" selected>Fast (115200 baud)</option>
-                  <option value="19200">Slow (19200 baud) - More reliable</option>
-                </select>
-              </div>
-              
-              <div class="spi-buttons" style="margin-bottom: 16px;">
-                <button id="spiDumpCalibBtn" class="secondary">
-                  <span class="btn-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                      <polyline points="7 10 12 15 17 10"/>
-                      <line x1="12" y1="15" x2="12" y2="3"/>
-                    </svg>
-                  </span>
-                  Dump Calibration (4 KB)
-                </button>
-              </div>
-              
-              <div class="field-row">
-                <label for="spiRestoreCalibFile">Select calibration file (must be exactly 4096 bytes)</label>
-                <input type="file" id="spiRestoreCalibFile" accept=".bin" />
-              </div>
-              
-              <button id="spiRestoreCalibBtn" class="danger" disabled>
-                <span class="btn-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                </span>
-                Restore Calibration (4 KB)
-              </button>
-              
-              <div class="progress" style="margin-top: 16px;">
-                <div class="progress-label">
-                  <span id="spiCalibProgressText">Ready</span>
-                  <span id="spiCalibProgressPct">0%</span>
-                </div>
-                <div class="progress-bar">
-                  <div class="progress-fill" id="spiCalibProgressBar" style="width: 0%"></div>
-                </div>
-              </div>
-              
-              <div id="spiCalibStatusLog" class="spi-status-log"></div>
-            </section>
-
-          </section>
-          <div id="rt890Log" class="log-area"></div>
-        </div>
-
         <!-- K5/K1 Log Area - Only visible when K5 is selected -->
-        <div class="k5-only" id="k1Log" class="log-area"></div>
+        <div class="k5-only" id="k1Log"></div>
       </section>
 
-      <nav class="sidebar">
+      
+      <!-- Spectrum Analyzer Page -->
+
+      <!-- RT-890 Flash Page -->
+      <section class="page rt890-only" id="rt890-flash" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">FLASH TOOLS</p>
+            <h1>RT-890 Flash Tools</h1>
+            <p class="subtitle">Flash firmware for RT-890 radios.</p>
+          </div>
+        </header>
+        <h2 class="section-title">RT-890 Firmware</h2>
+        <p class="hint" style="margin-bottom: 16px;">⚠️ Connect radio in bootloader mode: Turn OFF, hold PTT, then turn ON.</p>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Flash Firmware (RT-890)</h2>
+            <p class="muted">Select firmware or upload your own .bin file.</p>
+            <div class="field-row">
+              <label for="rt890FirmwareSelect">Pre-loaded Firmwares</label>
+              <select id="rt890FirmwareSelect">
+                <option value="">-- Select firmware --</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label for="rt890FirmwareFile">Or upload custom firmware</label>
+              <input type="file" id="rt890FirmwareFile" accept=".bin" />
+            </div>
+            <p class="hint" id="rt890FirmwareStatus">No firmware selected</p>
+            <button id="rt890FlashBtn" class="primary">Flash RT-890</button>
+            <div class="progress">
+              <div class="progress-label"><span>Progress</span><span id="rt890FlashPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="rt890FlashFill"></div></div>
+            </div>
+            <!-- Log Area -->
+            <h3 style="margin-top: 24px; margin-bottom: 12px;">Flash Log</h3>
+            <div class="rt890-only" id="rt890Log"></div>
+          </section>
+        </section>
+      </section>
+
+      <!-- RT-890 Tools Page -->
+      <section class="page rt890-only" id="rt890-tools" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RT-890 TOOLS</p>
+            <h1>RT-890 SPI Flash Tools</h1>
+            <p class="subtitle">Backup, restore and manage your RT-890 flash memory.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>SPI Flash Backup / Restore (4MB)</h2>
+            <p class="muted">Backup or restore the entire 4MB SPI flash memory.</p>
+            <p class="hint warning-box">⚠️ Radio must be in NORMAL MODE (not bootloader)!</p>
+            <div class="field-row">
+              <label for="spiBaudRate">Connection Speed</label>
+              <select id="spiBaudRate">
+                <option value="115200" selected>Fast (115200 baud)</option>
+                <option value="19200">Slow (19200 baud)</option>
+              </select>
+            </div>
+            <div class="spi-buttons">
+              <button id="spiBackupBtn" class="primary">Backup SPI (4MB)</button>
+              <button id="spiCancelBtn" class="secondary" disabled>Cancel</button>
+            </div>
+            <hr style="margin: 16px 0; border-color: var(--color-border);">
+            <div class="field-row">
+              <label for="spiRestoreFile">Select backup file to restore</label>
+              <input type="file" id="spiRestoreFile" accept=".bin" />
+            </div>
+            <button id="spiRestoreBtn" class="danger" disabled>Restore SPI</button>
+            <div class="progress" style="margin-top: 16px;">
+              <div class="progress-label"><span id="spiProgressText">Ready</span><span id="spiProgressPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="spiProgressBar" style="width: 0%"></div></div>
+            </div>
+            <div id="spiStatusLog" class="spi-status-log" style="margin-top: 16px; max-height: 200px; overflow-y: auto; background: var(--color-surface-alt); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px;"></div>
+          </section>
+          
+          <!-- Calibration Section -->
+          <section class="panel">
+            <h2>📏 RT-890 Calibration (4 KB)</h2>
+            <p class="muted">Dump or restore ONLY the calibration region (0x3BF000 - 0x3BFFFF).</p>
+            <p class="hint" style="background: var(--color-surface-alt); border-left: 3px solid var(--color-warning); padding: 8px 12px; margin: 12px 0;">
+              💡 <strong>Tip:</strong> Always backup calibration before flashing firmware!<br>
+              Calibration contains TX power levels, frequency offsets, and radio-specific tuning.
+            </p>
+            <div class="field-row">
+              <label for="spiCalibBaudRate">Connection Speed</label>
+              <select id="spiCalibBaudRate">
+                <option value="115200" selected>Fast (115200 baud)</option>
+                <option value="19200">Slow (19200 baud)</option>
+              </select>
+            </div>
+            <button id="spiDumpCalibBtn" class="secondary" style="margin-bottom: 16px;">Dump Calibration (4 KB)</button>
+            <div class="field-row">
+              <label for="spiRestoreCalibFile">Select calibration file (must be exactly 4096 bytes)</label>
+              <input type="file" id="spiRestoreCalibFile" accept=".bin" />
+            </div>
+            <button id="spiRestoreCalibBtn" class="danger" disabled>Restore Calibration (4 KB)</button>
+            <div class="progress" style="margin-top: 16px;">
+              <div class="progress-label"><span id="spiCalibProgressText">Ready</span><span id="spiCalibProgressPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="spiCalibProgressBar" style="width: 0%"></div></div>
+            </div>
+            <div id="spiCalibStatusLog" class="spi-status-log" style="margin-top: 16px; max-height: 200px; overflow-y: auto; background: var(--color-surface-alt); border-radius: 8px; padding: 12px; font-family: monospace; font-size: 12px;"></div>
+            <p class="hint warning-box" style="margin-top: 12px;">⚠️ Radio must be in NORMAL MODE (not bootloader) for SPI operations!</p>
+          </section>
+        </section>
+      </section>
+
+      <!-- TD-H3/H8 Flash Page -->
+      <section class="page h3-only" id="h3-flash" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">TD-H3/H8 FLASH</p>
+            <h1>TD-H3/H8 Firmware Flasher</h1>
+            <p class="subtitle">Flash nicFW firmware for TD-H3 and TD-H8 radios.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Flash Firmware</h2>
+            <p class="muted">Select firmware from preloaded list, upload a file, or paste a URL.</p>
+            <p class="hint" style="margin-bottom: 16px;">⚠️ Bootloader mode: Turn OFF radio, hold PTT (H3) or Flashlight (H8), then turn ON.</p>
+            
+            <div class="field-row">
+              <label for="h3FirmwareSelect">Pre-loaded Firmwares</label>
+              <select id="h3FirmwareSelect" class="field-select">
+                <option value="">-- Select Firmware --</option>
+              </select>
+            </div>
+            
+            <div class="field-row" style="margin-top: 12px;">
+              <label for="h3FirmwareFile">Or upload firmware file (.bin)</label>
+              <input type="file" id="h3FirmwareFile" accept=".bin" />
+            </div>
+            
+            <div class="field-row" style="margin-top: 12px;">
+              <label for="h3FirmwareUrl">Or paste firmware URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="h3FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
+                <button id="h3LoadUrlBtn" class="secondary">Load</button>
+              </div>
+            </div>
+            
+            <p class="hint" id="h3FirmwareStatus" style="margin-top: 12px;">No firmware selected</p>
+            <div style="display: flex; gap: 8px; margin-top: 16px;">
+              <button id="h3FlashBtn" class="primary" disabled>Flash TD-H3/H8</button>
+              <button id="h3AbortBtn" class="secondary" disabled>Abort</button>
+            </div>
+            <div class="progress" style="margin-top: 16px;">
+              <div class="progress-label"><span>Progress</span><span id="h3FlashPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="h3FlashFill"></div></div>
+            </div>
+            <h3 style="margin-top: 24px; margin-bottom: 12px;">Flash Log</h3>
+            <div class="h3-only" id="h3Log"></div>
+          </section>
+        </section>
+      </section>
+
+      <!-- TD-H3/H8 Channel Editor Page -->
+      <section class="page h3-only" id="h3-channels" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">TD-H3/H8 CHANNELS</p>
+            <h1>nicFW Channel Editor</h1>
+            <p class="subtitle">Read, edit, and write channels for TD-H3/H8 radios.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel" style="max-width: 100%;">
+            <h2>Channel Editor</h2>
+            <p class="muted">Connect radio in normal mode (not bootloader).</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <button id="h3ChanConnectBtn" class="primary">Serial Port</button>
+              <button id="h3ChanReadBtn" class="secondary" disabled>Read</button>
+              <button id="h3ChanWriteBtn" class="secondary" disabled>Write</button>
+              <button id="h3ChanSaveBtn" class="secondary">Save CSV</button>
+              <button id="h3ChanLoadBtn" class="secondary">Load CSV</button>
+              <input type="file" id="h3ChanCsvFile" accept=".csv" style="display: none;" />
+            </div>
+            <p class="hint" id="h3ChanStatus">Channel Editor ready. Connect to radio to begin.</p>
+            <div id="h3ChanScroller" style="overflow: auto; margin-top: 16px;">
+              <table id="h3ChanGrid" class="h3-table"></table>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- TD-H3/H8 Band Plan Editor Page -->
+      <section class="page h3-only" id="h3-bandplan" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">TD-H3/H8 BAND PLAN</p>
+            <h1>nicFW Band Plan Editor</h1>
+            <p class="subtitle">Configure frequency band restrictions and settings.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel" style="max-width: 100%;">
+            <h2>Band Plan Editor</h2>
+            <p class="muted">Connect radio in normal mode (not bootloader).</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+              <button id="h3BandConnectBtn" class="primary">Serial Port</button>
+              <button id="h3BandReadBtn" class="secondary" disabled>Read</button>
+              <button id="h3BandWriteBtn" class="secondary" disabled>Write</button>
+              <button id="h3BandSaveBtn" class="secondary">Save CSV</button>
+              <button id="h3BandLoadBtn" class="secondary">Load CSV</button>
+              <input type="file" id="h3BandCsvFile" accept=".csv" style="display: none;" />
+            </div>
+            <p class="hint" id="h3BandStatus">Band Plan Editor ready. Connect to radio to begin.</p>
+            <div id="h3BandScroller" style="overflow: auto; margin-top: 16px;">
+              <table id="h3BandGrid" class="h3-table"></table>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- TD-H3/H8 Codeplug Manager Page -->
+      <section class="page h3-only" id="h3-codeplug" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">TD-H3/H8 CODEPLUG</p>
+            <h1>nicFW Codeplug Manager</h1>
+            <p class="subtitle">Backup and restore complete radio configuration.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Codeplug Manager</h2>
+            <p class="muted">Read or write complete codeplug (8KB .nfw file).</p>
+            <div class="field-row">
+              <label for="h3CpFile">Codeplug File (.nfw)</label>
+              <input type="file" id="h3CpFile" accept=".nfw" />
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0;">
+              <button id="h3CpConnectBtn" class="primary">Serial Port</button>
+              <button id="h3CpReadBtn" class="secondary" disabled>Read Codeplug</button>
+              <button id="h3CpWriteBtn" class="secondary" disabled>Write Codeplug</button>
+              <button id="h3CpSaveBtn" class="secondary" disabled>Save Codeplug</button>
+              <button id="h3CpAbortBtn" class="secondary" disabled>Abort</button>
+            </div>
+            <p class="hint" id="h3CpStatus">Codeplug Manager ready. Connect to radio to begin.</p>
+            <div class="progress" style="margin-top: 16px;">
+              <div class="progress-label"><span>Progress</span><span id="h3CpProgressPct">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="h3CpProgressFill"></div></div>
+            </div>
+          </section>
+        </section>
+      </section>
+
+      <!-- RT-880 Flash Page -->
+      <section class="page rt880-only" id="rt880-flash" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RT-880 FLASH</p>
+            <h1>RT-880 / UV-98 Firmware Flasher</h1>
+            <p class="subtitle">Flash firmware for Radtel RT-880 and iRadio UV-98 radios.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Flash Firmware</h2>
+            <p class="muted">Select firmware from preloaded list, upload a file, or paste a URL.</p>
+            <p class="hint" style="margin-bottom: 16px;">⚠️ Bootloader mode: Turn OFF radio, hold PTT, then turn ON while holding PTT.</p>
+            
+            <div class="field-row">
+              <label for="rt880ModelSelect">Radio Model</label>
+              <select id="rt880ModelSelect" class="field-select">
+                <option value="rt880">Radtel RT-880</option>
+                <option value="uv98">iRadio UV-98</option>
+              </select>
+            </div>
+            
+            <div class="field-row" style="margin-top: 12px;">
+              <label for="rt880FirmwareSelect">Pre-loaded Firmwares</label>
+              <select id="rt880FirmwareSelect" class="field-select">
+                <option value="">-- Select Firmware --</option>
+              </select>
+            </div>
+            
+            <div class="field-row" style="margin-top: 12px;">
+              <label for="rt880FileInput">Or upload firmware file (.bin)</label>
+              <input type="file" id="rt880FileInput" accept=".bin" />
+            </div>
+            
+            <div class="field-row" style="margin-top: 12px;">
+              <label for="rt880FirmwareUrl">Or paste firmware URL</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="rt880FirmwareUrl" placeholder="https://example.com/firmware.bin" style="flex: 1;" />
+                <button id="rt880LoadUrlBtn" class="secondary" onclick="rt880LoadUrl()">Load</button>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-top: 16px;">
+              <button id="rt880FlashBtn" class="primary" disabled onclick="rt880Flash()">Flash Firmware</button>
+              <button id="rt880AbortBtn" class="secondary" disabled onclick="rt880Abort()">Abort</button>
+            </div>
+            <div class="progress" style="margin-top: 16px;">
+              <div class="progress-label"><span>Progress</span><span id="rt880ProgressText">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="rt880Progress"></div></div>
+            </div>
+            <h3 style="margin-top: 24px; margin-bottom: 12px;">Flash Log</h3>
+            <div class="rt880-only" id="rt880Log"></div>
+          </section>
+        </section>
+      </section>
+
+      <!-- RT-880 Monitor Page -->
+      <section class="page rt880-only" id="rt880-monitor" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RT-880 MONITOR</p>
+            <h1>RT-880 Serial Monitor</h1>
+            <p class="subtitle">Monitor serial output from RT-880 radio at 115200 baud.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>Serial Monitor</h2>
+            <p class="muted">Connect to monitor serial data from the radio.</p>
+            
+            <div class="field-row" style="margin-bottom: 16px;">
+              <label>
+                <input type="checkbox" id="rt880MonitorTextMode" checked /> Text mode (unchecked = Hex mode)
+              </label>
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <button id="rt880MonitorBtn" class="primary" onclick="rt880StartMonitor()">Start Monitor</button>
+              <button id="rt880MonitorStopBtn" class="secondary" disabled onclick="rt880StopMonitor()">Stop</button>
+            </div>
+            
+            <h3 style="margin-bottom: 12px;">Monitor Output</h3>
+            <pre id="rt880MonitorOutput" style="background: #1a1a1a; color: #0f0; padding: 12px; border-radius: 8px; height: 400px; overflow-y: auto; font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all;"></pre>
+          </section>
+        </section>
+      </section>
+
+      <!-- RT-880 SPI Backup Page -->
+      <section class="page rt880-only" id="rt880-spi" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RT-880 SPI BACKUP</p>
+            <h1>RT-880 SPI Flash Backup</h1>
+            <p class="subtitle">Backup the full 4MB SPI flash from RT-880 radio.</p>
+          </div>
+        </header>
+        <section class="panel-grid">
+          <section class="panel">
+            <h2>SPI Flash Backup</h2>
+            <p class="muted">Receive SPI flash data at 230400 baud.</p>
+            <p class="hint" style="margin-bottom: 16px;">⚠️ Requires special firmware or bootloader that dumps SPI flash via serial port.</p>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <button id="rt880SpiBtn" class="primary" onclick="rt880StartSpiBackup()">Start SPI Backup</button>
+              <button id="rt880SpiAbortBtn" class="secondary" onclick="rt880Abort()">Abort</button>
+            </div>
+            
+            <div class="progress" style="margin-bottom: 16px;">
+              <div class="progress-label"><span>Progress</span><span id="rt880SpiProgressText">0%</span></div>
+              <div class="progress-bar"><div class="progress-fill" id="rt880SpiProgress"></div></div>
+            </div>
+            
+            <h3 style="margin-bottom: 12px;">Backup Log</h3>
+            <div class="rt880-only" id="rt880SpiLog"></div>
+          </section>
+        </section>
+      </section>
+
+      <section class="page k5-only" id="spectrum" data-page>
+        <header class="hero">
+          <div>
+            <p class="eyebrow">SPECTRUM ANALYZER</p>
+            <h1>UV-K5 Spectrum Analyzer</h1>
+            <p class="subtitle">Real-time spectrum analyzer via UART connection.</p>
+          </div>
+        </header>
+
+        <!-- Warning Banner -->
+<div class="spectrum-warning">
+  <span class="spectrum-warning-icon">⚠️</span>
+  <span class="spectrum-warning-text"><strong>Requires MCFW v1.35.1D firmware</strong> - Radio must be in Spectrum mode (F+5)</span>
+  <br>
+  <span class="spectrum-warning-icon">📖</span>
+  <span class="spectrum-warning-text">
+    <strong>Manual:</strong> <a href="manual/MCFW%20v1.35.1D.pdf" download>Download MCFW v1.35.1D Manual (PDF)</a>
+  </span>
+</div>
+        <!-- Connection Panel -->
+        <div class="spectrum-connection-panel">
+          <div class="spectrum-conn-group">
+            <label>Baud:</label>
+            <select id="spectrumBaudRate">
+              <option value="38400" selected>38400</option>
+              <option value="9600">9600</option>
+              <option value="115200">115200</option>
+            </select>
+          </div>
+          <button id="spectrumConnectBtn" class="spectrum-btn btn-connect" onclick="spectrumToggleConnection()">🔌 Connect</button>
+          <div class="spectrum-conn-group">
+            <div class="spectrum-status-indicator" id="spectrumStatusIndicator"></div>
+            <span class="spectrum-status-text" id="spectrumStatusText">Disconnected</span>
+          </div>
+          <button class="spectrum-btn btn-primary btn-small" onclick="spectrumSendCommand('STATUS')">📊 Status</button>
+          <button class="spectrum-btn btn-secondary btn-small" onclick="spectrumSendCommand('PEAK')">📍 Peak</button>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="spectrum-main-grid">
+          <!-- Left: Info Panel -->
+          <div class="spectrum-info-panel">
+            <div class="spectrum-info-item">
+              <div class="spectrum-info-label">Mode</div>
+              <div class="spectrum-info-value mode" id="modeValue">---</div>
+            </div>
+            <div class="spectrum-info-item">
+              <div class="spectrum-info-label">Frequency</div>
+              <div class="spectrum-info-value freq" id="freqValue">----.---- MHz</div>
+            </div>
+            <div class="spectrum-info-item">
+              <div class="spectrum-info-label">RSSI</div>
+              <div class="spectrum-info-value rssi" id="rssiValue">--- dBm</div>
+            </div>
+            <div class="spectrum-info-item">
+              <div class="spectrum-info-label">Modulation</div>
+              <div class="spectrum-info-value" id="modValue">---</div>
+            </div>
+            <div class="spectrum-info-item">
+              <div class="spectrum-info-label">Channel / Tone</div>
+              <div class="spectrum-info-value" id="channelValue">---</div>
+            </div>
+
+            <!-- Mode Selection -->
+            <div class="spectrum-section-title" style="margin-top: 16px;">Select Mode</div>
+            <div class="spectrum-mode-buttons">
+              <button class="spectrum-mode-btn" id="modeBtn2" onclick="spectrumSetMode(2)">1️⃣ ORIGINAL</button>
+              <button class="spectrum-mode-btn" id="modeBtn3" onclick="spectrumSetMode(3)">2️⃣ WATERFALL</button>
+              <button class="spectrum-mode-btn" id="modeBtn0" onclick="spectrumSetMode(0)">3️⃣ FREQUENCY</button>
+              <button class="spectrum-mode-btn" id="modeBtn1" onclick="spectrumSetMode(1)">4️⃣ CHANNEL</button>
+            </div>
+            <div class="spectrum-mode-buttons" style="margin-top: 8px;">
+              <button class="spectrum-mode-btn pro" id="modeBtn4" onclick="spectrumSetMode(4)">5️⃣ PROFESSIONAL</button>
+            </div>
+          </div>
+
+          <!-- Right: Controls Panel -->
+          <div class="spectrum-controls-panel">
+            <!-- Tabs -->
+            <div class="spectrum-tabs">
+              <div class="spectrum-tab active" onclick="spectrumShowTab('spectrum')">📻 Spectrum</div>
+              <div class="spectrum-tab" onclick="spectrumShowTab('channel')">📺 Channel</div>
+              <div class="spectrum-tab" onclick="spectrumShowTab('presets')">📑 Presets (70)</div>
+              <div class="spectrum-tab" onclick="spectrumShowTab('log')">📋 Log</div>
+              <div class="spectrum-tab" onclick="spectrumShowTab('uart')">🖥️ UART</div>
+              <div class="spectrum-tab pro-tab" onclick="spectrumShowTab('professional')">⚡ PRO</div>
+            </div>
+
+            <!-- Tab: Spectrum Controls -->
+            <div class="spectrum-tab-content active" id="tab-spectrum">
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🎚️ Frequency</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-4">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('UP')">⬆️ Freq+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('DN')">⬇️ Freq-</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('FSTEP=+')">📈 Step+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('FSTEP=-')">📉 Step-</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📡 Scan</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-4">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BW=+')">🔊 BW+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BW=-')">🔉 BW-</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEPS')">📊 N Steps</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEP')">📏 Scan Step</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🎯 Actions</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-3">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TUNE')">🎵 Tune Peak</button>
+                  <button class="spectrum-ctrl-btn danger" onclick="spectrumSendCommand('EXIT')">⏹️ Exit Tune</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BL')">🚫 Blacklist</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('CLR')">🗑️ Clear BL</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('SHOW')">📋 Show Last</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📻 Modulation & Presets</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-4">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=+')">📻 Mod+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=-')">📻 Mod-</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PRESET=+')">⏩ Preset+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PRESET=-')">⏪ Preset-</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📊 Vertical Scale (dB)</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('DBMAX=+')">📈 dB Max+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('DBMAX=-')">📉 dB Max-</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🎚️ Threshold</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TRIG=+')">📈 Threshold+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TRIG=-')">📉 Threshold-</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Channel Controls -->
+            <div class="spectrum-tab-content" id="tab-channel">
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📺 Channel Navigation</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('CHUP')">⬆️ Previous Channel</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('CHDN')">⬇️ Next Channel</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🔧 Channel Mode Controls</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-3">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TRIG')">🔒 Trigger</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('LOCK')">🔐 Lock Channel</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('SCANLIST')">📋 ScanList</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📻 Modulation</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=+')">📻 Modulation+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=-')">📻 Modulation-</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🎚️ Threshold</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TRIG=+5')">📈 Threshold+5</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('TRIG=-5')">📉 Threshold-5</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Presets -->
+            <div class="spectrum-tab-content" id="tab-presets">
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📑 70 Band Presets</div>
+                <div class="spectrum-presets-grid" id="presetsGrid">
+                  <!-- Populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Log -->
+            <div class="spectrum-tab-content" id="tab-log">
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">📋 Peak Log (Auto)</div>
+                <div class="spectrum-log-actions">
+                  <button class="spectrum-btn btn-primary btn-small" onclick="spectrumExportLog('json')">📥 Export JSON</button>
+                  <button class="spectrum-btn btn-primary btn-small" onclick="spectrumExportLog('csv')">📥 Export CSV</button>
+                  <button class="spectrum-btn btn-secondary btn-small" onclick="spectrumClearLog()">🗑️ Clear</button>
+                </div>
+                <div class="spectrum-log-container" id="logContainer">
+                  <div class="log-empty">No peaks logged yet</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: UART -->
+            <div class="spectrum-tab-content" id="tab-uart">
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🖥️ Raw UART</div>
+                <div class="spectrum-uart-log" id="uartLog"></div>
+                <div class="spectrum-manual-cmd">
+                  <input type="text" id="manualCmd" placeholder="SPEC:COMMAND]">
+                  <button class="spectrum-btn btn-primary" onclick="spectrumSendManual()">Send</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab: Professional -->
+            <div class="spectrum-tab-content" id="tab-professional">
+              <div class="spectrum-control-section" style="border: 2px solid #9c27b0;">
+                <div class="spectrum-section-title" style="color: #ce93d8;">⚡ Professional Mode Features</div>
+                <div class="spectrum-pro-status" id="proStatus">Click a button to update status...</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-4" style="margin-bottom: 10px;">
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('SMOOTH')">🌊 Smooth</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('AUTOTRIG')">🎯 AutoTrig</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('HORIZON')">🌅 Horizon</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('BANDLED')">💡 BandLED</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('MOUNTAIN')">🏔️ Mountain</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('HELI')">🚁 Heli</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('SUGAR')">🍬 Sugar</button>
+                  <button class="spectrum-ctrl-btn pro" onclick="spectrumSendCommand('PROFSTAT')">📊 Status</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🎨 Display Options</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-3">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('GRID')">📐 Grid</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MARKER')">📍 Marker</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PEAK')">🔝 Peak</button>
+                </div>
+              </div>
+
+              <div class="spectrum-control-section">
+                <div class="spectrum-section-title">🔊 Audio</div>
+                <div class="spectrum-btn-grid spectrum-btn-grid-2">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('VOL=+')">🔊 Volume+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('VOL=-')">🔉 Volume-</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+<nav class="sidebar">
         <div class="brand">
           <span class="brand-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2">
@@ -4549,5 +4993,18 @@
           <p>Copyright 2026 and <span id="baseline-developed">developed by</span>&nbsp;<a href="https://github.com/spm81" target="_blank">Matoz</a>, based on <a href="https://home.joaquim.org/k5/" target="_blank">Joaquim(joaquim.org).</a><br>Special thanks to <a href="https://github.com/whosmatt/uvmod" target="_blank" rel="noopener">whosmatt</a> (The father of UVMOD, which later gave rise to UVTOOLS)</p>
         </footer>
 
+      <script src="js/spectrum-uart.js"></script>
+      <script src="js/rt890-tools-ui.js"></script>
+      <script src="js/flash-h3-ui.js"></script>
+      <script src="js/h3-chanedit-ui.js"></script>
+      <script src="js/h3-bandplan-ui.js"></script>
+      <script src="js/h3-codeplug-ui.js"></script>
+      <script src="js/flash-rt880-ui.js"></script>
+      <script>
+        // Initialize RT-880 Flash when DOM is ready
+        if (typeof initRt880Flash === 'function') {
+          initRt880Flash();
+        }
+      </script>
   </body>
 </html>

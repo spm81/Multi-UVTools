@@ -1,0 +1,508 @@
+/* =====================================================
+   SPECTRUM UART v12.20 - CSS Styles
+   For MCFW v1.35.1D firmware
+   ===================================================== */
+
+/* Connection Panel */
+.spectrum-connection-panel {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    background: var(--bg-secondary, #1a1a2e);
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.spectrum-conn-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.spectrum-conn-group label {
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 13px;
+}
+
+.spectrum-conn-group select {
+    background: var(--bg-primary, #0f0f1a);
+    border: 1px solid var(--border-color, #333);
+    color: var(--text-primary, #fff);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.spectrum-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #f44336;
+    transition: background 0.3s;
+}
+
+.spectrum-status-indicator.connected {
+    background: #4caf50;
+    box-shadow: 0 0 8px #4caf50;
+}
+
+.spectrum-status-text {
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 13px;
+}
+
+/* Main Grid Layout */
+.spectrum-main-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 900px) {
+    .spectrum-main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Info Panel (Left) */
+.spectrum-info-panel {
+    background: var(--bg-secondary, #1a1a2e);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.spectrum-info-item {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+.spectrum-info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.spectrum-info-label {
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+}
+
+.spectrum-info-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+.spectrum-info-value.mode { color: #2196f3; }
+.spectrum-info-value.freq { color: #4caf50; font-family: monospace; }
+.spectrum-info-value.rssi { color: #ff9800; }
+
+/* Mode Buttons */
+.spectrum-mode-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.spectrum-mode-btn {
+    padding: 10px 8px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 6px;
+    background: var(--bg-primary, #0f0f1a);
+    color: var(--text-primary, #fff);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spectrum-mode-btn:hover {
+    background: var(--bg-hover, #252540);
+    border-color: #2196f3;
+}
+
+.spectrum-mode-btn.active {
+    background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    border-color: #2196f3;
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.3);
+}
+
+.spectrum-mode-btn.pro {
+    grid-column: span 2;
+    background: linear-gradient(180deg, #9c27b0 0%, #6a1b9a 100%);
+    border-color: #9c27b0;
+}
+
+.spectrum-mode-btn.pro.active {
+    box-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
+}
+
+/* Controls Panel (Right) */
+.spectrum-controls-panel {
+    background: var(--bg-secondary, #1a1a2e);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* Tabs */
+.spectrum-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color, #333);
+    padding-bottom: 12px;
+}
+
+.spectrum-tab {
+    padding: 8px 12px;
+    background: var(--bg-primary, #0f0f1a);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 6px;
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spectrum-tab:hover {
+    background: var(--bg-hover, #252540);
+    color: var(--text-primary, #fff);
+}
+
+.spectrum-tab.active {
+    background: #2196f3;
+    border-color: #2196f3;
+    color: #fff;
+}
+
+.spectrum-tab.pro-tab {
+    background: linear-gradient(180deg, #9c27b0 0%, #6a1b9a 100%);
+    border-color: #9c27b0;
+    color: #fff;
+}
+
+/* Tab Content */
+.spectrum-tab-content {
+    display: none;
+}
+
+.spectrum-tab-content.active {
+    display: block;
+}
+
+/* Control Sections */
+.spectrum-control-section {
+    background: var(--bg-primary, #0f0f1a);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.spectrum-section-title {
+    color: #2196f3;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color, #333);
+}
+
+/* Button Grids */
+.spectrum-btn-grid {
+    display: grid;
+    gap: 8px;
+}
+
+.spectrum-btn-grid-2 { grid-template-columns: 1fr 1fr; }
+.spectrum-btn-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.spectrum-btn-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.spectrum-ctrl-btn {
+    padding: 10px 8px;
+    border: 1px solid var(--border-color, #444);
+    border-radius: 6px;
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    color: var(--text-primary, #fff);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spectrum-ctrl-btn:hover {
+    background: linear-gradient(135deg, #3d3d54 0%, #2a2a3e 100%);
+    border-color: #2196f3;
+    transform: translateY(-1px);
+}
+
+.spectrum-ctrl-btn:active {
+    transform: translateY(0);
+}
+
+.spectrum-ctrl-btn.danger {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+    border-color: #d32f2f;
+}
+
+.spectrum-ctrl-btn.pro {
+    background: linear-gradient(180deg, #7b1fa2 0%, #4a148c 100%);
+    border-color: #9c27b0;
+}
+
+/* Frequency Input Panel */
+.spectrum-freq-input-panel {
+    text-align: center;
+}
+
+.spectrum-freq-display {
+    font-family: 'Courier New', monospace;
+    font-size: 32px;
+    color: #4caf50;
+    background: #0a0a15;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 2px solid #333;
+}
+
+.spectrum-numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 280px;
+    margin: 0 auto 16px;
+}
+
+.spectrum-numpad-btn {
+    padding: 16px;
+    font-size: 20px;
+    font-weight: bold;
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 8px;
+    color: var(--text-primary, #fff);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.spectrum-numpad-btn:hover {
+    background: linear-gradient(135deg, #3d3d54 0%, #2a2a3e 100%);
+    border-color: #2196f3;
+}
+
+.spectrum-numpad-btn.del {
+    background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+}
+
+.spectrum-freq-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+/* Presets Grid */
+.spectrum-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.preset-btn {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    background: linear-gradient(135deg, #2d2d44 0%, #1a1a2e 100%);
+    border: 1px solid var(--border-color, #444);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.preset-btn:hover {
+    background: linear-gradient(135deg, #3d3d54 0%, #2a2a3e 100%);
+    border-color: #4caf50;
+}
+
+.preset-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    margin-bottom: 4px;
+}
+
+.preset-freq {
+    font-size: 10px;
+    color: #4caf50;
+    font-family: monospace;
+}
+
+/* Log Container */
+.spectrum-log-container {
+    max-height: 300px;
+    overflow-y: auto;
+    background: #0a0a15;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+.spectrum-log-container .log-entry {
+    display: grid;
+    grid-template-columns: 80px 120px 80px 50px 1fr;
+    gap: 8px;
+    padding: 6px 8px;
+    border-bottom: 1px solid #222;
+    font-size: 12px;
+    font-family: monospace;
+}
+
+.spectrum-log-container .log-entry:hover {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.spectrum-log-container .log-time { color: #888; }
+.spectrum-log-container .log-freq { color: #4caf50; }
+.spectrum-log-container .log-rssi { color: #ff9800; }
+.spectrum-log-container .log-mod { color: #2196f3; }
+.spectrum-log-container .log-extra { color: #9c27b0; }
+
+.spectrum-log-container .log-empty {
+    color: #666;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+}
+
+.spectrum-log-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+/* UART Log */
+.spectrum-uart-log {
+    height: 200px;
+    overflow-y: auto;
+    background: #0a0a15;
+    border-radius: 6px;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    margin-bottom: 12px;
+}
+
+.uart-tx { color: #4caf50; }
+.uart-rx { color: #2196f3; }
+.uart-err { color: #f44336; }
+
+.spectrum-manual-cmd {
+    display: flex;
+    gap: 8px;
+}
+
+.spectrum-manual-cmd input {
+    flex: 1;
+    padding: 8px 12px;
+    background: var(--bg-primary, #0f0f1a);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 6px;
+    color: var(--text-primary, #fff);
+    font-family: monospace;
+}
+
+/* Pro Status */
+.spectrum-pro-status {
+    background: rgba(156, 39, 176, 0.1);
+    border: 1px solid #9c27b0;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 12px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+/* Warning Banner */
+.spectrum-warning {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.2) 0%, rgba(255, 87, 34, 0.2) 100%);
+    border: 1px solid #ff9800;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.spectrum-warning-icon {
+    font-size: 24px;
+}
+
+.spectrum-warning-text {
+    color: #ff9800;
+    font-size: 13px;
+}
+
+.spectrum-warning-text strong {
+    color: #ffb74d;
+}
+
+/* Buttons */
+.spectrum-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.spectrum-btn.btn-connect {
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    color: white;
+}
+
+.spectrum-btn.btn-disconnect {
+    background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+    color: white;
+}
+
+.spectrum-btn.btn-primary {
+    background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+    color: white;
+}
+
+.spectrum-btn.btn-secondary {
+    background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+    color: white;
+}
+
+.spectrum-btn.btn-warning {
+    background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+    color: white;
+}
+
+.spectrum-btn.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.spectrum-btn:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* CTCSS/DCS column in log */
+.spectrum-log-container .log-ctcss {
+    color: #ff9800;
+    font-weight: 500;
+    min-width: 80px;
+}

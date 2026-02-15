@@ -503,7 +503,6 @@
 .page-info {
   font-size: 0.85rem;
   color: var(--muted);
-  white-space: nowrap;
 }
 
 .toolbar-right {
@@ -1737,7 +1736,6 @@ fieldset legend {
   font-size: 0.85rem;
   color: var(--text-muted, #aaa);
   font-weight: 500;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -2217,4 +2215,124 @@ section.hidden,
   background: #F8D7DA;
   color: #721C24;
   border: 1px solid #F5C6CB;
+}
+
+/* ========== TD-H3/H8 STYLES ========== */
+.h3-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+.h3-table th,
+.h3-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+
+.h3-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--color-surface-alt);
+  font-weight: 600;
+}
+
+.h3-table tr:nth-child(even) {
+  background-color: var(--color-surface-alt);
+}
+
+.h3-table input[type="number"],
+.h3-table input[type="text"] {
+  width: 100%;
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.h3-table select {
+  padding: 4px 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.h3-table .index-cell {
+  text-align: right;
+  font-weight: 600;
+  width: 40px;
+}
+
+.h3-table .freq-input {
+  width: 100px;
+  text-align: right;
+}
+
+.h3-table .name-input {
+  width: 120px;
+}
+
+.h3-table .tone-input {
+  width: 70px;
+  text-align: right;
+}
+
+.h3-table .power-input {
+  width: 60px;
+  text-align: right;
+}
+
+.h3-table .groups-input {
+  width: 60px;
+}
+
+#h3Log {
+  background: var(--color-surface-alt);
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+#h3ChanScroller,
+#h3BandScroller {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+/* RT-880 Log Styles */
+#rt880Log, #rt880SpiLog {
+  font-family: ui-monospace, 'SF Mono', Monaco, Consolas, monospace;
+  font-size: 0.9rem;
+  background: hsl(var(--base) calc(var(--surface-l) - 2%));
+  border-radius: 8px;
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#rt880Log .log-entry, #rt880SpiLog .log-entry {
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+#rt880Log .log-entry.success, #rt880SpiLog .log-entry.success {
+  color: #4caf50;
+}
+
+#rt880Log .log-entry.error, #rt880SpiLog .log-entry.error {
+  color: #f44336;
+}
+
+#rt880Log .log-time, #rt880SpiLog .log-time {
+  color: #888;
+  margin-right: 8px;
 }

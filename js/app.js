@@ -522,10 +522,13 @@ const OFFICIAL_VERSION_PACKET = new Uint8Array([
 
 if (flashBtn) {
   flashBtn.addEventListener("click", async () => {
+    // Use unified flash log (k1Log) - fallback to global log if not available
+    const flashLog = window.logK1 || log;
+    
     // Check for pre-selected firmware or file upload
     let firmwareEncoded = k5SelectedFirmware;
     if (!firmwareEncoded) {
-      log("No firmware selected. Choose from the list or upload a file.", "error");
+      flashLog("No firmware selected. Choose from the list or upload a file.", "error");
       return;
     }
     if (isBusy) return;
@@ -534,7 +537,7 @@ if (flashBtn) {
     setProgress(flashFill, flashPct, 0);
     
     if (!claim("flash")) {
-      log("Serial port is busy.", "error");
+      flashLog("Serial port is busy.", "error");
       isBusy = false;
       updateUI(isConnected());
       return;
@@ -547,16 +550,38 @@ if (flashBtn) {
       await port.open({ baudRate: 38400 });
       
       setProgress(flashFill, flashPct, 0);
-      log("Waiting for bootloader... (PTT + Power On)");
+      flashLog("Waiting for bootloader... (PTT + Power On)");
       
-      // Wait for bootloader message (0x18)
-      await readPacket(port, 0x18, 10000);
-      log("Bootloader detected!");
+      // Wait for bootloader message (0x18) and capture the response
+      const bootloaderPacket = await readPacket(port, 0x18, 10000);
+      flashLog("Bootloader detected!");
+      
+      // Extract UID from bytes 4-19 (16 bytes)
+      if (bootloaderPacket && bootloaderPacket.length >= 20) {
+        const uid = Array.from(bootloaderPacket.slice(4, 20))
+          .map(b => b.toString(16).padStart(2, '0'))
+          .join(' ');
+        flashLog(`UID: ${uid}`);
+      }
+      
+      // Extract bootloader version from bytes 20+ (for longer packets)
+      if (bootloaderPacket && bootloaderPacket.length >= 28) {
+        // Bootloader version starts at byte 20, null-terminated string
+        let blVersion = '';
+        for (let i = 20; i < bootloaderPacket.length && i < 36; i++) {
+          const c = bootloaderPacket[i];
+          if (c === 0 || c < 32 || c > 126) break;
+          blVersion += String.fromCharCode(c);
+        }
+        if (blVersion) {
+          flashLog(`Bootloader: ${blVersion}`);
+        }
+      }
       
       // Extract and show firmware version
       const rawVersion = unpackFirmwareVersion(firmwareEncoded);
       const versionText = new TextDecoder().decode(rawVersion).replace(/\0.*$/, "");
-      log(`Firmware version: ${versionText || "unknown"}`);
+      flashLog(`Firmware version: ${versionText || "unknown"}`);
       
       // Send official version packet
       await sendPacket(port, OFFICIAL_VERSION_PACKET);
@@ -568,7 +593,7 @@ if (flashBtn) {
         throw new Error("Firmware size too large for official flashing.");
       }
       
-      log(`Writing ${firmware.length} bytes...`);
+      flashLog(`Writing ${firmware.length} bytes...`);
       const totalBlocks = Math.ceil(firmware.length / FLASH_BLOCK_SIZE);
       
       for (let i = 0; i < firmware.length; i += FLASH_BLOCK_SIZE) {
@@ -582,15 +607,15 @@ if (flashBtn) {
         
         const blockNum = Math.floor(i / FLASH_BLOCK_SIZE) + 1;
         if (blockNum % 20 === 0 || i + FLASH_BLOCK_SIZE >= firmware.length) {
-          log(`Block ${blockNum}/${totalBlocks}`);
+          flashLog(`Block ${blockNum}/${totalBlocks}`);
         }
       }
       
       setProgress(flashFill, flashPct, 100);
-      log("Firmware programmed successfully! Radio will reboot.", "success");
+      flashLog("Firmware programmed successfully! Radio will reboot.", "success");
       
     } catch (e) {
-      log(`Flash failed: ${e.message}`, "error");
+      flashLog(`Flash failed: ${e.message}`, "error");
       console.error('Flash error:', e);
     } finally {
       if (port) {
@@ -896,6 +921,9 @@ if (restoreCalibTK11Btn) {
 // K5 Firmware Selection
 if (k5FirmwareSelect) {
   k5FirmwareSelect.addEventListener("change", async (e) => {
+    // Use unified flash log
+    const flashLog = window.logK1 || log;
+    const fwName = e.target.options[e.target.selectedIndex].text;
     const path = e.target.value;
     if (!path) {
       k5SelectedFirmware = null;
@@ -904,24 +932,19 @@ if (k5FirmwareSelect) {
       return;
     }
     try {
-      log(`[K5] Loading firmware from: ${e.target.options[e.target.selectedIndex].text}...`);
+      flashLog(`Loading firmware from: ${fwName}...`);
       
       // Check if it's a GitHub Release URL (needs special handling)
       if (path.includes('/releases/download/')) {
-        log('[K5] Detected GitHub Release URL - using API loader');
         k5SelectedFirmware = await loadFirmwareWithCORS(path);
         updateK5FlashButton();
-        const name = path.split('/').pop();
-        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${name} (${k5SelectedFirmware.length} bytes)`;
-        log(`[K5] ✅ Firmware loaded: ${k5SelectedFirmware.length} bytes`);
+        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${fwName} (${k5SelectedFirmware.length} bytes)`;
+        flashLog(`Firmware loaded: ${fwName} (${k5SelectedFirmware.length} bytes)`, 'success');
       } else {
         // Regular URL or GitHub repository file
         let fetchUrl = path;
         if (path.startsWith('http://') || path.startsWith('https://')) {
           fetchUrl = convertGitHubUrl(path);
-          if (fetchUrl !== path) {
-            log(`Converted GitHub URL to: ${fetchUrl}`);
-          }
         }
         
         const response = await fetch(fetchUrl);
@@ -929,9 +952,8 @@ if (k5FirmwareSelect) {
         const buffer = await response.arrayBuffer();
         k5SelectedFirmware = new Uint8Array(buffer);
         updateK5FlashButton();
-        const name = path.split('/').pop();
-        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${name} (${k5SelectedFirmware.length} bytes)`;
-        log(`[K5] ✅ Firmware loaded: ${k5SelectedFirmware.length} bytes`);
+        if (k5FirmwareStatus) k5FirmwareStatus.textContent = `Selected: ${fwName} (${k5SelectedFirmware.length} bytes)`;
+        flashLog(`Firmware loaded: ${fwName} (${k5SelectedFirmware.length} bytes)`, 'success');
       }
       
       // Clear file input when selecting from dropdown
@@ -940,7 +962,7 @@ if (k5FirmwareSelect) {
       k5SelectedFirmware = null;
       updateK5FlashButton();
       if (k5FirmwareStatus) k5FirmwareStatus.textContent = "Failed to load firmware";
-      log(`Error loading firmware: ${err.message}`, "error");
+      flashLog(`Error loading firmware: ${err.message}`, "error");
     }
   });
 }
@@ -1245,6 +1267,12 @@ onRadioTypeChange((type, config) => {
   });
   document.querySelectorAll('.rt890-only').forEach(el => {
     el.style.display = type === 'RT890' ? '' : 'none';
+  });
+  document.querySelectorAll('.h3-only').forEach(el => {
+    el.style.display = type === 'H3' ? '' : 'none';
+  });
+  document.querySelectorAll('.rt880-only').forEach(el => {
+    el.style.display = type === 'RT880' ? '' : 'none';
   });
   document.querySelectorAll('.k5-tk11-only').forEach(el => {
     el.style.display = (type === 'K5' || type === 'TK11') ? '' : 'none';

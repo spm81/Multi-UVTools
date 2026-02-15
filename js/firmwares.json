@@ -414,6 +414,11 @@
           "name": "Matoz v1.35.0D",
           "path": "firmware/Custom_Firmware_by_Matoz_V1.35.0D.bin",
           "profile": "Matoz"
+        },
+        {
+          "name": "Matoz v1.35.1D",
+          "path": "firmware/Custom_Firmware_by_Matoz_V1.35.1D.bin",
+          "profile": "Matoz"
         }
       ]
     },
@@ -486,8 +491,8 @@
           "profile": "N7SIX"
         },
         {
-          "name": "N7SIX v7.6.2 Beta Revision 5 ApeX Edition",
-          "path": "firmware/n7six.ApeX-k1.v7.6.2br5.bin",
+          "name": "N7SIX v7.6.2 Beta Revision 8 ApeX Edition",
+          "path": "firmware/n7six.ApeX-k1.v7.6.2br8.bin",
           "profile": "N7SIX"
         }
       ]
@@ -638,6 +643,20 @@
           "profile": "OEFWCOM"
         }
       ]
+    }
+  ],
+  "h3_firmwares": [
+    {
+      "name": "TD-H3 Stock Firmware",
+      "url": "",
+      "description": "Original TID TD-H3 firmware"
+    }
+  ],
+  "rt880_firmwares": [
+    {
+      "name": "RT-880 Stock Firmware",
+      "url": "",
+      "description": "Original Radtel RT-880 firmware"
     }
   ]
 }

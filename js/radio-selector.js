@@ -1,7 +1,6 @@
 /**
  * Radio Selector Module
  * Manages selection between UV-K5/K1, TK11, and RT-890 radios
- * Different radios have different protocols and memory layouts
  */
 
 const RADIO_TYPES = {
@@ -34,60 +33,70 @@ const RADIO_TYPES = {
     id: 'RT890',
     name: 'RT-890',
     description: 'RT-890 and compatible',
-    protocol: 'tk11',
+    protocol: 'rt890',
     baudRates: [115200],
     defaultBaud: 115200,
-    memorySize: 0x23000,
+    memorySize: 0x400000,
+    hasExternalEeprom: false,
+    hasCalibration: true,
+    channelCount: 200
+  },
+  H3: {
+    id: 'H3',
+    name: 'TD-H3/H8',
+    description: 'TID TD-H3 and TD-H8 with nicFW',
+    protocol: 'h3',
+    baudRates: [38400, 115200],
+    defaultBaud: 38400,
+    memorySize: 0x2000,
     hasExternalEeprom: false,
     hasCalibration: false,
-    channelCount: 999
+    channelCount: 198
+  },
+  RT880: {
+    id: 'RT880',
+    name: 'RT-880',
+    description: 'Radtel RT-880 and iRadio UV-98',
+    protocol: 'rt880',
+    baudRates: [115200],
+    defaultBaud: 115200,
+    memorySize: 0x10000,
+    hasExternalEeprom: false,
+    hasCalibration: false,
+    channelCount: 128
   }
 };
 
 let currentRadioType = 'K5';
 let onChangeCallbacks = [];
 
-// Get current radio type
 const getRadioType = () => currentRadioType;
-
-// Get radio config
 const getRadioConfig = () => RADIO_TYPES[currentRadioType];
 
-// Set radio type
 const setRadioType = (type) => {
   if (RADIO_TYPES[type] && type !== currentRadioType) {
     currentRadioType = type;
     localStorage.setItem('selectedRadioType', type);
-    
-    // Notify all subscribers
     onChangeCallbacks.forEach(cb => cb(type, RADIO_TYPES[type]));
-    
-    console.log(`Radio type changed to: ${RADIO_TYPES[type].name}`);
+    console.log('Radio type changed to: ' + RADIO_TYPES[type].name);
   }
 };
 
-// Subscribe to radio type changes
 const onRadioTypeChange = (callback) => {
   onChangeCallbacks.push(callback);
-  return () => {
-    onChangeCallbacks = onChangeCallbacks.filter(cb => cb !== callback);
-  };
+  return () => { onChangeCallbacks = onChangeCallbacks.filter(cb => cb !== callback); };
 };
 
-// Get all radio types
 const getAllRadioTypes = () => Object.values(RADIO_TYPES);
 
-// Initialize from localStorage
 const init = () => {
   const saved = localStorage.getItem('selectedRadioType');
   if (saved && RADIO_TYPES[saved]) {
     currentRadioType = saved;
   }
   
-  // Set up all radio selector dropdowns
   const selectors = document.querySelectorAll('.radio-type-select');
   selectors.forEach(select => {
-    // Populate options
     select.innerHTML = '';
     Object.values(RADIO_TYPES).forEach(radio => {
       const option = document.createElement('option');
@@ -97,35 +106,29 @@ const init = () => {
       select.appendChild(option);
     });
     
-    // Listen for changes
     select.addEventListener('change', (e) => {
       setRadioType(e.target.value);
     });
   });
   
-  // Update baud rate selector based on radio type
   updateBaudRates();
   
-  // Save user's baud rate choice to localStorage
   const baudSelect = document.getElementById('baudSelect');
   if (baudSelect) {
     baudSelect.addEventListener('change', () => {
-      localStorage.setItem(`baudRate_${currentRadioType}`, baudSelect.value);
+      localStorage.setItem('baudRate_' + currentRadioType, baudSelect.value);
     });
   }
   
-  console.log(`Radio selector initialized: ${RADIO_TYPES[currentRadioType].name}`);
+  console.log('Radio selector initialized: ' + RADIO_TYPES[currentRadioType].name);
 };
 
-// Update baud rate options based on radio type
 const updateBaudRates = () => {
   const baudSelect = document.getElementById('baudSelect');
   if (!baudSelect) return;
   
   const config = RADIO_TYPES[currentRadioType];
-  
-  // Try to get saved baud from localStorage for this radio type
-  const savedBaud = localStorage.getItem(`baudRate_${currentRadioType}`);
+  const savedBaud = localStorage.getItem('baudRate_' + currentRadioType);
   const preferredBaud = savedBaud ? parseInt(savedBaud) : config.defaultBaud;
   
   baudSelect.innerHTML = '';
@@ -137,127 +140,102 @@ const updateBaudRates = () => {
     baudSelect.appendChild(option);
   });
   
-  // Set the preferred baud if available
   if (config.baudRates.includes(preferredBaud)) {
     baudSelect.value = preferredBaud;
   }
 };
 
-// Update UI elements based on radio type
 const updateUI = () => {
   const config = RADIO_TYPES[currentRadioType];
+  const isK5 = currentRadioType === 'K5';
   const isTK11 = currentRadioType === 'TK11';
+  const isRT890 = currentRadioType === 'RT890';
+  const isH3 = currentRadioType === 'H3';
+  const isRT880 = currentRadioType === 'RT880';
   
-  // Show/hide calibration options for K5 only
-  const calibElements = document.querySelectorAll('.k5-calib-only');
-  calibElements.forEach(el => {
-    el.style.display = config.hasCalibration ? '' : 'none';
+  document.querySelectorAll('.k5-only').forEach(el => {
+    el.style.display = isK5 ? '' : 'none';
   });
   
-  // Show/hide K5-specific elements
-  const k5Elements = document.querySelectorAll('.k5-only');
-  k5Elements.forEach(el => {
-    el.style.display = !isTK11 ? '' : 'none';
-  });
-  
-  // Show/hide TK11-specific elements
-  const tk11Elements = document.querySelectorAll('.tk11-only');
-  tk11Elements.forEach(el => {
+  document.querySelectorAll('.tk11-only').forEach(el => {
     el.style.display = isTK11 ? '' : 'none';
   });
   
-  // Update navigation tabs based on radio type
-  // TK11 supports: Home (instructions), Tools (home) and Channels
+  document.querySelectorAll('.rt890-only').forEach(el => {
+    el.style.display = isRT890 ? '' : 'none';
+  });
+  
+  document.querySelectorAll('.h3-only').forEach(el => {
+    el.style.display = isH3 ? '' : 'none';
+  });
+  
+  document.querySelectorAll('.rt880-only').forEach(el => {
+    el.style.display = isRT880 ? '' : 'none';
+  });
+  
+  document.querySelectorAll('.k5-tk11-only').forEach(el => {
+    el.style.display = (isK5 || isTK11) ? '' : 'none';
+  });
+  
   const navItems = document.querySelectorAll('.nav-links .nav-item');
   navItems.forEach(item => {
     const navTarget = item.getAttribute('data-nav');
-    // Tabs supported by TK11: instructions (Home), home (Tools), channels, k1 (Flash)
-    const tk11Tabs = ['instructions', 'home', 'channels', 'k1'];
-    // Tabs only for K5 (Flash page now works for both, content is toggled inside)
-    const k5OnlyTabs = ['settings', 'mirror', 'smr', 'unbricking'];
     
-    if (isTK11) {
-      // Hide K5-only tabs when TK11 is selected
-      if (k5OnlyTabs.includes(navTarget)) {
-        item.style.display = 'none';
-      } else {
-        item.style.display = '';
-      }
-    } else {
-      // Hide TK11-only tabs when K5 is selected
-      if (item.classList.contains('tk11-only')) {
-        item.style.display = 'none';
-      } else {
-        item.style.display = '';
-      }
+    const k5Tabs = ['instructions', 'home', 'k1', 'channels', 'settings', 'mirror', 'smr', 'spectrum', 'unbricking'];
+    const tk11Tabs = ['instructions', 'home', 'channels', 'tk11-settings'];
+    const rt890Tabs = ['instructions', 'rt890-flash', 'rt890-tools'];
+    const h3Tabs = ['instructions', 'h3-flash', 'h3-channels', 'h3-bandplan', 'h3-codeplug'];
+    const rt880Tabs = ['instructions', 'rt880-flash', 'rt880-monitor', 'rt880-spi'];
+    
+    if (isK5) {
+      item.style.display = k5Tabs.includes(navTarget) ? '' : 'none';
+    } else if (isTK11) {
+      item.style.display = tk11Tabs.includes(navTarget) ? '' : 'none';
+    } else if (isRT890) {
+      item.style.display = rt890Tabs.includes(navTarget) ? '' : 'none';
+    } else if (isH3) {
+      item.style.display = h3Tabs.includes(navTarget) ? '' : 'none';
+    } else if (isRT880) {
+      item.style.display = rt880Tabs.includes(navTarget) ? '' : 'none';
     }
   });
   
-  // If currently on a hidden tab, navigate to Tools
-  if (isTK11) {
-    const currentHash = window.location.hash.replace('#', '') || 'instructions';
-    const tk11Tabs = ['instructions', 'home', 'channels'];
-    if (!tk11Tabs.includes(currentHash)) {
-      window.location.hash = '#instructions';
-    }
+  const currentHash = window.location.hash.replace('#', '') || 'instructions';
+  if (isRT890 && !['instructions', 'rt890-flash', 'rt890-tools'].includes(currentHash)) {
+    window.location.hash = '#instructions';
+  } else if (isTK11 && !['instructions', 'home', 'channels', 'tk11-settings'].includes(currentHash)) {
+    window.location.hash = '#instructions';
+  } else if (isH3 && !h3Tabs.includes(currentHash)) {
+    window.location.hash = '#instructions';
+  } else if (isRT880 && !rt880Tabs.includes(currentHash)) {
+    window.location.hash = '#instructions';
   }
   
-  // Update memory size displays
-  const memorySizeElements = document.querySelectorAll('.memory-size');
-  memorySizeElements.forEach(el => {
-    el.textContent = `${(config.memorySize / 1024).toFixed(1)} KB`;
+  document.querySelectorAll('.memory-size').forEach(el => {
+    el.textContent = (config.memorySize / 1024).toFixed(1) + ' KB';
   });
   
-  // Update channel count displays
-  const channelCountElements = document.querySelectorAll('.channel-count');
-  channelCountElements.forEach(el => {
+  document.querySelectorAll('.channel-count').forEach(el => {
     el.textContent = config.channelCount;
   });
   
-  // Update memory type labels
-  const memoryTypeLabels = document.querySelectorAll('.memory-type-label');
-  const memoryTypeName = isTK11 ? 'Flash Memory' : 'EEPROM/Flash Memory';
-  memoryTypeLabels.forEach(el => {
-    el.textContent = memoryTypeName;
-  });
-  
-  // Hide K5-only sections when TK11 is selected
   const memorySizeDetectorSection = document.getElementById('memorySizeDetectorSection');
   const eepromCleanerSection = document.getElementById('eepromCleanerSection');
   
-  if (memorySizeDetectorSection) {
-    memorySizeDetectorSection.style.display = isTK11 ? 'none' : '';
-  }
-  if (eepromCleanerSection) {
-    eepromCleanerSection.style.display = isTK11 ? 'none' : '';
-  }
+  if (memorySizeDetectorSection) memorySizeDetectorSection.style.display = isK5 ? '' : 'none';
+  if (eepromCleanerSection) eepromCleanerSection.style.display = isK5 ? '' : 'none';
   
   updateBaudRates();
-  
-  const tabType = currentRadioType === 'K5' ? 'K5' : currentRadioType === 'TK11' ? 'TK11' : 'RT890';
-  console.log(`UI updated for ${config.name}: showing ${tabType} tabs`);
+  console.log('UI updated for ' + config.name);
 };
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    init();
-    updateUI();
-  });
+  document.addEventListener('DOMContentLoaded', () => { init(); updateUI(); });
 } else {
   init();
   updateUI();
 }
 
-// Subscribe to changes and update UI
 onRadioTypeChange(() => updateUI());
 
-export {
-  RADIO_TYPES,
-  getRadioType,
-  getRadioConfig,
-  setRadioType,
-  onRadioTypeChange,
-  getAllRadioTypes,
-  updateUI
-};
+export { RADIO_TYPES, getRadioType, getRadioConfig, setRadioType, onRadioTypeChange, getAllRadioTypes, updateUI };

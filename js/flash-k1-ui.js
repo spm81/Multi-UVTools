@@ -24,6 +24,30 @@ let k1Writer = null;
 let k1FirmwareData = null;
 let k1FirmwareName = '';
 let isK1Flashing = false;
+
+// ========== K5 BOOTLOADER PROTECTION ==========
+// These bootloaders belong to UV-K5 radios - flashing K1 firmware will BRICK them!
+const K5_BLOCKED_BOOTLOADERS = {
+  "2.00.06": "UV-K5 (original)",
+  "5.00.01": "UV-K5 v2"
+};
+
+function isK5Bootloader(blVersion) {
+  if (!blVersion) return null;
+  const version = blVersion.trim();
+  
+  // Check exact match first
+  if (K5_BLOCKED_BOOTLOADERS[version]) {
+    return K5_BLOCKED_BOOTLOADERS[version];
+  }
+  
+  // Check for any 5.xx.xx bootloader (all K5 v2 variants)
+  if (version.startsWith("5.")) {
+    return "UV-K5 v2 (variant)";
+  }
+  
+  return null;
+}
 let k1ReadBuffer = [];
 let isK1Reading = false;
 
@@ -46,6 +70,9 @@ function logK1(message, type = 'info') {
     k1Log.scrollTop = k1Log.scrollHeight;
   }
 }
+
+// Export logK1 globally so K5 flash can also use it
+window.logK1 = logK1;
 
 // ========== PROGRESS ==========
 function updateK1Progress(percent) {
@@ -275,6 +302,18 @@ async function flashK1Firmware() {
     // Wait for device info
     const devInfo = await waitForK1DeviceInfo();
     logK1(`UID: ${arrayToHex(devInfo.uid)}`);
+    
+    // ========== K5 BOOTLOADER PROTECTION ==========
+    const k5Model = isK5Bootloader(devInfo.blVersion);
+    if (k5Model) {
+      logK1(`Bootloader: ${devInfo.blVersion}`, 'error');
+      logK1(`🚨 WRONG RADIO! This is a ${k5Model}, not UV-K5 (v3) or UV-K1! Flash BLOCKED.`, 'error');
+      
+      // Full disconnect (reader, writer, port)
+      await disconnectK1();
+      
+      throw new Error('BLOCKED: Wrong radio type detected');
+    }
     logK1(`Bootloader: ${devInfo.blVersion}`);
     logK1('Device detected!', 'success');
 
@@ -465,7 +504,7 @@ if (!('serial' in navigator)) {
 }
 
 console.log('[K1 UI] Initialized successfully!');
-logK1('K1 Flash ready. Select firmware to begin.');
+logK1('Flash ready. Select firmware to begin.');
 
 // Export for external use
 export { flashK1, updateK1FlashButton };
