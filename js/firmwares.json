@@ -491,8 +491,8 @@
           "profile": "N7SIX"
         },
         {
-          "name": "N7SIX v7.6.2 Beta Revision 8 ApeX Edition",
-          "path": "firmware/n7six.ApeX-k1.v7.6.2br8.bin",
+          "name": "N7SIX ApeX Edition (Last Version)",
+          "path": "https://github.com/N7SIX/uv-k1-k5v3-firmware-custom/blob/main/N7SIX_Archive/N7SIX.ApeX_Edition.bin",
           "profile": "N7SIX"
         }
       ]
