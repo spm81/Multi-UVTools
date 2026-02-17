@@ -34,12 +34,14 @@ const BLOCKED_BOOTLOADERS = [
 ];
 
 // MINIMUM SAFE version for UV-K1
-const MIN_K1_BOOTLOADER = "7.03.01";
+const MIN_K1_BOOTLOADER = "7.02.02"; // or 7.00.07 to match with UV-K5 V3...
 
 // Known bootloader to model mapping
 const BOOTLOADER_TO_MODEL = {
     "5.00.01": "UV-K5 V2",
     "2.00.06": "UV-K5 V1", 
+    "7.00.07": "UV-K5 V3",
+    "7.02.02": "UV-K1",
     "7.03.01": "UV-K1",
     "7.03.02": "UV-K1",
     "7.03.03": "UV-K1",
