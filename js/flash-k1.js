@@ -29,18 +29,20 @@ const MODEL_UV_K1 = 3;
 // ========== BOOTLOADER BLOCKLIST ==========
 // CRITICALLY DANGEROUS versions - ALWAYS BLOCK
 const BLOCKED_BOOTLOADERS = [
+    "1.01.01",  // UV-K5 V2 - GUARANTEED BRICK with K1 firmware
     "1.02.01",  // UV-K5 V2 - GUARANTEED BRICK with K1 firmware  
-    "5.00.01",  // UV-K5 V2 - GUARANTEED BRICK with K1 firmware
+    "5.00.01",  // UV-5R Plus V2 - GUARANTEED BRICK with K1 firmware
     "2.00.06",  // UV-K5 V1 - GUARANTEED BRICK with K1 firmware
 ];
 
-// MINIMUM SAFE version for UV-K1
-const MIN_K1_BOOTLOADER = "7.02.02"; // or 7.00.07 to match with UV-K5 V3...
+// MINIMUM SAFE version for UV-K5 V3 / UV-K1 
+const MIN_K1_BOOTLOADER = "7.00.07"; 
 
 // Known bootloader to model mapping
 const BOOTLOADER_TO_MODEL = {
+    "1.01.01": "UV-K5 V2",
     "1.02.01": "UV-K5 V2",
-    "5.00.01": "UV-K5 V2",
+    "5.00.01": "UV-5R Plus V2",
     "2.00.06": "UV-K5 V1", 
     "7.00.07": "UV-K5 V3",
     "7.02.02": "UV-K1",
