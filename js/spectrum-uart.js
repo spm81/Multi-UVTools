@@ -457,19 +457,20 @@
         const idx = line.indexOf('SPEC:PS,');
         if (idx === -1) return;
         
-        const data = line.substring(idx + 8);
+        const data = line.substring(idx + 8).trim();
         let smooth = '--', autotrig = '--', horizon = '--', bandled = '--';
         let mountain = '--', heli = '--', sugar = '--';
         
-        const matches = data.match(/SMOOTH=(\d),AUTO=(\d),HORIZ=(\d),LED=(\d),MOUNT=(\d),HELI=(\d),SUGAR=(\d)/);
-        if (matches) {
-            smooth = matches[1] === '1' ? 'ON' : 'OFF';
-            autotrig = matches[2] === '1' ? 'ON' : 'OFF';
-            horizon = matches[3] === '1' ? 'ON' : 'OFF';
-            bandled = matches[4] === '1' ? 'ON' : 'OFF';
-            mountain = matches[5] === '1' ? 'ON' : 'OFF';
-            heli = matches[6] === '1' ? 'ON' : 'OFF';
-            sugar = matches[7] === '1' ? 'ON' : 'OFF';
+        // C firmware sends compact format: SPEC:PS,2011110
+        // 7 digits: smooth(0=off,1-4=factor), auto, horizon, led, mountain, heli, sugar
+        if (data.length >= 7) {
+            smooth = data[0] !== '0' ? 'ON' : 'OFF';
+            autotrig = data[1] !== '0' ? 'ON' : 'OFF';
+            horizon = data[2] !== '0' ? 'ON' : 'OFF';
+            bandled = data[3] !== '0' ? 'ON' : 'OFF';
+            mountain = data[4] !== '0' ? 'ON' : 'OFF';
+            heli = data[5] !== '0' ? 'ON' : 'OFF';
+            sugar = data[6] !== '0' ? 'ON' : 'OFF';
         }
         
         const proStatus = document.getElementById('proStatus');

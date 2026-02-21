@@ -652,16 +652,36 @@
   ],
   "h3_firmwares": [
     {
-      "name": "TD-H3 Stock Firmware",
-      "url": "",
-      "description": "Original TID TD-H3 firmware"
+      "group": "Stock Firmware",
+      "firmwares": [
+        {
+          "name": "TD-H3 Stock Firmware",
+          "path": "",
+          "profile": "Stock"
+        }
+      ]
     }
   ],
   "rt880_firmwares": [
     {
-      "name": "RT-880 Stock Firmware",
-      "url": "",
-      "description": "Original Radtel RT-880 firmware"
+      "group": "NicSure Firmware",
+      "firmwares": [
+        {
+          "name": "RT-880 V1.15 (2025-06-12)",
+          "path": "https://github.com/nicsure/RT880-FWFlasher/raw/master/RT-880-V1.15_250612.bin",
+          "profile": "NicSure"
+        }
+      ]
+    },
+    {
+      "group": "Stock Firmware",
+      "firmwares": [
+        {
+          "name": "RT-880 Stock Firmware",
+          "path": "",
+          "profile": "Stock"
+        }
+      ]
     }
   ]
 }

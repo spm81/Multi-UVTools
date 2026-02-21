@@ -1,7 +1,7 @@
 /**
  * RT-880 Flash / Monitor / SPI Backup UI
  * Protocol based on https://github.com/nicsure/RT880-FWFlasher
- * 
+ *
  * Flash: 115200 baud - Erase + Write firmware
  * Monitor: 115200 baud - Serial monitor (text/hex)
  * SPI Backup: 230400 baud - Read full 4MB SPI flash
@@ -23,16 +23,32 @@
     const FLASH_SIZE = 4 * 1024 * 1024; // 4MB SPI flash
     const BLOCK_SIZE = 1024;
 
-    // Preloaded firmwares
-    const PRELOADED_FIRMWARES = [
-        { name: 'RT-880 V1.15 (2025-06-12)', url: 'https://github.com/nicsure/RT880-FWFlasher/raw/master/RT-880-V1.15_250612.bin' }
-    ];
-
     // DOM Elements
     const getEl = id => document.getElementById(id);
 
     // Current log target
     let currentLogEl = 'rt880Log';
+
+    // Helper function to convert GitHub URLs to jsDelivr (avoids CORS issues)
+    function convertGitHubUrlRt880(url) {
+        if (!url || !url.includes('github.com')) return url;
+
+        // Convert github.com/user/repo/blob/branch/path → cdn.jsdelivr.net/gh/user/repo@branch/path
+        let match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree|raw)\/([^\/]+)\/(.+)/);
+        if (match) {
+            const [, user, repo, type, branch, path] = match;
+            return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+        }
+
+        // Convert raw.githubusercontent.com/user/repo/branch/path → cdn.jsdelivr.net/gh/user/repo@branch/path
+        match = url.match(/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)/);
+        if (match) {
+            const [, user, repo, branch, path] = match;
+            return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+        }
+
+        return url;
+    }
 
     // Logging
     function logRt880(msg, type = 'info') {
@@ -59,35 +75,35 @@
         packet[0] = type;
         packet[1] = (address >> 8) & 0xFF;
         packet[2] = address & 0xFF;
-        
+
         for (let i = 0; i < data.length; i++) {
             packet[3 + i] = data[i];
         }
-        
+
         // Checksum: start with 0x52, add all bytes before checksum
         let cs = 0x52;
         for (let i = 0; i < packet.length - 1; i++) {
             cs = (cs + packet[i]) & 0xFF;
         }
         packet[packet.length - 1] = cs;
-        
+
         return packet;
     }
 
     // Read single byte with timeout
     async function readByte(timeoutMs = 20000) {
         if (!reader) return -1;
-        
-        const timeoutPromise = new Promise((_, reject) => 
+
+        const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), timeoutMs)
         );
-        
+
         try {
             const result = await Promise.race([
                 reader.read(),
                 timeoutPromise
             ]);
-            
+
             if (result.done) return -1;
             if (result.value && result.value.length > 0) {
                 return result.value[0];
@@ -137,11 +153,11 @@
         try {
             port = await navigator.serial.requestPort();
             await port.open({ baudRate, dataBits: 8, stopBits: 1, parity: 'none' });
-            
+
             reader = port.readable.getReader();
             writer = port.writable.getWriter();
             isConnected = true;
-            
+
             return true;
         } catch (e) {
             logRt880(`Cannot open port: ${e.message}`, 'error');
@@ -216,25 +232,25 @@
             paddedFirmware.set(firmware);
 
             logRt880('Erasing flash...');
-            
+
             // Erase command 1
             let packet = constructPacket(0x39, 0x3305, new Uint8Array([0x10]));
             if (!await writeData(packet)) return;
             if (!await getAck()) return;
-            
+
             // Erase command 2
             if (!await writeData(packet)) return;
             if (!await getAck()) return;
-            
+
             // Erase confirm
             packet = constructPacket(0x39, 0x3305, new Uint8Array([0x55]));
             if (!await writeData(packet)) return;
             if (!await getAck()) return;
 
             logRt880('Flash erased, writing firmware...');
-            
+
             const totalBlocks = paddedLen / BLOCK_SIZE;
-            
+
             for (let i = 0; i < paddedLen; i += BLOCK_SIZE) {
                 if (abortRequested) {
                     logRt880('Flash aborted by user', 'error');
@@ -243,13 +259,13 @@
 
                 const blockData = paddedFirmware.slice(i, i + BLOCK_SIZE);
                 packet = constructPacket(0x57, i, blockData);
-                
+
                 if (!await writeData(packet)) return;
                 if (!await getAck()) return;
-                
+
                 const blockNum = (i / BLOCK_SIZE) + 1;
                 updateProgress(blockNum, totalBlocks);
-                
+
                 if (blockNum % 10 === 0 || blockNum === totalBlocks) {
                     logRt880(`Block ${blockNum}/${totalBlocks} (0x${i.toString(16).padStart(6, '0')})`);
                 }
@@ -257,7 +273,7 @@
 
             // Final ACK
             if (!await getAck()) return;
-            
+
             logRt880('');
             logRt880('✅ Firmware flash completed successfully!', 'success');
             logRt880('Turn off the radio and turn it back on.');
@@ -283,7 +299,7 @@
 
         abortRequested = false;
         setBusy(true, 'monitor');
-        
+
         if (!await openPort(115200)) {
             setBusy(false);
             return;
@@ -299,7 +315,7 @@
                 const b = await readByte(1000);
                 if (b === -1) break;
                 if (b === -2) continue; // Timeout, keep waiting
-                
+
                 if (monitorOutput) {
                     if (textMode) {
                         if (b === 0) {
@@ -371,9 +387,9 @@
                 // Read 4-byte address (little endian)
                 const addrBytes = await readBytes(4);
                 if (!addrBytes) break;
-                
+
                 let raddr = addrBytes[0] | (addrBytes[1] << 8) | (addrBytes[2] << 16) | (addrBytes[3] << 24);
-                
+
                 // Verify address matches expected
                 if (raddr !== addr) continue;
 
@@ -406,7 +422,7 @@
                 addr += BLOCK_SIZE;
 
                 updateProgress(addr, FLASH_SIZE);
-                
+
                 const blockNum = addr / BLOCK_SIZE;
                 if (blockNum % 100 === 0) {
                     logRt880(`Block ${blockNum}/${FLASH_SIZE / BLOCK_SIZE} (0x${raddr.toString(16).padStart(8, '0')})`);
@@ -416,7 +432,7 @@
             if (addr >= FLASH_SIZE) {
                 logRt880('');
                 logRt880('✅ SPI Backup completed!', 'success');
-                
+
                 // Save file
                 const blob = new Blob([spiData], { type: 'application/octet-stream' });
                 const url = URL.createObjectURL(blob);
@@ -425,7 +441,7 @@
                 a.download = `RT880_SPI_Backup_${new Date().toISOString().slice(0,10)}.880spi`;
                 a.click();
                 URL.revokeObjectURL(url);
-                
+
                 logRt880('File saved: RT880_SPI_Backup_*.880spi');
             } else if (abortRequested) {
                 logRt880('SPI Backup aborted by user', 'error');
@@ -445,32 +461,63 @@
     function populateFirmwareSelect() {
         const select = getEl('rt880FirmwareSelect');
         if (!select) return;
-        
+
         select.innerHTML = '<option value="">-- Select Firmware --</option>';
-        PRELOADED_FIRMWARES.forEach((fw, idx) => {
-            const opt = document.createElement('option');
-            opt.value = idx;
-            opt.textContent = fw.name;
-            select.appendChild(opt);
-        });
+
+        // Load from firmwares.json (same pattern as K5, K1, RT890)
+        fetch('js/firmwares.json')
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.rt880_firmwares && data.rt880_firmwares.length > 0) {
+                    data.rt880_firmwares.forEach(group => {
+                        const optgroup = document.createElement('optgroup');
+                        optgroup.label = group.group;
+                        group.firmwares.forEach(fw => {
+                            // Skip entries with empty path
+                            if (!fw.path) return;
+                            const opt = document.createElement('option');
+                            // Convert GitHub URLs via jsDelivr to avoid CORS
+                            let fwUrl = fw.path;
+                            if (fwUrl.startsWith('http://') || fwUrl.startsWith('https://')) {
+                                fwUrl = convertGitHubUrlRt880(fwUrl);
+                            }
+                            opt.value = fwUrl;
+                            opt.textContent = fw.name;
+                            optgroup.appendChild(opt);
+                        });
+                        // Only add optgroup if it has options
+                        if (optgroup.children.length > 0) {
+                            select.appendChild(optgroup);
+                        }
+                    });
+                }
+                console.log('[RT880] Preloaded firmwares loaded successfully');
+            })
+            .catch(e => {
+                console.error('[RT880] Failed to load firmwares:', e);
+                select.innerHTML = '<option value="">-- No preloaded firmwares --</option>';
+            });
     }
 
     async function loadPreloadedFirmware() {
         const select = getEl('rt880FirmwareSelect');
         if (!select || select.value === '') return;
-        
-        const fw = PRELOADED_FIRMWARES[parseInt(select.value)];
-        if (!fw) return;
-        
-        logRt880(`Loading: ${fw.name}...`);
-        
+
+        const url = select.value; // Already converted by populateFirmwareSelect
+        const name = select.options[select.selectedIndex].textContent;
+
+        logRt880(`Loading: ${name}...`);
+
         try {
-            const response = await fetch(fw.url);
+            const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
+
             firmware = new Uint8Array(await response.arrayBuffer());
-            firmwareName = fw.name;
-            
+            firmwareName = name;
+
             logRt880(`Firmware loaded: ${firmwareName} (${firmware.length} bytes)`, 'success');
             getEl('rt880FlashBtn')?.removeAttribute('disabled');
         } catch (e) {
@@ -481,17 +528,26 @@
     async function loadFirmwareFromUrl() {
         const input = getEl('rt880FirmwareUrl');
         if (!input || !input.value.trim()) return;
-        
-        const url = input.value.trim();
-        logRt880(`Loading from URL: ${url}...`);
-        
+
+        const inputUrl = input.value.trim();
+        logRt880(`Loading from URL: ${inputUrl}...`);
+
         try {
+            // Convert GitHub URLs to jsDelivr to avoid CORS
+            let url = inputUrl;
+            if (inputUrl.startsWith('http://') || inputUrl.startsWith('https://')) {
+                url = convertGitHubUrlRt880(inputUrl);
+                if (url !== inputUrl) {
+                    logRt880(`Converted GitHub URL to CDN: ${url}`);
+                }
+            }
+
             const response = await fetch(url);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
+
             firmware = new Uint8Array(await response.arrayBuffer());
-            firmwareName = url.split('/').pop() || 'firmware.bin';
-            
+            firmwareName = inputUrl.split('/').pop() || 'firmware.bin';
+
             logRt880(`Firmware loaded: ${firmwareName} (${firmware.length} bytes)`, 'success');
             getEl('rt880FlashBtn')?.removeAttribute('disabled');
         } catch (e) {
@@ -502,7 +558,7 @@
     function handleFileSelect(e) {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const reader = new FileReader();
         reader.onload = () => {
             firmware = new Uint8Array(reader.result);
@@ -558,10 +614,10 @@
         document.querySelectorAll('.rt880-tab-btn').forEach(el => {
             el.classList.remove('active');
         });
-        
+
         const content = getEl(tabId);
         if (content) content.classList.add('active');
-        
+
         document.querySelectorAll(`.rt880-tab-btn[data-tab="${tabId}"]`).forEach(el => {
             el.classList.add('active');
         });
@@ -571,17 +627,17 @@
     function init() {
         logRt880('RT-880 Tools ready.');
         logRt880('Functions: Flash | Monitor | SPI Backup');
-        
+
         populateFirmwareSelect();
         setBusy(false);
 
         // Event listeners
         const fileInput = getEl('rt880FileInput');
         if (fileInput) fileInput.addEventListener('change', handleFileSelect);
-        
+
         const fwSelect = getEl('rt880FirmwareSelect');
         if (fwSelect) fwSelect.addEventListener('change', loadPreloadedFirmware);
-        
+
         // Tab switching
         document.querySelectorAll('.rt880-tab-btn').forEach(btn => {
             btn.addEventListener('click', () => showTab(btn.dataset.tab));

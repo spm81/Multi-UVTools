@@ -55,20 +55,41 @@ function updateH3Progress(percent) {
   if (h3FlashPct) h3FlashPct.textContent = `${Math.round(percent)}%`;
 }
 
+// ========== HELPER: Convert GitHub URLs to jsDelivr (avoids CORS issues) ==========
+function convertGitHubUrlH3(url) {
+  if (!url || !url.includes('github.com')) return url;
+
+  // Convert github.com/user/repo/blob/branch/path → cdn.jsdelivr.net/gh/user/repo@branch/path
+  let match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree|raw)\/([^\/]+)\/(.+)/);
+  if (match) {
+    const [, user, repo, type, branch, path] = match;
+    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+  }
+
+  // Convert raw.githubusercontent.com/user/repo/branch/path → cdn.jsdelivr.net/gh/user/repo@branch/path
+  match = url.match(/raw\.githubusercontent\.com\/([^\/]+)\/([^\/]+)\/([^\/]+)\/(.+)/);
+  if (match) {
+    const [, user, repo, branch, path] = match;
+    return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+  }
+
+  return url;
+}
+
 // ========== FIRMWARE LOADING ==========
 function processFirmwareData(data, name) {
   const fileBytes = new Uint8Array(data);
   const roundedLength = Math.ceil(fileBytes.length / 32) * 32;
-  
+
   if (roundedLength > 0xf800) {
     throw new Error("File too large (max 63488 bytes)");
   }
-  
+
   h3LastBlock = (roundedLength / 32) - 1;
   h3Firmware = new Uint8Array(roundedLength);
   h3Firmware.set(fileBytes);
   h3FirmwareName = name;
-  
+
   logH3(`✅ Firmware loaded: ${name} (${fileBytes.length} bytes)`, 'success');
   if (h3FirmwareStatus) {
     h3FirmwareStatus.textContent = `✅ Selected: ${name} (${fileBytes.length} bytes)`;
@@ -80,7 +101,15 @@ function processFirmwareData(data, name) {
 async function loadH3FirmwareFromUrl(url) {
   logH3(`Fetching firmware from URL...`);
   try {
-    const response = await fetch(url);
+    // Convert GitHub URLs to jsDelivr to avoid CORS
+    let fetchUrl = url;
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      fetchUrl = convertGitHubUrlH3(url);
+      if (fetchUrl !== url) {
+        logH3(`Converted GitHub URL to CDN: ${fetchUrl}`);
+      }
+    }
+    const response = await fetch(fetchUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const buffer = await response.arrayBuffer();
     const name = url.split('/').pop() || 'firmware.bin';
@@ -117,26 +146,39 @@ async function loadH3PreloadedFirmwares() {
   if (!h3FirmwareSelect) return;
 
   try {
-    const response = await fetch('firmware/firmware-links.json');
+    const response = await fetch('js/firmwares.json');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    
+
     h3FirmwareSelect.innerHTML = '<option value="">-- Select Firmware --</option>';
-    
+
     if (data.h3_firmwares && data.h3_firmwares.length > 0) {
       data.h3_firmwares.forEach(group => {
         const optgroup = document.createElement('optgroup');
         optgroup.label = group.group;
         group.firmwares.forEach(fw => {
+          // Skip entries with empty path
+          if (!fw.path) return;
           const option = document.createElement('option');
-          option.value = fw.url;
+          // Convert GitHub URLs via jsDelivr to avoid CORS
+          let fwUrl = fw.path;
+          if (fwUrl.startsWith('http://') || fwUrl.startsWith('https://')) {
+            fwUrl = convertGitHubUrlH3(fwUrl);
+          }
+          option.value = fwUrl;
           option.textContent = fw.name;
           optgroup.appendChild(option);
         });
-        h3FirmwareSelect.appendChild(optgroup);
+        // Only add optgroup if it has options
+        if (optgroup.children.length > 0) {
+          h3FirmwareSelect.appendChild(optgroup);
+        }
       });
     }
+
+    console.log('[H3] Preloaded firmwares loaded successfully');
   } catch (e) {
-    // No preloaded firmwares available
+    console.error('[H3] Failed to load firmwares:', e);
     h3FirmwareSelect.innerHTML = '<option value="">-- No preloaded firmwares --</option>';
   }
 }
@@ -187,7 +229,7 @@ async function detectH3() {
     for (let attempt = 0; attempt < 3 && !h3Detected; attempt++) {
       await h3Writer.write(H3_INIT_SEQUENCE);
       logH3(`Sending init sequence (attempt ${attempt + 1})...`);
-      
+
       // Wait for response
       const startTime = Date.now();
       while (Date.now() - startTime < 2000) {
@@ -195,7 +237,7 @@ async function detectH3() {
           h3Reader.read(),
           new Promise((_, reject) => setTimeout(() => reject('timeout'), 500))
         ]).catch(() => ({ value: null, done: false }));
-        
+
         if (value && value.length > 0) {
           if (value[0] === 0x89 || value.includes(0x89)) {
             h3Detected = true;
@@ -215,17 +257,17 @@ async function detectH3() {
 function createH3Block(blockNumber) {
   const offset = blockNumber * 32;
   const packet = new Uint8Array(37);
-  
+
   // Header
   packet[0] = 0xA1;
   packet[1] = (offset >> 8) & 0xFF;
   packet[2] = offset & 0xFF;
-  
+
   // Data (32 bytes)
   for (let i = 0; i < 32; i++) {
     packet[3 + i] = h3Firmware[offset + i] || 0x00;
   }
-  
+
   // Checksum
   let checksum = 0;
   for (let i = 0; i < 35; i++) {
@@ -233,7 +275,7 @@ function createH3Block(blockNumber) {
   }
   packet[35] = checksum;
   packet[36] = 0xA2;
-  
+
   return packet;
 }
 
@@ -242,81 +284,81 @@ async function flashH3() {
     logH3('❌ No firmware loaded!', 'error');
     return;
   }
-  
+
   h3Flashing = true;
   h3Started = true;
   h3Block = 0;
   h3Detected = false;
   setH3ActiveButtons();
   updateH3Progress(0);
-  
+
   logH3('🚀 Starting TD-H3/H8 flash process...');
   logH3(`📄 Firmware: ${h3FirmwareName}`);
   logH3('⚠️ Put radio in bootloader mode: Hold PTT + Power On');
-  
+
   try {
     // Request port
     logH3('Requesting serial port...');
     h3Port = await navigator.serial.requestPort();
-    
+
     // Open at 115200 baud
     logH3('Opening port at 115200 baud...');
     if (!await openH3Serial(115200)) {
       throw new Error('Failed to open serial port');
     }
-    
+
     // Detect bootloader
     logH3('Detecting bootloader...');
     if (!await detectH3()) {
       throw new Error('Bootloader not detected. Make sure radio is in bootloader mode (PTT + Power On)');
     }
-    
+
     // Flash blocks
     const totalBlocks = h3LastBlock + 1;
     logH3(`📝 Writing ${totalBlocks} blocks (${h3Firmware.length} bytes)...`);
-    
+
     for (h3Block = 0; h3Block <= h3LastBlock && h3Started; h3Block++) {
       const packet = createH3Block(h3Block);
       await h3Writer.write(packet);
-      
+
       // Wait for ACK
       const ackTimeout = setTimeout(() => {
         logH3(`⚠️ Block ${h3Block} ACK timeout`, 'warning');
       }, 1000);
-      
+
       try {
         const { value } = await Promise.race([
           h3Reader.read(),
           new Promise((_, reject) => setTimeout(() => reject('timeout'), 1000))
         ]);
         clearTimeout(ackTimeout);
-        
+
         if (!value || value[0] !== 0x06) {
           logH3(`⚠️ Block ${h3Block} - unexpected response`, 'warning');
         }
       } catch (e) {
         clearTimeout(ackTimeout);
       }
-      
+
       const progress = ((h3Block + 1) / totalBlocks) * 100;
       updateH3Progress(progress);
-      
+
       if ((h3Block + 1) % 50 === 0 || h3Block === h3LastBlock) {
         logH3(`Block ${h3Block + 1}/${totalBlocks} (${Math.round(progress)}%)`);
       }
     }
-    
+
     if (h3Started) {
       logH3('✅ Flash completed successfully!', 'success');
       logH3('🔄 Turn off the radio and turn it back on.');
       updateH3Progress(100);
     }
-    
+
   } catch (error) {
     logH3(`❌ Flashing failed: ${error.message}`, 'error');
     h3Started = false;
   }
-  
+
   closeH3Serial();
   h3Flashing = false;
   setH3ActiveButtons();
