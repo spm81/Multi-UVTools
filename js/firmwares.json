@@ -449,6 +449,11 @@
           "name": "E25WOP v5.0.2 Fusion+ V15",
           "path": "firmware/f4hwn.fusion+V15.v5.0.2.bin",
           "profile": "E25WOP"
+        },
+        {
+          "name": "E25WOP v5.1.0 Fusion+ V25",
+          "path": "firmware/f4hwn.fusion+v25.v5.1.0.bin",
+          "profile": "E25WOP"
         }
       ]
     },
