@@ -185,7 +185,7 @@ const updateUI = () => {
     const tk11Tabs = ['instructions', 'home', 'channels', 'tk11-settings'];
     const rt890Tabs = ['instructions', 'rt890-flash', 'rt890-tools'];
     const h3Tabs = ['instructions', 'h3-flash', 'h3-channels', 'h3-bandplan', 'h3-codeplug'];
-    const rt880Tabs = ['instructions', 'rt880-flash', 'rt880-monitor', 'rt880-spi'];
+    const rt880Tabs = ['instructions', 'rt880-flash', 'rt880-monitor', 'rt880-remote', 'rt880-spi'];
     
     if (isK5) {
       item.style.display = k5Tabs.includes(navTarget) ? '' : 'none';

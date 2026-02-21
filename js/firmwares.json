@@ -666,18 +666,19 @@
     {
       "group": "NicSure Firmware",
       "firmwares": [
-        {
-          "name": "RT-880 V1.15 (2025-06-12)",
-          "path": "https://github.com/nicsure/RT880-FWFlasher/raw/master/RT-880-V1.15_250612.bin",
-          "profile": "NicSure"
-        },
+
         {
           "name": "RT-880 V1.14",
           "path": "https://github.com/nicsure/RT880-FWFlasher/blob/master/RT880_V1.14.bin",
           "profile": "NicSure"
         },
         {
-          "name": "RT-880 V1.15 (2025-09-15)",
+          "name": "RT-880 V1.15 (2025-06-12)",
+          "path": "https://github.com/nicsure/RT880-FWFlasher/raw/master/RT-880-V1.15_250612.bin",
+          "profile": "NicSure"
+        },
+        {
+          "name": "RT-880 V1.16 (2025-09-15)",
           "path": "https://github.com/nicsure/RT880-FWFlasher/blob/master/RT-880_Upgrade_V1_16_250915.bin",
           "profile": "NicSure"
         }

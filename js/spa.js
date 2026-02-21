@@ -15,6 +15,7 @@ const pageTitles = {
   "h3-codeplug": "TD-H3/H8 Codeplug",
   "rt880-flash": "RT-880 Flash",
   "rt880-monitor": "RT-880 Monitor",
+  "rt880-remote": "RT-880 Web Remote",
   "rt880-spi": "RT-880 SPI Backup",
 };
 
