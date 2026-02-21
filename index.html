@@ -294,6 +294,7 @@
             <a href="#h3-codeplug" class="nav-item h3-only" data-nav="h3-codeplug" style="display: none;">Codeplug</a>
             <a href="#rt880-flash" class="nav-item rt880-only" data-nav="rt880-flash" style="display: none;">Flash</a>
             <a href="#rt880-monitor" class="nav-item rt880-only" data-nav="rt880-monitor" style="display: none;">Monitor</a>
+            <a href="#rt880-remote" class="nav-item rt880-only" data-nav="rt880-remote" style="display: none;">Web Remote</a>
             <a href="#rt880-spi" class="nav-item rt880-only" data-nav="rt880-spi" style="display: none;">SPI Backup</a>
             <a href="#spectrum" class="nav-item k5-only" data-nav="spectrum">Spectrum</a>
             <a href="#unbricking" class="nav-item k5-only" data-nav="unbricking">Unbricking</a>
@@ -3997,7 +3998,90 @@
         </section>
       </section>
 
-      <!-- RT-880 SPI Backup Page -->
+      <!-- RT-880 Web Remote Page -->
+      <section class="page rt880-only" id="rt880-remote" data-page style="display: none;">
+        <header class="hero">
+          <div>
+            <p class="eyebrow">RT-880 WEB REMOTE</p>
+            <h1>RT-880 Web Remote</h1>
+            <p class="subtitle">Remote control interface for nicFW880 firmware via Web Serial at 38400 baud.</p>
+            <p class="subtitle muted" style="font-size: 0.85rem; margin-top: 0.5rem;">
+              Based on <a href="https://github.com/nicsure/webremote_nicfw880" target="_blank" style="color: var(--primary);">NicSure's Web Remote</a>
+            </p>
+          </div>
+        </header>
+
+        <section class="panel-grid">
+          <section class="panel" style="max-width: 100%;">
+            <h2>Remote Control</h2>
+            <p class="muted">Connect to your RT-880 running nicFW880 firmware to control it remotely.</p>
+
+            <!-- Toolbar -->
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; padding: 12px; background: var(--bg-hover, #f0f3fb); border-radius: 8px;">
+              <button id="rt880RemoteConnectBtn" class="primary">Connect</button>
+              <button id="rt880RemoteDisconnectBtn" class="secondary" disabled>Disconnect</button>
+              <button id="rt880RemoteStartBtn" class="secondary" disabled>Start Session</button>
+              <button id="rt880RemoteExitBtn" class="secondary" disabled>Exit Session</button>
+              <button id="rt880RemoteClearBtn" class="secondary">Clear Display</button>
+              <div style="margin-left: auto; display: flex; flex-direction: column; gap: 2px; font-size: 0.85rem; color: var(--text-muted);">
+                <span id="rt880RemoteStatus">Disconnected</span>
+                <span id="rt880RemotePing">Ping: --</span>
+                <span id="rt880RemoteChecksum">Checksum: --</span>
+              </div>
+            </div>
+
+            <!-- Display + Keypad layout -->
+            <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start;">
+              <!-- Display Panel -->
+              <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--text);">
+                  <span id="rt880RemoteLed" style="width: 64px; height: 12px; border-radius: 4px; background: #1c1e26; border: 2px solid #1c1e26; display: inline-block;"></span>
+                  <span>LED</span>
+                </div>
+                <canvas id="rt880RemoteDisplay" width="480" height="640" style="border-radius: 12px; border: 2px solid var(--border, #1c1e26); background: #000; image-rendering: pixelated; width: 480px; height: 640px;"></canvas>
+              </div>
+
+              <!-- Keypad -->
+              <div style="display: grid; grid-template-columns: auto 1fr; gap: 16px; background: var(--bg-card, #fff); padding: 16px; border-radius: 12px; border: 1px solid var(--border);">
+                <!-- Side keys -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <button class="rt880r-key" data-key="0x13" data-release="0xFE" style="width: 90px; min-height: 142px; background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">PTT</button>
+                  <button class="rt880r-key" data-key="0x10" data-release="0xFF" style="width: 90px; min-height: 98px; background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">S1</button>
+                  <button class="rt880r-key" data-key="0x11" data-release="0xFF" style="width: 90px; min-height: 98px; background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">S2</button>
+                </div>
+                <!-- Grid keys -->
+                <div style="display: grid; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(7, 44px); gap: 10px;">
+                  <button class="rt880r-key" data-key="0x12" data-release="0xFF" style="background: #c76b00; color: #1c1e26; border: 1px solid #9a5200; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1.2rem;" title="Emergency">⚠</button>
+                  <button class="rt880r-key" data-key="0x0D" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">↑</button>
+                  <span></span>
+                  <button class="rt880r-key" data-key="0x0C" data-release="0xFF" style="background: #0f7a3c; color: #fff; border: 1px solid #0b5b2d; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1.2rem;" title="Menu">☰</button>
+                  <button class="rt880r-key" data-key="0x0E" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">↓</button>
+                  <button class="rt880r-key" data-key="0x0F" data-release="0xFF" style="background: #b8161f; color: #fff; border: 1px solid #8f1017; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1.2rem;" title="Back">⨯</button>
+                  <span></span><span></span><span></span>
+                  <button class="rt880r-key" data-key="0x00" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">1</button>
+                  <button class="rt880r-key" data-key="0x04" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">2</button>
+                  <button class="rt880r-key" data-key="0x08" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">3</button>
+                  <button class="rt880r-key" data-key="0x01" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">4</button>
+                  <button class="rt880r-key" data-key="0x05" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">5</button>
+                  <button class="rt880r-key" data-key="0x09" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">6</button>
+                  <button class="rt880r-key" data-key="0x02" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">7</button>
+                  <button class="rt880r-key" data-key="0x06" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">8</button>
+                  <button class="rt880r-key" data-key="0x0A" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">9</button>
+                  <button class="rt880r-key" data-key="0x03" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">*</button>
+                  <button class="rt880r-key" data-key="0x07" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">0</button>
+                  <button class="rt880r-key" data-key="0x0B" data-release="0xFF" style="background: var(--bg-hover, #e2e6f3); border: 1px solid var(--border); border-radius: 8px; font-weight: 600; cursor: pointer; color: var(--text);">#</button>
+                </div>
+              </div>
+            </div>
+
+            <p class="hint" style="margin-top: 16px;">
+              ⚠️ Requires nicFW880 firmware with remote protocol support. The radio must be on and connected via USB at 38400 baud.
+              This connection is independent from the main app connection.
+            </p>
+          </section>
+        </section>
+      </section>
+
       <section class="page rt880-only" id="rt880-spi" data-page style="display: none;">
         <header class="hero">
           <div>
@@ -5000,6 +5084,7 @@
       <script src="js/h3-bandplan-ui.js"></script>
       <script src="js/h3-codeplug-ui.js"></script>
       <script src="js/flash-rt880-ui.js"></script>
+      <script src="js/rt880-remote.js"></script>
       <script>
         // Initialize RT-880 Flash when DOM is ready
         if (typeof initRt880Flash === 'function') {
