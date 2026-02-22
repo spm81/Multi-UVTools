@@ -356,6 +356,27 @@
           </div>
         </header>
 
+
+        <header class="hero h3-only" style="display: none;">
+          <div>
+            <p class="eyebrow">INTRO</p>
+            <h1>Instructions</h1>
+            <p class="subtitle">
+              Welcome to Multi-UVTools. This application helps you manage your TIDRadio TD-H3/H8 radio.
+            </p>
+          </div>
+        </header>
+
+        <header class="hero rt880-only" style="display: none;">
+          <div>
+            <p class="eyebrow">INTRO</p>
+            <h1>Instructions</h1>
+            <p class="subtitle">
+              Welcome to Multi-UVTools. This application helps you manage your Radtel RT-880 / iRadio UV-98 radio.
+            </p>
+          </div>
+        </header>
+
         <!-- K5 Instructions -->
         <section class="panel k5-only">
           <h2>Getting Started</h2>
@@ -462,6 +483,291 @@
             </p>
           </div>
         </section>
+
+        <!-- H3 Instructions -->
+        <section class="panel h3-only" style="display: none;">
+          <h2>Getting Started with TD-H3/H8</h2>
+          <p>Connect your TIDRadio TD-H3 or TD-H8 via USB-C cable. The radio uses the <strong>nicFW</strong> custom firmware by NicSure.</p>
+          
+          <div style="margin-top: 1.2rem; padding: 1rem; background: #f59e0b22; border: 1px solid #f59e0b; border-radius: 8px; color: #f59e0b;">
+            ⚠️ <strong>Important:</strong> nicFW is a standalone firmware — do NOT use TIDStation to flash or configure it. Use this website instead.
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">📻 About the Radios</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.8rem;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #ffd700; margin-bottom: 0.5rem;">🔹 TIDRadio TD-H3</h4>
+              <ul style="list-style: disc; margin-left: 1.2rem; line-height: 1.8; color: #a2d2ff; font-size: 0.95rem;">
+                <li>8-Band coverage (HF/VHF/UHF/Air Band)</li>
+                <li>5W output power</li>
+                <li>Compact and lightweight design</li>
+                <li>USB-C charging &amp; programming</li>
+                <li>Bluetooth programming support</li>
+                <li>Dual PTT buttons</li>
+                <li>FM/AM reception including Air Band</li>
+                <li>Frequency copy (wireless cloning)</li>
+              </ul>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #ffd700; margin-bottom: 0.5rem;">🔹 TIDRadio TD-H8</h4>
+              <ul style="list-style: disc; margin-left: 1.2rem; line-height: 1.8; color: #a2d2ff; font-size: 0.95rem;">
+                <li>VHF/UHF focused amateur radio</li>
+                <li>10W output power (higher than H3)</li>
+                <li>Scanning function</li>
+                <li>LED indicator light</li>
+                <li>MIC gain adjustment</li>
+                <li>More privacy encoding options (DCS/CTCSS)</li>
+                <li>USB-C charging &amp; programming</li>
+                <li>Designed for amateur radio enthusiasts</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">🔧 Available Features</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 2;">
+            <li><strong>🔥 Flash:</strong> Flash nicFW firmware for TD-H3 and TD-H8 radios. Choose from pre-loaded firmwares, upload a .bin file, or paste a URL. Supports multiple firmware versions from NicSure.</li>
+            <li><strong>📡 Channels:</strong> Read, edit, and write channel configurations directly to/from the radio via serial connection. Supports CSV import/export for easy channel management and sharing.</li>
+            <li><strong>📊 Band Plan:</strong> Configure frequency band restrictions and settings. Edit which bands are enabled/disabled and their power/modulation settings. CSV import/export supported.</li>
+            <li><strong>💾 Codeplug:</strong> Full codeplug backup and restore (8KB .nfw files). Save your complete radio configuration and restore it anytime, or share it with other users.</li>
+          </ul>
+
+          <h3 style="margin-top: 1.5rem;">⚡ How to Enter Bootloader Mode (for Flashing)</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.8rem;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #e94560; margin-bottom: 0.5rem;">TD-H3 Bootloader</h4>
+              <ol style="margin-left: 1.2rem; line-height: 2; color: #a2d2ff;">
+                <li>Turn OFF the radio</li>
+                <li>Connect the USB-C cable to your computer</li>
+                <li>Press and <strong>hold PTT</strong></li>
+                <li>While holding PTT, turn ON the radio</li>
+                <li>Release PTT — the screen should stay blank (bootloader mode)</li>
+              </ol>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #e94560; margin-bottom: 0.5rem;">TD-H8 Bootloader</h4>
+              <ol style="margin-left: 1.2rem; line-height: 2; color: #a2d2ff;">
+                <li>Turn OFF the radio</li>
+                <li>Connect the USB-C cable to your computer</li>
+                <li>Press and <strong>hold the Flashlight button</strong></li>
+                <li>While holding Flashlight, turn ON the radio</li>
+                <li>Release — the screen should stay blank (bootloader mode)</li>
+              </ol>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">📖 Channels &amp; Band Plan (Normal Mode)</h3>
+          <p style="line-height: 1.8; color: #a2d2ff;">
+            For <strong>Channels</strong>, <strong>Band Plan</strong>, and <strong>Codeplug</strong> operations, the radio must be in <strong>normal operating mode</strong> (NOT bootloader mode). 
+            Simply turn on the radio normally and connect the USB-C cable. Click "Serial Port" to establish the connection, then use "Read" to load data from the radio or "Write" to save changes back.
+          </p>
+
+          <h3 style="margin-top: 1.5rem;">💡 Tips &amp; Tricks</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 2;">
+            <li><strong>CSV Import/Export:</strong> Save your channels or band plan as CSV to edit in a spreadsheet app, then load them back.</li>
+            <li><strong>Codeplug Sharing:</strong> Use the Codeplug Manager to share complete radio configurations (.nfw files) with friends or the community.</li>
+            <li><strong>Always backup first:</strong> Before flashing new firmware, use the Codeplug Manager to save your current configuration.</li>
+            <li><strong>Browser compatibility:</strong> Web Serial API requires Chrome, Edge, or Opera. Firefox and Safari are not supported.</li>
+          </ul>
+
+          <div style="margin-top: 1.5rem; padding: 1.2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #ffd700; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              📚 Resources &amp; Community
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <a href="https://github.com/nicsure/TD-H3-Engineering" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                NicSure's TD-H3 Engineering (GitHub) — firmware, schematics, documentation
+              </a>
+              <a href="https://github.com/nicsure/nicfw2docs" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                nicFW User Manual (PDF) — complete guide for nicFW on TD-H3
+              </a>
+              <a href="https://www.facebook.com/groups/456942886822492" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                TIDRadio TD-H3 Hacking Group (Facebook)
+              </a>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #e94560; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              Open Source Project
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              This website is available on my GitHub (<a href="https://github.com/spm81/Multi-UVTools" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm81</a>) <strong style="color: #fff;">Matoz</strong>.
+            </p>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
+            </p>
+            <p style="color: #e94560; font-weight: bold; font-size: 1.1rem; margin-top: 1rem;">
+              I hope you enjoy my work! 🚀
+            </p>
+          </div>
+        </section>
+
+
+        <!-- RT-880 Instructions -->
+        <section class="panel rt880-only" style="display: none;">
+          <h2>Getting Started with RT-880 / UV-98</h2>
+          <p>Connect your Radtel RT-880, RT-880G, or iRadio UV-98 via USB-C cable. This section supports the <strong>nicFW880</strong> custom firmware by NicSure.</p>
+          
+          <div style="margin-top: 1.2rem; padding: 1rem; background: #f59e0b22; border: 1px solid #f59e0b; border-radius: 8px; color: #f59e0b;">
+            ⚠️ <strong>Important:</strong> Some features (Web Remote, SPI Backup) require nicFW880 firmware. Flash operations work with both stock and custom firmware.
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">📻 About the Radios</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 0.8rem;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #ffd700; margin-bottom: 0.5rem;">🔹 Radtel RT-880</h4>
+              <ul style="list-style: disc; margin-left: 1.2rem; line-height: 1.8; color: #a2d2ff; font-size: 0.95rem;">
+                <li>10W output power (multi-band)</li>
+                <li>HF/VHF/UHF coverage</li>
+                <li>AM, FM, USB, LSB, CW modes</li>
+                <li>CB, LW, MW, SW, SSB reception</li>
+                <li>1024 channels</li>
+                <li>Cross-band repeater capability</li>
+                <li>2400mAh battery</li>
+                <li>USB-C charging &amp; programming</li>
+              </ul>
+            </div>
+            <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px;">
+              <h4 style="color: #ffd700; margin-bottom: 0.5rem;">🔹 iRadio UV-98 Pro</h4>
+              <ul style="list-style: disc; margin-left: 1.2rem; line-height: 1.8; color: #a2d2ff; font-size: 0.95rem;">
+                <li>Same hardware platform as RT-880</li>
+                <li>Multi-band HF/VHF/UHF</li>
+                <li>AM, FM, USB, LSB, CW modes</li>
+                <li>Full SSB reception support</li>
+                <li>USB-C interface</li>
+                <li>Compatible with RT-880 firmware</li>
+                <li>Same flash protocol</li>
+                <li>All tools work identically</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">🔧 Available Features</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 2;">
+            <li><strong>🔥 Flash:</strong> Flash firmware for RT-880 and UV-98 radios. Choose from pre-loaded nicFW880 firmwares, upload a .bin file, or paste a URL. Select your radio model before flashing.</li>
+            <li><strong>📡 Monitor:</strong> Real-time serial monitor at 115200 baud. View serial output in Text or Hex mode. Useful for debugging, monitoring radio status, and observing firmware messages.</li>
+            <li><strong>🎮 Web Remote:</strong> Full remote control interface for radios running nicFW880 firmware. See the radio display in real time and control all buttons (PTT, keypad, menu, etc.) from your browser at 38400 baud.</li>
+            <li><strong>💾 SPI Backup:</strong> Backup the full 4MB SPI flash memory at 230400 baud. Requires special firmware or bootloader that supports SPI dump via serial port. Essential for full radio recovery.</li>
+          </ul>
+
+          <h3 style="margin-top: 1.5rem;">⚡ How to Enter Bootloader Mode (for Flashing)</h3>
+          <div style="padding: 1rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 10px; margin-top: 0.8rem;">
+            <h4 style="color: #e94560; margin-bottom: 0.5rem;">RT-880 / UV-98 Bootloader</h4>
+            <ol style="margin-left: 1.2rem; line-height: 2; color: #a2d2ff;">
+              <li>Turn OFF the radio completely</li>
+              <li>Connect the USB-C cable to your computer</li>
+              <li>Press and <strong>hold PTT</strong></li>
+              <li>While holding PTT, turn ON the radio</li>
+              <li>Release PTT — the screen should stay blank or show bootloader indicator</li>
+              <li>The radio is now ready to receive firmware</li>
+            </ol>
+            <p style="color: #f59e0b; margin-top: 0.8rem; font-size: 0.9rem;">
+              💡 <strong>Tip:</strong> If the radio shows its normal boot screen, try again — make sure you're holding PTT <em>before</em> turning the power on.
+            </p>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">🎮 Web Remote (nicFW880 only)</h3>
+          <p style="line-height: 1.8; color: #a2d2ff;">
+            The Web Remote connects to your radio at <strong>38400 baud</strong> and streams the display in real time to your browser. 
+            You can click the on-screen buttons to control the radio remotely — perfect for operating the radio from your desk without touching it.
+          </p>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 2; margin-top: 0.5rem;">
+            <li><strong>Connect:</strong> Opens the serial port at 38400 baud</li>
+            <li><strong>Start Session:</strong> Begins streaming the display and enables button control</li>
+            <li><strong>Keypad:</strong> Full keypad including PTT, side keys (S1/S2), menu, navigation, and number pad</li>
+            <li><strong>LED indicator:</strong> Shows the current LED color status from the radio</li>
+            <li><strong>Status panel:</strong> Shows connection state, ping time, and checksum info</li>
+          </ul>
+
+          <h3 style="margin-top: 1.5rem;">🔌 Serial Baud Rates</h3>
+          <div style="overflow-x: auto; margin-top: 0.8rem;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+              <thead>
+                <tr style="border-bottom: 2px solid #0f3460;">
+                  <th style="text-align: left; padding: 8px 12px; color: #ffd700;">Feature</th>
+                  <th style="text-align: left; padding: 8px 12px; color: #ffd700;">Baud Rate</th>
+                  <th style="text-align: left; padding: 8px 12px; color: #ffd700;">Mode</th>
+                </tr>
+              </thead>
+              <tbody style="color: #a2d2ff;">
+                <tr style="border-bottom: 1px solid #0f3460;">
+                  <td style="padding: 8px 12px;">Flash Firmware</td>
+                  <td style="padding: 8px 12px;"><code>115200</code></td>
+                  <td style="padding: 8px 12px;">Bootloader</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #0f3460;">
+                  <td style="padding: 8px 12px;">Serial Monitor</td>
+                  <td style="padding: 8px 12px;"><code>115200</code></td>
+                  <td style="padding: 8px 12px;">Normal</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #0f3460;">
+                  <td style="padding: 8px 12px;">Web Remote</td>
+                  <td style="padding: 8px 12px;"><code>38400</code></td>
+                  <td style="padding: 8px 12px;">Normal (nicFW880)</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 12px;">SPI Backup</td>
+                  <td style="padding: 8px 12px;"><code>230400</code></td>
+                  <td style="padding: 8px 12px;">Special firmware/bootloader</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 style="margin-top: 1.5rem;">💡 Tips &amp; Tricks</h3>
+          <ul style="list-style: disc; margin-left: 2rem; line-height: 2;">
+            <li><strong>SPI Backup first:</strong> Before any major firmware change, do a full SPI backup (4MB) — this is your ultimate safety net for full radio recovery.</li>
+            <li><strong>Web Remote connection:</strong> The Web Remote uses an independent serial connection — it does not conflict with other tools.</li>
+            <li><strong>Radio model selection:</strong> When flashing, select the correct model (RT-880 or UV-98) to ensure the correct firmware variant is used.</li>
+            <li><strong>Monitor modes:</strong> Use Text mode for readable serial output, or switch to Hex mode to inspect raw protocol data.</li>
+            <li><strong>Browser compatibility:</strong> Web Serial API requires Chrome, Edge, or Opera. Firefox and Safari are not supported.</li>
+          </ul>
+
+          <div style="margin-top: 1.5rem; padding: 1.2rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #ffd700; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              📚 Resources &amp; Community
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+              <a href="https://github.com/nicsure/webremote_nicfw880" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                NicSure's Web Remote for nicFW880 (GitHub) — original web remote project
+              </a>
+              <a href="https://www.patreon.com/nicsure" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M14.82 2.41c3.96 0 7.18 3.24 7.18 7.21 0 3.96-3.22 7.18-7.18 7.18-3.97 0-7.21-3.22-7.21-7.18 0-3.97 3.24-7.21 7.21-7.21M2 21.6h3.5V2.41H2V21.6z"/></svg>
+                NicSure on Patreon — latest nicFW880 beta releases and updates
+              </a>
+              <a href="https://community.allstarlink.org/t/radtel-rt-880-development/23813" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                RT-880 Development Thread (AllStarLink) — community discussion and development
+              </a>
+              <a href="https://www.radtels.com/" target="_blank" style="color: #a2d2ff; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                Radtel Official Website — firmware updates, manuals, Q&amp;A
+              </a>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem; padding: 1.5rem; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 1px solid #0f3460; border-radius: 12px;">
+            <h3 style="color: #e94560; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+              Open Source Project
+            </h3>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              This website is available on my GitHub (<a href="https://github.com/spm81/Multi-UVTools" target="_blank" style="color: #e94560; text-decoration: none; font-weight: bold;">spm81</a>) <strong style="color: #fff;">Matoz</strong>.
+            </p>
+            <p style="color: #a2d2ff; line-height: 1.6; margin-bottom: 0.5rem;">
+              The code is open so that everyone can contribute to and improve the site. You can also ask to add your custom firmware or simply make pull requests on GitHub, and I will then add them to my code.
+            </p>
+            <p style="color: #e94560; font-weight: bold; font-size: 1.1rem; margin-top: 1rem;">
+              I hope you enjoy my work! 🚀
+            </p>
+          </div>
+        </section>
+
       </section>
 
       <section class="page" id="home" data-page>

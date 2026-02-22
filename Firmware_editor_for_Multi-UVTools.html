@@ -580,6 +580,163 @@
                 flex-wrap: wrap;
             }
         }
+
+        .fw-move-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 3px 5px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            color: #f39c12;
+        }
+
+        .fw-move-btn:hover {
+            background-color: rgba(243, 156, 18, 0.1);
+        }
+
+        .fw-move-btn:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .fw-move-btn:disabled:hover {
+            background-color: transparent;
+        }
+
+        .fw-position {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            min-width: 35px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .stats-panel {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-panel h2 {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 5px;
+        }
+
+        .stat-card.total .stat-value {
+            color: #f39c12;
+        }
+
+        .stat-card.groups .stat-value {
+            color: #2ecc71;
+        }
+
+        .stats-breakdown {
+            margin-top: 15px;
+        }
+
+        .stats-breakdown h3 {
+            font-size: 1rem;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .breakdown-table th,
+        .breakdown-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .breakdown-table th {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .breakdown-table td {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .breakdown-table .fw-count {
+            font-weight: 700;
+            color: #3498db;
+        }
+
+        .breakdown-table .group-count {
+            font-weight: 700;
+            color: #2ecc71;
+        }
+
+        .stats-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stats-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .stats-details {
+            display: none;
+        }
+
+        .stats-details.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -607,6 +764,18 @@
             </div>
         </header>
         
+
+        <div class="stats-panel" id="statsPanel" style="display: none;">
+            <h2><i class="fas fa-chart-bar"></i> Firmware Statistics</h2>
+            <div class="stats-grid" id="statsGrid"></div>
+            <button class="stats-toggle" id="statsToggle">
+                <i class="fas fa-table"></i> Show Detailed Breakdown
+            </button>
+            <div class="stats-details" id="statsDetails">
+                <div class="stats-breakdown" id="statsBreakdown"></div>
+            </div>
+        </div>
+
         <div class="category-selector">
             <button class="category-btn active" data-category="k5_firmwares">UV-K5 Firmwares</button>
             <button class="category-btn" data-category="k1_firmwares">UV-K1 Firmwares</button>
@@ -805,6 +974,7 @@
                     firmwareData = JSON.parse(savedData);
                     loadCategory(currentCategory);
                     updateJSONDisplay();
+                    updateStats();
                     showNotification('Loaded data from local storage', 'info');
                 } catch (e) {
                     console.error('Error loading from local storage:', e);
@@ -844,7 +1014,7 @@
                     const data = JSON.parse(e.target.result);
                     
                     // Validate the JSON structure
-                    if (!data.k5_firmwares && !data.k1_firmwares && !data.rt890_firmwares) {
+                    if (!data.k5_firmwares && !data.k1_firmwares && !data.rt890_firmwares && !data.h3_firmwares && !data.rt880_firmwares) {
                         throw new Error('Invalid firmware JSON structure');
                     }
                     
@@ -855,6 +1025,7 @@
                     updateJSONDisplay();
                     hideEmptyState();
                     
+                    updateStats();
                     showNotification(`Loaded ${file.name} successfully`, 'success');
                     
                     // Save to local storage
@@ -927,6 +1098,7 @@
             groupEditor.style.display = 'none';
             
             updateJSONDisplay();
+            updateStats();
         }
 
         // Update active category button
@@ -1009,6 +1181,7 @@
             // Save to local storage
             localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
             
+            updateStats();
             showNotification('Group moved up', 'success');
         }
 
@@ -1040,6 +1213,7 @@
             // Save to local storage
             localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
             
+            updateStats();
             showNotification('Group moved down', 'success');
         }
 
@@ -1063,12 +1237,20 @@
                 firmwareItem.className = 'firmware-item';
                 firmwareItem.setAttribute('data-index', index);
                 
+                const totalFw = group.firmwares.length;
                 firmwareItem.innerHTML = `
                     <div class="firmware-info">
                         <div class="firmware-name">${firmware.name}</div>
                         <div class="firmware-path">${firmware.path}</div>
                     </div>
                     <div class="firmware-actions">
+                        <button class="action-btn fw-move-btn fw-move-up" data-index="${index}" ${index === 0 ? 'disabled' : ''} title="Move Up">
+                            <i class="fas fa-arrow-up"></i>
+                        </button>
+                        <span class="fw-position">${index + 1}/${totalFw}</span>
+                        <button class="action-btn fw-move-btn fw-move-down" data-index="${index}" ${index === totalFw - 1 ? 'disabled' : ''} title="Move Down">
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
                         <button class="action-btn edit-btn" data-index="${index}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -1095,6 +1277,52 @@
                     deleteFirmware(index);
                 });
             });
+
+            document.querySelectorAll('.fw-move-up').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    moveFirmwareUp(index);
+                });
+            });
+
+            document.querySelectorAll('.fw-move-down').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = parseInt(e.currentTarget.dataset.index);
+                    moveFirmwareDown(index);
+                });
+            });
+        }
+
+
+        // Move firmware up within its group
+        function moveFirmwareUp(index) {
+            if (!firmwareData || index <= 0) return;
+
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            [group.firmwares[index], group.firmwares[index - 1]] =
+            [group.firmwares[index - 1], group.firmwares[index]];
+
+            loadFirmwares();
+            updateJSONDisplay();
+            updateStats();
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            showNotification('Firmware moved up', 'success');
+        }
+
+        // Move firmware down within its group
+        function moveFirmwareDown(index) {
+            if (!firmwareData) return;
+            const group = firmwareData[currentCategory][currentGroupIndex];
+            if (index >= group.firmwares.length - 1) return;
+
+            [group.firmwares[index], group.firmwares[index + 1]] =
+            [group.firmwares[index + 1], group.firmwares[index]];
+
+            loadFirmwares();
+            updateJSONDisplay();
+            updateStats();
+            localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
+            showNotification('Firmware moved down', 'success');
         }
 
         // Add a new firmware to the current group
@@ -1129,6 +1357,7 @@
             updateJSONDisplay();
             
             showNotification('Firmware added successfully', 'success');
+            updateStats();
             
             // Save to local storage
             localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
@@ -1176,6 +1405,7 @@
             updateJSONDisplay();
             
             showNotification('Firmware updated successfully', 'success');
+            updateStats();
             
             // Save to local storage
             localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
@@ -1194,6 +1424,7 @@
                 updateJSONDisplay();
                 
                 showNotification('Firmware deleted successfully', 'success');
+                updateStats();
                 
                 // Save to local storage
                 localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
@@ -1212,6 +1443,7 @@
                 updateJSONDisplay();
                 
                 showNotification('Group deleted successfully', 'success');
+                updateStats();
                 
                 // Save to local storage
                 localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
@@ -1225,7 +1457,9 @@
                 firmwareData = {
                     k5_firmwares: [],
                     k1_firmwares: [],
-                    rt890_firmwares: []
+                    rt890_firmwares: [],
+                    h3_firmwares: [],
+                    rt880_firmwares: []
                 };
                 hideEmptyState();
             }
@@ -1270,6 +1504,7 @@
             updateJSONDisplay();
             
             showNotification('Group added successfully', 'success');
+            updateStats();
             
             // Save to local storage
             localStorage.setItem('firmwareData', JSON.stringify(firmwareData));
@@ -1329,6 +1564,102 @@
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
+        }
+
+
+        // Update statistics panel
+        function updateStats() {
+            if (!firmwareData) {
+                document.getElementById('statsPanel').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('statsPanel').style.display = 'block';
+
+            const categoryNames = {
+                k5_firmwares: 'UV-K5',
+                k1_firmwares: 'UV-K1',
+                rt890_firmwares: 'RT-890',
+                h3_firmwares: 'TD-H3/H8',
+                rt880_firmwares: 'RT-880'
+            };
+
+            let totalFirmwares = 0;
+            let totalGroups = 0;
+            let categoryStats = [];
+
+            Object.keys(categoryNames).forEach(cat => {
+                const groups = firmwareData[cat] || [];
+                const groupCount = groups.length;
+                let fwCount = 0;
+                let groupDetails = [];
+
+                groups.forEach(g => {
+                    const count = g.firmwares ? g.firmwares.length : 0;
+                    fwCount += count;
+                    groupDetails.push({ name: g.group, count: count });
+                });
+
+                totalFirmwares += fwCount;
+                totalGroups += groupCount;
+
+                categoryStats.push({
+                    key: cat,
+                    name: categoryNames[cat],
+                    groups: groupCount,
+                    firmwares: fwCount,
+                    groupDetails: groupDetails
+                });
+            });
+
+            // Render stat cards
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = `
+                <div class="stat-card total">
+                    <div class="stat-value">${totalFirmwares}</div>
+                    <div class="stat-label">Total Firmwares</div>
+                </div>
+                <div class="stat-card groups">
+                    <div class="stat-value">${totalGroups}</div>
+                    <div class="stat-label">Total Groups</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${categoryStats.filter(c => c.firmwares > 0).length}</div>
+                    <div class="stat-label">Active Categories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">${totalGroups > 0 ? (totalFirmwares / totalGroups).toFixed(1) : 0}</div>
+                    <div class="stat-label">Avg FW / Group</div>
+                </div>
+            `;
+
+            // Render breakdown table
+            const statsBreakdown = document.getElementById('statsBreakdown');
+            let breakdownHtml = '<h3><i class="fas fa-list"></i> Breakdown by Category &amp; Group</h3>';
+
+            categoryStats.forEach(cat => {
+                breakdownHtml += `
+                    <table class="breakdown-table">
+                        <thead>
+                            <tr>
+                                <th colspan="2">${cat.name} — <span class="group-count">${cat.groups} groups</span>, <span class="fw-count">${cat.firmwares} firmwares</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
+                if (cat.groupDetails.length === 0) {
+                    breakdownHtml += '<tr><td colspan="2" style="color: rgba(255,255,255,0.4); font-style: italic;">No groups</td></tr>';
+                } else {
+                    cat.groupDetails.forEach(g => {
+                        breakdownHtml += `<tr><td>${g.name}</td><td class="fw-count">${g.count} firmwares</td></tr>`;
+                    });
+                }
+
+                breakdownHtml += '</tbody></table>';
+            });
+
+            statsBreakdown.innerHTML = breakdownHtml;
         }
 
         // Setup event listeners
@@ -1393,6 +1724,18 @@
             // Confirm edit firmware button
             confirmEditFirmwareBtn.addEventListener('click', saveEditedFirmware);
             
+            // Stats toggle
+            document.getElementById('statsToggle').addEventListener('click', () => {
+                const details = document.getElementById('statsDetails');
+                const toggle = document.getElementById('statsToggle');
+                details.classList.toggle('show');
+                if (details.classList.contains('show')) {
+                    toggle.innerHTML = '<i class="fas fa-table"></i> Hide Detailed Breakdown';
+                } else {
+                    toggle.innerHTML = '<i class="fas fa-table"></i> Show Detailed Breakdown';
+                }
+            });
+
             // Close modals when clicking outside
             window.addEventListener('click', (e) => {
                 if (e.target === addGroupModal) {

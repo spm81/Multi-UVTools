@@ -289,12 +289,12 @@
       "group": "SU-75 Firmware",
       "firmwares": [
         {
-          "name": "SU-75 CFW (Last Verison)",
+          "name": "SU-75 CFW (Last Version)",
           "path": "https://github.com/igimalek/Port/blob/main/compiled-firmware/su75.ru.packed.bin",
           "profile": "SU-75"
         },
         {
-          "name": "SU-75 CFW (Last Verison) (512k)",
+          "name": "SU-75 CFW (Last Version) (512k)",
           "path": "https://github.com/igimalek/Port/blob/main/compiled-firmware/su75.512k.ru.packed.bin",
           "profile": "SU-75"
         }
@@ -503,7 +503,7 @@
       ]
     },
     {
-      "group": "Quansheng Stock Firware",
+      "group": "Quansheng Stock Firmware",
       "firmwares": [
         {
           "name": "Quansheng Stock v7.00.11 (K5v3)",
@@ -652,12 +652,117 @@
   ],
   "h3_firmwares": [
     {
-      "group": "Stock Firmware",
+      "group": "Nicsure Engineering",
       "firmwares": [
         {
-          "name": "TD-H3 Stock Firmware",
-          "path": "",
-          "profile": "Stock"
+          "name": "137AB H3 24-05-30",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/137AB_H3_240530.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "EEPROM WIPE",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/EEPROM_WIPE.bin",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "MicGainFix H3 24-05-30",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/MicGainFix_H3_240530.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 V7.3X3 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_V7.3X3_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.2 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.2_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.3X1 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.3X1_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.6 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.6_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.7 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.7_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.8X1 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.8X1_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMODH3 v7.9 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMODH3_v7.9_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMOD V6.1 NOS 24-06-25 nicsuremod logo",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMOD_V6.1_NOS_240625-nicsuremod-logo.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMOD V6.1 NOS 24-06-25",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMOD_V6.1_NOS_240625.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMOD V6.2 H3 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMOD_V6.2_H3_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICMOD V7 24-07-02",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICMOD_V7_240702.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD 24-06-06 v3",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_240606v3.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD 24-06-06 v4.1",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_240606v4.1.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD 24-06-06 v4",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_240606v4.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD 24-06-06 v5",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_240606v5.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD V5.1 H3 24-06-25",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_V5.1_H3_240625.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "NICSUREMOD V6 24-06-25",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/NICSUREMOD_V6_240625.BIN",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "h3bootloader",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/h3bootloader.bin",
+          "profile": "Nicsure"
+        },
+        {
+          "name": "patched H3 24-05-30",
+          "path": "https://github.com/nicsure/TD-H3-Engineering/blob/main/patched_H3_240530.BIN",
+          "profile": "Nicsure"
         }
       ]
     }
@@ -666,7 +771,6 @@
     {
       "group": "NicSure Firmware",
       "firmwares": [
-
         {
           "name": "RT-880 V1.14",
           "path": "https://github.com/nicsure/RT880-FWFlasher/blob/master/RT880_V1.14.bin",
