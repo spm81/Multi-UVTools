@@ -4605,10 +4605,99 @@
             <!-- Tab: Presets -->
             <div class="spectrum-tab-content" id="tab-presets">
               <div class="spectrum-control-section">
-                <div class="spectrum-section-title">📑 70 Band Presets</div>
+                <div class="spectrum-section-title">📑 <span id="presetCountBadge">70 Band Presets</span></div>
                 <div class="spectrum-presets-grid" id="presetsGrid">
                   <!-- Populated by JavaScript -->
                 </div>
+
+                        <!-- ===== PRESET EDITOR ===== -->
+                        <div class="preset-editor-section">
+                            <h4 class="pe-title">🛠️ Band Presets Editor</h4>
+
+                            <!-- Stats Bar -->
+                            <div class="pe-stats-bar">
+                                <span class="pe-stat"><strong>Total:</strong> <span id="peStatTotal">0</span></span>
+                                <span class="pe-stat"><strong>Firmware:</strong> <span id="peStatFirmware">0</span></span>
+                                <span class="pe-stat"><strong>Custom:</strong> <span id="peStatCustom">0</span></span>
+                                <span class="pe-stat"><strong>Mods:</strong> <span id="peStatMods">-</span></span>
+                            </div>
+
+                            <!-- Add Custom Preset Form -->
+                            <details class="pe-add-section">
+                                <summary class="pe-add-toggle">➕ Add Custom Preset</summary>
+                                <div class="pe-add-form">
+                                    <div class="pe-form-row">
+                                        <input id="peAddName" class="pe-input" type="text" placeholder="Name (max 15 chars)" maxlength="15">
+                                        <input id="peAddStart" class="pe-input pe-input-freq" type="number" step="0.001" min="0.01" max="1340" placeholder="Start MHz (0.01-1340)">
+                                        <input id="peAddEnd" class="pe-input pe-input-freq" type="number" step="0.001" min="0.01" max="1340" placeholder="End MHz (0.01-1340)">
+                                        <button type="button" class="pe-btn pe-auto-btn" onclick="spectrumAutoCalcSteps()" title="Auto-calculate Steps, Step Size, Modulation and BW based on frequency range">⚡ Auto</button>
+                                    </div>
+                                    <div class="pe-form-row">
+                                        <select id="peAddMod" class="pe-input pe-select">
+                                            <option value="0">FM</option>
+                                            <option value="1">AM</option>
+                                            <option value="2">USB</option>
+                                            <option value="3">LSB</option>
+                                        </select>
+                                        <select id="peAddSteps" class="pe-input pe-select">
+                                            <option value="0">128 steps</option>
+                                            <option value="1">64 steps</option>
+                                            <option value="2">32 steps</option>
+                                            <option value="3">16 steps</option>
+                                        </select>
+                                        <select id="peAddStepSize" class="pe-input pe-select">
+                                            <option value="0">0.01 kHz</option>
+                                            <option value="1">0.1 kHz</option>
+                                            <option value="2">0.5 kHz</option>
+                                            <option value="3">1.0 kHz</option>
+                                            <option value="4">2.5 kHz</option>
+                                            <option value="5">5.0 kHz</option>
+                                            <option value="6">6.25 kHz</option>
+                                            <option value="7">8.33 kHz</option>
+                                            <option value="8">10.0 kHz</option>
+                                            <option value="9">12.5 kHz</option>
+                                            <option value="10">15.0 kHz</option>
+                                            <option value="11">20.0 kHz</option>
+                                            <option value="12" selected>25.0 kHz</option>
+                                            <option value="13">50.0 kHz</option>
+                                            <option value="14">100.0 kHz</option>
+                                        </select>
+                                        <select id="peAddBW" class="pe-input pe-select">
+                                            <option value="0">Wide</option>
+                                            <option value="1">Narrow</option>
+                                            <option value="2">Narrower</option>
+                                        </select>
+                                        <button class="pe-btn pe-add-btn" onclick="spectrumAddPreset()">Add</button>
+                                    </div>
+                                    <div id="peAutoInfo" class="pe-auto-info" style="display:none"></div>
+                                </div>
+                            </details>
+
+                            <!-- Toolbar -->
+                            <div class="pe-toolbar">
+                                <input id="peSearch" class="pe-input pe-search" type="text" placeholder="🔍 Search presets..." oninput="spectrumFilterEditorList()">
+                                <button class="pe-btn pe-export" onclick="spectrumExportPresets()" title="Export presets to JSON">📥 Export JSON</button>
+                                <button class="pe-btn pe-import" onclick="spectrumImportPresets()" title="Import presets from JSON">📤 Import JSON</button>
+                                <button class="pe-btn pe-reset" onclick="spectrumResetPresets()" title="Reset to 70 firmware defaults">🔄 Reset Defaults</button>
+                            </div>
+
+                            <!-- List Header -->
+                            <div class="pe-list-header">
+                                <span class="pe-pos">#</span>
+                                <span class="pe-type">Type</span>
+                                <span class="pe-name">Name</span>
+                                <span class="pe-freq">Frequency Range</span>
+                                <span class="pe-detail">Mod</span>
+                                <span class="pe-detail">Steps</span>
+                                <span class="pe-detail">Step Size</span>
+                                <span class="pe-detail">BW</span>
+                                <span class="pe-actions">Actions</span>
+                            </div>
+
+                            <!-- Preset List (rendered by JS) -->
+                            <div id="presetEditorList" class="preset-editor-list"></div>
+                        </div>
+
               </div>
             </div>
 

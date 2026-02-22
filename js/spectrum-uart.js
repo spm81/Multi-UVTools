@@ -1,6 +1,7 @@
 // =====================================================
-// SPECTRUM UART v12.20 - Complete Implementation
+// SPECTRUM UART v12.30 - Complete Implementation
 // For MCFW v1.35.1D firmware
+// Full preset system with editor (matches spectrum.h)
 // =====================================================
 
 (function() {
@@ -23,108 +24,174 @@
     // Mode names (5 modes)
     const MODE_NAMES = ['FREQUENCY', 'CHANNEL', 'ORIGINAL', 'WATERFALL', 'PROFESSIONAL'];
 
-    // ===== 70 PRESETS (from spectrum.h - EXACT) =====
-    const PRESETS = [
-        {name: "17m Ham Band", start: 18.06800, end: 18.89999, mod: "USB"},
-        {name: "15m Broadcast", start: 18.90000, end: 20.99999, mod: "AM"},
-        {name: "15m Ham Band", start: 21.00000, end: 21.44999, mod: "USB"},
-        {name: "13m Broadcast", start: 21.45000, end: 24.88999, mod: "AM"},
-        {name: "12m Ham Band", start: 24.89000, end: 25.66999, mod: "USB"},
-        {name: "11m Broadcast", start: 25.67000, end: 26.97499, mod: "AM"},
-        {name: "CB", start: 26.97500, end: 27.99999, mod: "FM"},
-        {name: "10m Ham Band", start: 28.00000, end: 49.99999, mod: "USB"},
-        {name: "6m Ham Band", start: 50.00000, end: 54.49999, mod: "USB"},
-        {name: "Volmet Aviation", start: 54.50000, end: 77.49999, mod: "AM"},
-        {name: "Time Signals", start: 77.50000, end: 87.49999, mod: "AM"},
-        {name: "FM Broadcast EU", start: 87.50000, end: 117.99999, mod: "FM"},
-        {name: "Airband Tower", start: 118.00000, end: 120.99999, mod: "AM"},
-        {name: "Air Band Voice", start: 118.00000, end: 120.99999, mod: "AM"},
-        {name: "Airband Ground", start: 121.00000, end: 126.99999, mod: "AM"},
-        {name: "Airband ATIS", start: 127.00000, end: 137.99999, mod: "AM"},
-        {name: "FEMA", start: 138.00000, end: 138.99999, mod: "FM"},
-        {name: "MARS", start: 139.00000, end: 143.99999, mod: "USB"},
-        {name: "2m Ham Band", start: 144.00000, end: 144.29999, mod: "FM"},
-        {name: "YSF/WIRES-X", start: 144.00000, end: 144.29999, mod: "FM"},
-        {name: "RSGB Test", start: 144.30000, end: 144.99999, mod: "FM"},
-        {name: "D-Star", start: 145.00000, end: 145.79999, mod: "FM"},
-        {name: "ISS Packet", start: 145.80000, end: 146.51999, mod: "FM"},
-        {name: "ARRL Test", start: 146.52000, end: 147.99999, mod: "FM"},
-        {name: "CAP", start: 148.00000, end: 151.74999, mod: "FM"},
-        {name: "Railway", start: 151.75000, end: 151.99999, mod: "FM"},
-        {name: "Taxi USA/Bus", start: 152.00000, end: 153.99999, mod: "FM"},
-        {name: "USA Fire", start: 154.00000, end: 154.99999, mod: "FM"},
-        {name: "USA EMS", start: 155.00000, end: 155.99999, mod: "FM"},
-        {name: "USA Police", start: 155.00000, end: 155.99999, mod: "FM"},
-        {name: "Marine Intl", start: 156.00000, end: 156.79999, mod: "FM"},
-        {name: "Sea", start: 156.00000, end: 156.79999, mod: "FM"},
-        {name: "Marine VHF CH16", start: 156.80000, end: 159.99999, mod: "FM"},
-        {name: "Marine USA", start: 160.00000, end: 160.99999, mod: "FM"},
-        {name: "Weather Canada", start: 161.00000, end: 162.39999, mod: "FM"},
-        {name: "EAS", start: 162.40000, end: 164.99999, mod: "FM"},
-        {name: "NOAA Weather", start: 162.40000, end: 164.99999, mod: "FM"},
-        {name: "Taxi UK", start: 165.00000, end: 167.99999, mod: "FM"},
-        {name: "UK Emergency", start: 165.00000, end: 167.99999, mod: "FM"},
-        {name: "ROB - Bombeiros", start: 168.00000, end: 221.99999, mod: "FM"},
-        {name: "1.25m Ham", start: 222.00000, end: 224.99999, mod: "FM"},
-        {name: "Military Air", start: 225.00000, end: 242.99999, mod: "AM"},
-        {name: "Satcom", start: 243.00000, end: 254.99999, mod: "FM"},
-        {name: "Satcom II", start: 255.00000, end: 300.01249, mod: "FM"},
-        {name: "River1", start: 300.01250, end: 336.01249, mod: "FM"},
-        {name: "River2", start: 336.01250, end: 429.99999, mod: "FM"},
-        {name: "70cm Ham Band L", start: 430.00000, end: 433.04999, mod: "FM"},
-        {name: "DMR Europe", start: 430.00000, end: 433.04999, mod: "FM"},
-        {name: "ISM 433 MHz", start: 433.05000, end: 435.99999, mod: "FM"},
-        {name: "LPD/LoRa 433", start: 433.05000, end: 435.99999, mod: "FM"},
-        {name: "CubeSats", start: 436.00000, end: 437.79999, mod: "FM"},
-        {name: "ISS Voice", start: 437.80000, end: 437.99999, mod: "FM"},
-        {name: "70cm Ham Band H", start: 438.00000, end: 439.99999, mod: "FM"},
-        {name: "MOV/SMT", start: 440.00000, end: 446.00624, mod: "FM"},
-        {name: "PMR446", start: 446.00625, end: 446.19999, mod: "FM"},
-        {name: "MOV/SMT 2", start: 446.20000, end: 449.99999, mod: "FM"},
-        {name: "Business Radio", start: 450.00000, end: 457.62499, mod: "FM"},
-        {name: "CP - C.Portugal", start: 457.62500, end: 462.56249, mod: "FM"},
-        {name: "FRS/GMRS 462", start: 462.56250, end: 467.56249, mod: "FM"},
-        {name: "FRS/GMRS 467", start: 467.56250, end: 469.99999, mod: "FM"},
-        {name: "Industrial", start: 470.00000, end: 863.99999, mod: "FM"},
-        {name: "LoRa WAN", start: 864.00000, end: 867.99999, mod: "FM"},
-        {name: "ISM 868 MHz EU", start: 868.00000, end: 868.09999, mod: "FM"},
-        {name: "LoRa 868 MHz", start: 868.10000, end: 889.99999, mod: "FM"},
-        {name: "GSM900 UP", start: 890.00000, end: 901.99999, mod: "FM"},
-        {name: "33cm Ham", start: 902.00000, end: 934.99999, mod: "FM"},
-        {name: "ISM 915 MHz", start: 902.00000, end: 934.99999, mod: "FM"},
-        {name: "GSM900 DOWN", start: 935.00000, end: 1079.99999, mod: "FM"},
-        {name: "Aeronautical Nav", start: 1080.00000, end: 1239.99999, mod: "AM"},
-        {name: "23cm Ham Band", start: 1240.00000, end: 1300.00000, mod: "FM"}
+    // ===== PRESET ENUMS (from spectrum.h) =====
+    const STEPS_COUNT = [
+        { value: 0, label: '128', name: 'STEPS_128' },
+        { value: 1, label: '64',  name: 'STEPS_64' },
+        { value: 2, label: '32',  name: 'STEPS_32' },
+        { value: 3, label: '16',  name: 'STEPS_16' }
     ];
 
+    const STEP_SIZES = [
+        { value: 0,  label: '0.01 kHz',  name: 'S_STEP_0_01kHz',   raw: 1 },
+        { value: 1,  label: '0.1 kHz',   name: 'S_STEP_0_1kHz',    raw: 10 },
+        { value: 2,  label: '0.5 kHz',   name: 'S_STEP_0_5kHz',    raw: 50 },
+        { value: 3,  label: '1.0 kHz',   name: 'S_STEP_1_0kHz',    raw: 100 },
+        { value: 4,  label: '2.5 kHz',   name: 'S_STEP_2_5kHz',    raw: 250 },
+        { value: 5,  label: '5.0 kHz',   name: 'S_STEP_5_0kHz',    raw: 500 },
+        { value: 6,  label: '6.25 kHz',  name: 'S_STEP_6_25kHz',   raw: 625 },
+        { value: 7,  label: '8.33 kHz',  name: 'S_STEP_8_33kHz',   raw: 833 },
+        { value: 8,  label: '10.0 kHz',  name: 'S_STEP_10_0kHz',   raw: 1000 },
+        { value: 9,  label: '12.5 kHz',  name: 'S_STEP_12_5kHz',   raw: 1250 },
+        { value: 10, label: '15.0 kHz',  name: 'S_STEP_15_0kHz',   raw: 1500 },
+        { value: 11, label: '20.0 kHz',  name: 'S_STEP_20_0kHz',   raw: 2000 },
+        { value: 12, label: '25.0 kHz',  name: 'S_STEP_25_0kHz',   raw: 2500 },
+        { value: 13, label: '50.0 kHz',  name: 'S_STEP_50_0kHz',   raw: 5000 },
+        { value: 14, label: '100.0 kHz', name: 'S_STEP_100_0kHz',  raw: 10000 }
+    ];
 
-    // ===== CONNECTION FUNCTIONS =====
+    const MODULATIONS = [
+        { value: 0, label: 'FM',  name: 'MODULATION_FM' },
+        { value: 1, label: 'AM',  name: 'MODULATION_AM' },
+        { value: 2, label: 'USB', name: 'MODULATION_USB' },
+        { value: 3, label: 'LSB', name: 'MODULATION_LSB' }
+    ];
+
+    const BANDWIDTHS = [
+        { value: 0, label: 'Wide',     name: 'BK4819_FILTER_BW_WIDE' },
+        { value: 1, label: 'Narrow',   name: 'BK4819_FILTER_BW_NARROW' },
+        { value: 2, label: 'Narrower', name: 'BK4819_FILTER_BW_NARROWER' }
+    ];
+
+    // ===== 70 DEFAULT PRESETS (from spectrum.h freqPresets[] - EXACT) =====
+    // Fields: name, fStart (Hz*10), fEnd (Hz*10), stepsCount, stepSize, modulation, listenBW, firmwareIndex
+    const DEFAULT_PRESETS = [
+        {name:"17m Ham Band",     fStart:1806800,  fEnd:1889999,   stepsCount:0, stepSize:3,  mod:2, bw:2, fwIdx:0},
+        {name:"15m Broadcast",    fStart:1890000,  fEnd:2099999,   stepsCount:0, stepSize:5,  mod:1, bw:1, fwIdx:1},
+        {name:"15m Ham Band",     fStart:2100000,  fEnd:2144999,   stepsCount:0, stepSize:3,  mod:2, bw:2, fwIdx:2},
+        {name:"13m Broadcast",    fStart:2145000,  fEnd:2488999,   stepsCount:0, stepSize:5,  mod:1, bw:1, fwIdx:3},
+        {name:"12m Ham Band",     fStart:2489000,  fEnd:2566999,   stepsCount:0, stepSize:3,  mod:2, bw:2, fwIdx:4},
+        {name:"11m Broadcast",    fStart:2567000,  fEnd:2697499,   stepsCount:0, stepSize:5,  mod:1, bw:1, fwIdx:5},
+        {name:"CB",               fStart:2697500,  fEnd:2799999,   stepsCount:0, stepSize:5,  mod:0, bw:1, fwIdx:6},
+        {name:"10m Ham Band",     fStart:2800000,  fEnd:4999999,   stepsCount:0, stepSize:3,  mod:2, bw:2, fwIdx:7},
+        {name:"6m Ham Band",      fStart:5000000,  fEnd:5449999,   stepsCount:0, stepSize:3,  mod:2, bw:2, fwIdx:8},
+        {name:"Volmet Aviation",  fStart:5450000,  fEnd:7749999,   stepsCount:1, stepSize:5,  mod:1, bw:1, fwIdx:9},
+        {name:"Time Signals",     fStart:7750000,  fEnd:8749999,   stepsCount:3, stepSize:5,  mod:1, bw:2, fwIdx:10},
+        {name:"FM Broadcast EU",  fStart:8750000,  fEnd:11799999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:11},
+        {name:"Airband Tower",    fStart:11800000, fEnd:12099999,  stepsCount:0, stepSize:12, mod:1, bw:1, fwIdx:12},
+        {name:"Air Band Voice",   fStart:11800000, fEnd:12099999,  stepsCount:0, stepSize:14, mod:1, bw:1, fwIdx:13},
+        {name:"Airband Ground",   fStart:12100000, fEnd:12699999,  stepsCount:0, stepSize:12, mod:1, bw:1, fwIdx:14},
+        {name:"Airband ATIS",     fStart:12700000, fEnd:13799999,  stepsCount:1, stepSize:12, mod:1, bw:1, fwIdx:15},
+        {name:"FEMA",             fStart:13800000, fEnd:13899999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:16},
+        {name:"MARS",             fStart:13900000, fEnd:14399999,  stepsCount:0, stepSize:5,  mod:2, bw:2, fwIdx:17},
+        {name:"2m Ham Band",      fStart:14400000, fEnd:14429999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:18},
+        {name:"YSF/WIRES-X",      fStart:14400000, fEnd:14429999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:19},
+        {name:"RSGB Test",        fStart:14430000, fEnd:14499999,  stepsCount:3, stepSize:12, mod:0, bw:1, fwIdx:20},
+        {name:"D-Star",           fStart:14500000, fEnd:14579999,  stepsCount:0, stepSize:12, mod:0, bw:1, fwIdx:21},
+        {name:"ISS Packet",       fStart:14580000, fEnd:14651999,  stepsCount:3, stepSize:5,  mod:0, bw:1, fwIdx:22},
+        {name:"ARRL Test",        fStart:14652000, fEnd:14799999,  stepsCount:3, stepSize:12, mod:0, bw:1, fwIdx:23},
+        {name:"CAP",              fStart:14800000, fEnd:15174999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:24},
+        {name:"Railway",          fStart:15175000, fEnd:15199999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:25},
+        {name:"Taxi USA/Bus",     fStart:15200000, fEnd:15399999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:26},
+        {name:"USA Fire",         fStart:15400000, fEnd:15499999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:27},
+        {name:"USA EMS",          fStart:15500000, fEnd:15599999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:28},
+        {name:"USA Police",       fStart:15500000, fEnd:15599999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:29},
+        {name:"Marine Intl",      fStart:15600000, fEnd:15679999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:30},
+        {name:"Sea",              fStart:15600000, fEnd:15679999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:31},
+        {name:"Marine VHF CH16",  fStart:15680000, fEnd:15999999,  stepsCount:3, stepSize:12, mod:0, bw:0, fwIdx:32},
+        {name:"Marine USA",       fStart:16000000, fEnd:16099999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:33},
+        {name:"Weather Canada",   fStart:16100000, fEnd:16239999,  stepsCount:1, stepSize:12, mod:0, bw:1, fwIdx:34},
+        {name:"EAS",              fStart:16240000, fEnd:16499999,  stepsCount:3, stepSize:5,  mod:0, bw:1, fwIdx:35},
+        {name:"NOAA Weather",     fStart:16240000, fEnd:16499999,  stepsCount:3, stepSize:5,  mod:0, bw:1, fwIdx:36},
+        {name:"Taxi UK",          fStart:16500000, fEnd:16799999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:37},
+        {name:"UK Emergency",     fStart:16500000, fEnd:16799999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:38},
+        {name:"ROB - Bombeiros",  fStart:16800000, fEnd:22199999,  stepsCount:1, stepSize:14, mod:0, bw:0, fwIdx:39},
+        {name:"1.25m Ham",        fStart:22200000, fEnd:22499999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:40},
+        {name:"Military Air",     fStart:22500000, fEnd:24299999,  stepsCount:0, stepSize:12, mod:1, bw:0, fwIdx:41},
+        {name:"Satcom",           fStart:24300000, fEnd:25499999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:42},
+        {name:"Satcom II",        fStart:25500000, fEnd:30001249,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:43},
+        {name:"River1",           fStart:30001250, fEnd:33601249,  stepsCount:1, stepSize:9,  mod:0, bw:1, fwIdx:44},
+        {name:"River2",           fStart:33601250, fEnd:42999999,  stepsCount:1, stepSize:9,  mod:0, bw:1, fwIdx:45},
+        {name:"70cm Ham Band L",  fStart:43000000, fEnd:43304999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:46},
+        {name:"DMR Europe",       fStart:43000000, fEnd:43304999,  stepsCount:0, stepSize:9,  mod:0, bw:1, fwIdx:47},
+        {name:"ISM 433 MHz",      fStart:43305000, fEnd:43599999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:48},
+        {name:"LPD/LoRa 433",     fStart:43305000, fEnd:43599999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:49},
+        {name:"CubeSats",         fStart:43600000, fEnd:43779999,  stepsCount:1, stepSize:5,  mod:0, bw:1, fwIdx:50},
+        {name:"ISS Voice",        fStart:43780000, fEnd:43799999,  stepsCount:3, stepSize:5,  mod:0, bw:1, fwIdx:51},
+        {name:"70cm Ham Band H",  fStart:43800000, fEnd:43999999,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:52},
+        {name:"MOV/SMT",          fStart:44000000, fEnd:44600624,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:53},
+        {name:"PMR",              fStart:44600625, fEnd:44619999,  stepsCount:2, stepSize:6,  mod:0, bw:1, fwIdx:54},
+        {name:"MOV/SMT",          fStart:44620000, fEnd:44999999,  stepsCount:1, stepSize:14, mod:0, bw:0, fwIdx:55},
+        {name:"Business Radio",   fStart:45000000, fEnd:45762499,  stepsCount:0, stepSize:9,  mod:0, bw:0, fwIdx:56},
+        {name:"CP - C.Portugal",  fStart:45762500, fEnd:46256249,  stepsCount:3, stepSize:12, mod:0, bw:1, fwIdx:57},
+        {name:"FRS/GMRS 462",     fStart:46256250, fEnd:46756249,  stepsCount:3, stepSize:9,  mod:0, bw:1, fwIdx:58},
+        {name:"FRS/GMRS 467",     fStart:46756250, fEnd:46999999,  stepsCount:3, stepSize:9,  mod:0, bw:1, fwIdx:59},
+        {name:"Industrial",       fStart:47000000, fEnd:86399999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:60},
+        {name:"LoRa WAN",         fStart:86400000, fEnd:86799999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:61},
+        {name:"ISM 868 MHz EU",   fStart:86800000, fEnd:86809999,  stepsCount:2, stepSize:12, mod:0, bw:1, fwIdx:62},
+        {name:"LoRa 868 MHz",     fStart:86810000, fEnd:88999999,  stepsCount:2, stepSize:12, mod:0, bw:1, fwIdx:63},
+        {name:"GSM900 UP",        fStart:89000000, fEnd:90199999,  stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:64},
+        {name:"33cm Ham",         fStart:90200000, fEnd:93499999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:65},
+        {name:"ISM 915 MHz",      fStart:90200000, fEnd:93499999,  stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:66},
+        {name:"GSM900 DOWN",      fStart:93500000, fEnd:107999999, stepsCount:0, stepSize:14, mod:0, bw:0, fwIdx:67},
+        {name:"Aeronautical Nav", fStart:108000000,fEnd:123999999, stepsCount:0, stepSize:12, mod:1, bw:1, fwIdx:68},
+        {name:"23cm Ham Band",    fStart:124000000,fEnd:130000000, stepsCount:0, stepSize:12, mod:0, bw:0, fwIdx:69}
+    ];
+
+    // ===== ACTIVE PRESETS (mutable) =====
+    let PRESETS = [];
+
+    // ===== PRESET PERSISTENCE =====
+    function loadPresets() {
+        try {
+            const saved = localStorage.getItem('spectrumPresets_v3');
+            if (saved) {
+                PRESETS = JSON.parse(saved);
+                return;
+            }
+        } catch(e) {}
+        resetPresetsToDefaults();
+    }
+
+    function resetPresetsToDefaults() {
+        PRESETS = JSON.parse(JSON.stringify(DEFAULT_PRESETS));
+    }
+
+    function savePresets() {
+        try { localStorage.setItem('spectrumPresets_v3', JSON.stringify(PRESETS)); } catch(e) {}
+    }
+
+    // ===== HELPER: Format frequency =====
+    function fmtFreq(val) {
+        return (val / 100000).toFixed(3);
+    }
+
+    function getModLabel(v) { return (MODULATIONS[v] || MODULATIONS[0]).label; }
+    function getStepsLabel(v) { return (STEPS_COUNT[v] || STEPS_COUNT[0]).label; }
+    function getStepSizeLabel(v) { return (STEP_SIZES[v] || STEP_SIZES[0]).label; }
+    function getBwLabel(v) { return (BANDWIDTHS[v] || BANDWIDTHS[0]).label; }
+
+    // ===== CONNECTION =====
     async function connect() {
         try {
             port = await navigator.serial.requestPort();
-            const baudSelect = document.getElementById('spectrumBaudRate');
-            const baud = baudSelect ? parseInt(baudSelect.value) : 38400;
-            await port.open({ baudRate: baud });
-            
+            await port.open({ baudRate: 38400 });
+
             writer = port.writable.getWriter();
             reader = port.readable.getReader();
-            
             isConnected = true;
+
             updateConnectionUI(true);
-            
-            // Start reading
             readLoop();
-            
-            // Start status polling every 2 seconds
-            statusInterval = setInterval(() => {
+
+            statusInterval = setInterval(function() {
                 if (isConnected) sendCommand('STATUS');
             }, 2000);
-            
-            // Initial status request
-            setTimeout(() => sendCommand('STATUS'), 500);
-            
-            logUART('INFO', 'Connected at ' + baud + ' baud');
-            
+
+            setTimeout(function() { sendCommand('STATUS'); }, 500);
+
+            logUART('INFO', 'Connected at 38400 baud');
+
         } catch (e) {
             console.error('Connection error:', e);
             logUART('ERR', e.message);
@@ -138,19 +205,9 @@
             statusInterval = null;
         }
         try {
-            if (reader) { 
-                await reader.cancel();
-                reader.releaseLock(); 
-                reader = null; 
-            }
-            if (writer) { 
-                writer.releaseLock(); 
-                writer = null; 
-            }
-            if (port) { 
-                await port.close(); 
-                port = null; 
-            }
+            if (reader) { await reader.cancel(); reader.releaseLock(); reader = null; }
+            if (writer) { writer.releaseLock(); writer = null; }
+            if (port) { await port.close(); port = null; }
         } catch (e) {
             console.error('Disconnect error:', e);
         }
@@ -159,44 +216,36 @@
     }
 
     function toggleConnection() {
-        if (isConnected) {
-            disconnect();
-        } else {
-            connect();
-        }
+        if (isConnected) { disconnect(); } else { connect(); }
     }
 
     function updateConnectionUI(connected) {
-        const indicator = document.getElementById('spectrumStatusIndicator');
-        const text = document.getElementById('spectrumStatusText');
-        const btn = document.getElementById('spectrumConnectBtn');
-        
+        var indicator = document.getElementById('spectrumStatusIndicator');
+        var text = document.getElementById('spectrumStatusText');
+        var btn = document.getElementById('spectrumConnectBtn');
+
         if (indicator) indicator.classList.toggle('connected', connected);
         if (text) text.textContent = connected ? 'Connected' : 'Disconnected';
-        if (btn) {
-            btn.textContent = connected ? '🔌 Disconnect' : '🔌 Connect';
-            btn.className = 'btn ' + (connected ? 'btn-disconnect' : 'btn-connect');
-        }
+        if (btn) btn.textContent = connected ? 'Disconnect' : 'Connect';
     }
 
     // ===== READ LOOP =====
     async function readLoop() {
-        const decoder = new TextDecoder();
-        let buffer = '';
-        
+        var buffer = '';
         while (isConnected && reader) {
             try {
-                const { value, done } = await reader.read();
-                if (done) break;
-                
-                const text = decoder.decode(value).replace(/[^\x20-\x7E\r\n]/g, '');
-                buffer += text;
-                
-                const lines = buffer.split(/\r?\n/);
-                buffer = lines.pop() || '';
-                
-                for (const line of lines) {
-                    if (line.trim()) {
+                var result = await reader.read();
+                if (result.done) break;
+
+                var decoder = new TextDecoder();
+                buffer += decoder.decode(result.value, { stream: true });
+
+                var lines = buffer.split('\n');
+                buffer = lines.pop();
+
+                for (var li = 0; li < lines.length; li++) {
+                    var line = lines[li].trim();
+                    if (line) {
                         logUART('RX', line);
                         processData(line);
                     }
@@ -214,10 +263,10 @@
             logUART('ERR', 'Not connected');
             return;
         }
-        
-        const fullCmd = 'SPEC:' + cmd + ']';
+
+        var fullCmd = 'SPEC:' + cmd + ']';
         try {
-            const encoder = new TextEncoder();
+            var encoder = new TextEncoder();
             await writer.write(encoder.encode(fullCmd));
             logUART('TX', fullCmd);
         } catch (e) {
@@ -252,32 +301,30 @@
         } else if (line.includes('SPEC:PS,')) {
             parseProfStatus(line);
         } else if (line.includes('SPEC:TH,')) {
-            const th = parseInt(line.substring(line.indexOf('SPEC:TH,') + 8));
+            var th = parseInt(line.substring(line.indexOf('SPEC:TH,') + 8));
             if (!isNaN(th)) {
                 currentThreshold = th;
-                const thDbm = (th / 2) - 160;
+                var thDbm = (th / 2) - 160;
                 logUART('RX', 'Threshold: ' + th + ' raw (' + thDbm.toFixed(1) + ' dBm)');
             }
         }
     }
 
     function parseStatus(line) {
-        const idx = line.indexOf('SPEC:ST,');
+        var idx = line.indexOf('SPEC:ST,');
         if (idx === -1) return;
-        
-        const parts = line.substring(idx + 8).split(',');
-        let mode = -1, freq = 0, rssi = 0, mod = '---', ch = '', tone = '';
-        
-        // SPEC:ST,mode,freq,rssi,mod,TONE (5 fields, NO channel)
+
+        var parts = line.substring(idx + 8).split(',');
+        var mode = -1, freq = 0, rssi = 0, mod = '---', ch = '', tone = '';
+
         if (parts.length >= 1) mode = parseInt(parts[0]) || 0;
         if (parts.length >= 2) freq = parseInt(parts[1]) || 0;
         if (parts.length >= 3) rssi = parseInt(parts[2]) || 0;
         if (parts.length >= 4) mod = parts[3] || '---';
-        if (parts.length >= 5) tone = parts[4] || '';  // Tone is 5th field (index 4)
-        
+        if (parts.length >= 5) tone = parts[4] || '';
+
         currentTone = tone || "N";
-        
-        // If STATUS has a valid tone, update recent log entries with "N" tone
+
         if (tone && tone !== "N" && freq > 0) {
             var statusFreqMHz = (freq / 100000).toFixed(5);
             for (var i = 0; i < Math.min(peakLog.length, 10); i++) {
@@ -288,9 +335,9 @@
             }
             updateLogDisplay();
         }
-        
+
         updateDisplay(mode, freq, rssi, mod, ch, tone);
-        
+
         if (mode !== currentMode) {
             currentMode = mode;
             updateModeButtons(mode);
@@ -298,28 +345,25 @@
     }
 
     function parsePeak(line) {
-        const idx = line.indexOf('SPEC:PK,');
+        var idx = line.indexOf('SPEC:PK,');
         if (idx === -1) return;
-        
-        const parts = line.substring(idx + 8).split(',');
+        var parts = line.substring(idx + 8).split(',');
         if (parts.length >= 3) {
-            const freq = parseInt(parts[0]) || 0;
-            const rssi = parseInt(parts[1]) || 0;
-            const mod = parts[2] || '';
-            
+            var freq = parseInt(parts[0]) || 0;
+            var rssi = parseInt(parts[1]) || 0;
+            var mod = parts[2] || '';
             if (freq > 0) {
-                const freqMHz = freq / 100000;
-                const rssiDbm = (rssi / 2) - 160;
+                var freqMHz = freq / 100000;
+                var rssiDbm = (rssi / 2) - 160;
                 addToLog(freqMHz, rssiDbm, mod, 'PEAK');
             }
         }
     }
 
     function parseMode(line) {
-        const idx = line.indexOf('SPEC:M=');
+        var idx = line.indexOf('SPEC:M=');
         if (idx === -1) return;
-        
-        const mode = parseInt(line.substring(idx + 7));
+        var mode = parseInt(line.substring(idx + 7));
         if (!isNaN(mode) && mode >= 0 && mode <= 4) {
             currentMode = mode;
             updateModeButtons(mode);
@@ -330,26 +374,20 @@
     }
 
     function parseTriggerFreq(line) {
-        const idx = line.indexOf('SPEC:TR,');
+        var idx = line.indexOf('SPEC:TR,');
         if (idx === -1) return;
-        
-        const data = line.substring(idx + 8);
-        const parts = data.split(',');
+        var data = line.substring(idx + 8);
+        var parts = data.split(',');
         if (parts.length < 2) return;
-        
-        const freq = parseInt(parts[0]);
-        const rssiDbm = parseInt(parts[1]);
-        let tone = parts.length >= 3 ? parts[2].trim() : 'N';
+        var freq = parseInt(parts[0]);
+        var rssiDbm = parseInt(parts[1]);
+        var tone = parts.length >= 3 ? parts[2].trim() : 'N';
         if (tone === 'N' && currentTone !== 'N') tone = currentTone;
-        
         if (isNaN(freq) || isNaN(rssiDbm)) return;
-        
-        const freqMHz = freq / 100000;
-        
-        const now = Date.now();
-        const freqChanged = Math.abs(freq - lastLoggedFreq) > 1000;
-        const timePassed = now - lastLoggedTime > 3000;
-        
+        var freqMHz = freq / 100000;
+        var now = Date.now();
+        var freqChanged = Math.abs(freq - lastLoggedFreq) > 1000;
+        var timePassed = now - lastLoggedTime > 3000;
         if (freqChanged || timePassed) {
             addToLog(freqMHz, rssiDbm, '---', 'TRIG ' + tone);
             lastLoggedFreq = freq;
@@ -358,19 +396,15 @@
     }
 
     function parseTriggerChannel(line) {
-        const match = line.match(/M:(\d+),FREQ:(\d+),RSSI:(-?\d+)/);
+        var match = line.match(/M:(\d+),FREQ:(\d+),RSSI:(-?\d+)/);
         if (!match) return;
-        
-        const ch = parseInt(match[1]);
-        const freq = parseInt(match[2]);
-        const rssiDbm = parseInt(match[3]);
-        
-        const freqMHz = freq / 100000;
-        
-        const now = Date.now();
-        const freqChanged = Math.abs(freq - lastLoggedFreq) > 1000;
-        const timePassed = now - lastLoggedTime > 3000;
-        
+        var ch = parseInt(match[1]);
+        var freq = parseInt(match[2]);
+        var rssiDbm = parseInt(match[3]);
+        var freqMHz = freq / 100000;
+        var now = Date.now();
+        var freqChanged = Math.abs(freq - lastLoggedFreq) > 1000;
+        var timePassed = now - lastLoggedTime > 3000;
         if (freqChanged || timePassed) {
             addToLog(freqMHz, rssiDbm, '---', 'CH' + ch);
             lastLoggedFreq = freq;
@@ -379,73 +413,64 @@
     }
 
     function parseChannel(line) {
-        const idx = line.indexOf('SPEC:C,');
+        var idx = line.indexOf('SPEC:C,');
         if (idx === -1) return;
-        
-        const parts = line.substring(idx + 7).split(',');
+        var parts = line.substring(idx + 7).split(',');
         if (parts.length < 4) return;
-        
-        const chNum = parts[0];
-        const chName = parts[1];
-        const rssi = parseInt(parts[2]) || 0;
-        const tone = parts[3];
-        
-        let chDisplay = 'CH ' + chNum;
+        var chNum = parts[0];
+        var chName = parts[1];
+        var rssi = parseInt(parts[2]) || 0;
+        var tone = parts[3];
+        var chDisplay = 'CH ' + chNum;
         if (chName && chName !== '-') chDisplay += ' (' + chName + ')';
-        
-        const chEl = document.getElementById('channelValue');
+        var chEl = document.getElementById('channelValue');
         if (chEl) chEl.textContent = chDisplay;
     }
 
     function parseFreqIn(line) {
-        const idx = line.indexOf('SPEC:FI,');
+        var idx = line.indexOf('SPEC:FI,');
         if (idx === -1) return;
-        
-        const parts = line.substring(idx + 8).split(',');
-        const min = parseInt(parts[0]) || 0;
-        const max = parseInt(parts[1]) || 0;
-        
-        const display = document.getElementById('freqInputDisplay');
+        var parts = line.substring(idx + 8).split(',');
+        var min = parseInt(parts[0]) || 0;
+        var max = parseInt(parts[1]) || 0;
+        var display = document.getElementById('freqInputDisplay');
         if (display) {
             display.textContent = 'Range: ' + (min/100000).toFixed(3) + ' - ' + (max/100000).toFixed(3) + ' MHz';
         }
     }
 
     function parseFreqKey(line) {
-        const idx = line.indexOf('SPEC:FK,');
+        var idx = line.indexOf('SPEC:FK,');
         if (idx === -1) return;
-        
-        const parts = line.substring(idx + 8).split(',');
-        const str = parts[0] || '';
-        
-        const display = document.getElementById('freqInputDisplay');
+        var parts = line.substring(idx + 8).split(',');
+        var str = parts[0] || '';
+        var display = document.getElementById('freqInputDisplay');
         if (display) display.textContent = str || '0.00000';
     }
 
     function parseFreqOk(line) {
-        const idx = line.indexOf('SPEC:FO,');
+        var idx = line.indexOf('SPEC:FO,');
         if (idx === -1) return;
-        
-        const freq = parseInt(line.substring(idx + 8)) || 0;
-        const display = document.getElementById('freqInputDisplay');
+        var freq = parseInt(line.substring(idx + 8)) || 0;
+        var display = document.getElementById('freqInputDisplay');
         if (display) {
-            display.textContent = '✓ ' + (freq/100000).toFixed(5) + ' MHz';
+            display.textContent = '\u2713 ' + (freq/100000).toFixed(5) + ' MHz';
             display.style.color = '#4caf50';
             setTimeout(function() { display.textContent = '0.00000'; display.style.color = ''; }, 2000);
         }
     }
 
     function parseFreqErr(line) {
-        const display = document.getElementById('freqInputDisplay');
+        var display = document.getElementById('freqInputDisplay');
         if (display) {
-            display.textContent = '✗ Out of range';
+            display.textContent = '\u2717 Out of range';
             display.style.color = '#f44336';
             setTimeout(function() { display.textContent = '0.00000'; display.style.color = ''; }, 2000);
         }
     }
 
     function parseFreqCancel() {
-        const display = document.getElementById('freqInputDisplay');
+        var display = document.getElementById('freqInputDisplay');
         if (display) {
             display.textContent = 'Cancelled';
             display.style.color = '#ff9800';
@@ -454,15 +479,11 @@
     }
 
     function parseProfStatus(line) {
-        const idx = line.indexOf('SPEC:PS,');
+        var idx = line.indexOf('SPEC:PS,');
         if (idx === -1) return;
-        
-        const data = line.substring(idx + 8).trim();
-        let smooth = '--', autotrig = '--', horizon = '--', bandled = '--';
-        let mountain = '--', heli = '--', sugar = '--';
-        
-        // C firmware sends compact format: SPEC:PS,2011110
-        // 7 digits: smooth(0=off,1-4=factor), auto, horizon, led, mountain, heli, sugar
+        var data = line.substring(idx + 8).trim();
+        var smooth = '--', autotrig = '--', horizon = '--', bandled = '--';
+        var mountain = '--', heli = '--', sugar = '--';
         if (data.length >= 7) {
             smooth = data[0] !== '0' ? 'ON' : 'OFF';
             autotrig = data[1] !== '0' ? 'ON' : 'OFF';
@@ -472,19 +493,17 @@
             heli = data[5] !== '0' ? 'ON' : 'OFF';
             sugar = data[6] !== '0' ? 'ON' : 'OFF';
         }
-        
-        const proStatus = document.getElementById('proStatus');
+        var proStatus = document.getElementById('proStatus');
         if (proStatus) {
-            var onColor = '#4caf50';
-            var offColor = '#f44336';
-            proStatus.innerHTML = 
-                '<span style="color:' + (smooth==='ON'?onColor:offColor) + '">Smooth:' + smooth + '</span> | ' +
-                '<span style="color:' + (autotrig==='ON'?onColor:offColor) + '">AutoTrig:' + autotrig + '</span> | ' +
-                '<span style="color:' + (horizon==='ON'?onColor:offColor) + '">Horizon:' + horizon + '</span> | ' +
-                '<span style="color:' + (bandled==='ON'?onColor:offColor) + '">BandLED:' + bandled + '</span> | ' +
-                '<span style="color:' + (mountain==='ON'?onColor:offColor) + '">Mountain:' + mountain + '</span> | ' +
-                '<span style="color:' + (heli==='ON'?onColor:offColor) + '">Heli:' + heli + '</span> | ' +
-                '<span style="color:' + (sugar==='ON'?onColor:offColor) + '">Sugar:' + sugar + '</span>';
+            var onC = '#4caf50', offC = '#f44336';
+            proStatus.innerHTML =
+                '<span style="color:' + (smooth==='ON'?onC:offC) + '">Smooth:' + smooth + '</span> | ' +
+                '<span style="color:' + (autotrig==='ON'?onC:offC) + '">AutoTrig:' + autotrig + '</span> | ' +
+                '<span style="color:' + (horizon==='ON'?onC:offC) + '">Horizon:' + horizon + '</span> | ' +
+                '<span style="color:' + (bandled==='ON'?onC:offC) + '">BandLED:' + bandled + '</span> | ' +
+                '<span style="color:' + (mountain==='ON'?onC:offC) + '">Mountain:' + mountain + '</span> | ' +
+                '<span style="color:' + (heli==='ON'?onC:offC) + '">Heli:' + heli + '</span> | ' +
+                '<span style="color:' + (sugar==='ON'?onC:offC) + '">Sugar:' + sugar + '</span>';
         }
     }
 
@@ -495,139 +514,116 @@
         var rssiEl = document.getElementById('rssiValue');
         var modEl = document.getElementById('modValue');
         var chEl = document.getElementById('channelValue');
-        
+
         if (modeEl) modeEl.textContent = MODE_NAMES[mode] || ('Mode ' + mode);
-        
-        if (freqEl && freq > 0) {
-            var freqMHz = freq / 100000;
-            freqEl.textContent = freqMHz.toFixed(5) + ' MHz';
+
+        if (freqEl) {
+            if (freq > 0) {
+                freqEl.textContent = (freq / 100000).toFixed(5) + ' MHz';
+            } else {
+                freqEl.textContent = '---';
+            }
         }
-        
-        if (rssiEl && rssi > 0) {
-            var rssiDbm = (rssi / 2) - 160;
-            rssiEl.textContent = rssiDbm.toFixed(1) + ' dBm';
-            rssiEl.style.color = rssiDbm > -90 ? '#4caf50' : rssiDbm > -110 ? '#ff9800' : '#f44336';
+
+        if (rssiEl) {
+            if (rssi > 0) {
+                var rssiDbm = (rssi / 2) - 160;
+                rssiEl.textContent = rssiDbm.toFixed(1) + ' dBm (' + rssi + ')';
+            } else {
+                rssiEl.textContent = '---';
+            }
         }
-        
+
         if (modEl) modEl.textContent = mod || '---';
-        
-        var chToneText = '---';
-        if (ch && ch !== 'N') {
-            chToneText = ch;
-            if (tone && tone !== 'N' && tone !== ch) chToneText += ' / ' + tone;
-        } else if (tone && tone !== 'N') {
-            chToneText = tone;
-        }
-        if (chEl) chEl.textContent = chToneText;
     }
 
-    function updateModeButtons(mode) {
-        for (var i = 0; i <= 4; i++) {
-            var btn = document.getElementById('modeBtn' + i);
-            if (btn) {
-                if (i === mode) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            }
+    // ===== MODE BUTTONS =====
+    function updateModeButtons(activeMode) {
+        var btns = document.querySelectorAll('.mode-btn');
+        for (var i = 0; i < btns.length; i++) {
+            var m = parseInt(btns[i].getAttribute('data-mode'));
+            btns[i].classList.toggle('active', m === activeMode);
         }
     }
 
     // ===== LOGGING =====
-    function addToLog(freq, rssi, mod, extra) {
+    function addToLog(freqMHz, rssiDbm, mod, type) {
         var now = new Date();
+        var ts = now.getHours().toString().padStart(2, '0') + ':' +
+                 now.getMinutes().toString().padStart(2, '0') + ':' +
+                 now.getSeconds().toString().padStart(2, '0');
+
         var entry = {
-            time: now.toLocaleTimeString(),
-            date: now.toLocaleDateString(),
-            freq: freq.toFixed(5),
-            rssi: rssi.toFixed(1),
+            time: ts,
+            freq: freqMHz.toFixed(5),
+            rssi: rssiDbm.toFixed(1),
             mod: mod,
-            extra: extra || "",
-            ctcss: (extra && extra.startsWith("TRIG ")) ? extra.substring(5) : "N"
+            type: type,
+            ctcss: currentTone
         };
-        
+
         peakLog.unshift(entry);
         if (peakLog.length > 500) peakLog.pop();
         updateLogDisplay();
     }
 
     function updateLogDisplay() {
-        var container = document.getElementById('logContainer');
-        if (!container) return;
-        
-        if (peakLog.length === 0) {
-            container.innerHTML = '<div class="log-empty">No peaks logged yet</div>';
-        } else {
-            var html = '';
-            var count = Math.min(peakLog.length, 100);
-            for (var i = 0; i < count; i++) {
-                var e = peakLog[i];
-                html += '<div class="log-entry">' +
-                    '<span class="log-time">' + e.time + '</span>' +
-                    '<span class="log-freq">' + e.freq + ' MHz</span>' +
-                    '<span class="log-rssi">' + e.rssi + ' dBm</span>' +
-                    '<span class="log-mod">' + e.mod + '</span>' +
-                    '<span class="log-ctcss">' + (e.ctcss || 'N') + '</span>' +
-                    '<span class="log-extra">' + (e.extra ? '🎯' : '') + '</span>' +
-                    '</div>';
-            }
-            container.innerHTML = html;
-        }
-    }
+        var log = document.getElementById('peakLogList');
+        if (!log) return;
 
-    function exportLog(format) {
-        if (peakLog.length === 0) {
-            alert('No data to export');
-            return;
+        while (log.children.length > peakLog.length) {
+            log.removeChild(log.lastChild);
         }
-        
-        var content, filename, type;
-        if (format === 'json') {
-            content = JSON.stringify(peakLog, null, 2);
-            filename = 'spectrum_log_' + Date.now() + '.json';
-            type = 'application/json';
-        } else {
-            var header = 'Time,Frequency (MHz),RSSI (dBm),Modulation,CTCSS/DCS\n';
-            var rows = [];
-            for (var i = 0; i < peakLog.length; i++) {
-                var e = peakLog[i];
-                rows.push(e.time + ',' + e.freq + ',' + e.rssi + ',' + e.mod + ',' + (e.ctcss || 'N'));
+
+        for (var i = 0; i < Math.min(peakLog.length, 200); i++) {
+            var e = peakLog[i];
+            var row = log.children[i];
+            var html = '<span class="log-time">' + e.time + '</span>' +
+                       '<span class="log-freq">' + e.freq + ' MHz</span>' +
+                       '<span class="log-rssi">' + e.rssi + ' dBm</span>' +
+                       '<span class="log-mod">' + e.mod + '</span>' +
+                       '<span class="log-type">' + e.type + '</span>' +
+                       (e.ctcss && e.ctcss !== 'N' ? '<span class="log-ctcss">' + e.ctcss + '</span>' : '');
+            if (!row) {
+                row = document.createElement('div');
+                row.className = 'log-entry';
+                log.appendChild(row);
             }
-            content = header + rows.join('\n');
-            filename = 'spectrum_log_' + Date.now() + '.csv';
-            type = 'text/csv';
+            row.innerHTML = html;
         }
-        
-        var blob = new Blob([content], { type: type });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
     }
 
     function clearLog() {
-        if (confirm('Clear all logged peaks?')) {
-            peakLog = [];
-            updateLogDisplay();
-        }
+        peakLog = [];
+        var log = document.getElementById('peakLogList');
+        if (log) log.innerHTML = '';
     }
 
-    // ===== UART LOG =====
+    function exportLog() {
+        if (peakLog.length === 0) return;
+        var csv = 'Time,Frequency (MHz),RSSI (dBm),Modulation,Type,CTCSS\\n';
+        for (var i = 0; i < peakLog.length; i++) {
+            var e = peakLog[i];
+            csv += e.time + ',' + e.freq + ',' + e.rssi + ',' + e.mod + ',' + e.type + ',' + (e.ctcss||'') + '\\n';
+        }
+        var blob = new Blob([csv], { type: 'text/csv' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'spectrum_log_' + new Date().toISOString().slice(0,10) + '.csv';
+        a.click();
+    }
+
     function logUART(type, msg) {
         var log = document.getElementById('uartLog');
         if (!log) return;
-        
-        var time = new Date().toLocaleTimeString();
-        var className = type === 'TX' ? 'uart-tx' : (type === 'ERR' ? 'uart-err' : 'uart-rx');
+
         var entry = document.createElement('div');
-        entry.className = className;
-        entry.textContent = '[' + time + '] ' + type + ': ' + msg;
+        var className = type === 'TX' ? 'uart-tx' : (type === 'ERR' ? 'uart-err' : 'uart-rx');
+        entry.className = 'uart-entry ' + className;
+        entry.textContent = '[' + type + '] ' + msg;
         log.appendChild(entry);
         log.scrollTop = log.scrollHeight;
-        
+
         while (log.children.length > 200) {
             log.removeChild(log.firstChild);
         }
@@ -637,17 +633,10 @@
     function showTab(name) {
         var tabs = document.querySelectorAll('.spectrum-tab');
         var contents = document.querySelectorAll('.spectrum-tab-content');
-        
-        for (var i = 0; i < tabs.length; i++) {
-            tabs[i].classList.remove('active');
-        }
-        for (var j = 0; j < contents.length; j++) {
-            contents[j].classList.remove('active');
-        }
-        
+        for (var i = 0; i < tabs.length; i++) { tabs[i].classList.remove('active'); }
+        for (var j = 0; j < contents.length; j++) { contents[j].classList.remove('active'); }
         var tabBtn = document.querySelector('.spectrum-tab[data-tab="' + name + '"]');
         var tabContent = document.getElementById('tab-' + name);
-        
         if (tabBtn) tabBtn.classList.add('active');
         if (tabContent) tabContent.classList.add('active');
     }
@@ -669,7 +658,6 @@
     function sendManual() {
         var input = document.getElementById('manualCmd');
         if (!input) return;
-        
         var cmd = input.value.trim();
         if (cmd && isConnected && writer) {
             var encoder = new TextEncoder();
@@ -679,28 +667,338 @@
         }
     }
 
-    // ===== PRESETS =====
+    // ===== PRESETS GRID (button display) =====
     function initPresets() {
         var grid = document.getElementById('presetsGrid');
         if (!grid) return;
-        
+
         grid.innerHTML = '';
+        var badge = document.getElementById('presetCountBadge');
+        if (badge) badge.textContent = PRESETS.length + ' Band Presets';
+
         for (var idx = 0; idx < PRESETS.length; idx++) {
             (function(i) {
                 var p = PRESETS[i];
+                var isFirmware = (typeof p.fwIdx === 'number' && p.fwIdx >= 0);
                 var btn = document.createElement('button');
-                btn.className = 'preset-btn';
-                btn.innerHTML = '<span class="preset-name">' + p.name + '</span><span class="preset-freq">' + p.start.toFixed(3) + '-' + p.end.toFixed(3) + ' ' + p.mod + '</span>';
-                btn.onclick = function() { sendCommand('BAND=' + i); };
+                btn.className = 'preset-btn' + (isFirmware ? '' : ' preset-btn-custom');
+                btn.title = p.name + ' | ' + fmtFreq(p.fStart) + '-' + fmtFreq(p.fEnd) + ' MHz' +
+                    ' | ' + getModLabel(p.mod) + ' | Steps:' + getStepsLabel(p.stepsCount) +
+                    ' | Step:' + getStepSizeLabel(p.stepSize) + ' | BW:' + getBwLabel(p.bw) +
+                    (isFirmware ? ' | FW#' + p.fwIdx : ' | CUSTOM (reference only)');
+
+                var badgeHtml = isFirmware ? '' : '<span class="preset-custom-badge">CUSTOM</span>';
+                btn.innerHTML = '<span class="preset-name">' + p.name + '</span>' +
+                    '<span class="preset-freq">' + fmtFreq(p.fStart) + '-' + fmtFreq(p.fEnd) + ' ' + getModLabel(p.mod) + '</span>' +
+                    badgeHtml;
+
+                btn.onclick = function() {
+                    if (isFirmware) {
+                        sendCommand('BAND=' + p.fwIdx);
+                    } else {
+                        // Custom preset: send individual commands to replicate ApplyPreset
+                        // fStart is in firmware units (10Hz). SPEC:FREQ expects Hz, so multiply by 10
+                        sendCommand('FREQ=' + (p.fStart * 10));
+                        sendCommand('MOD=' + p.mod);
+                        sendCommand('BW=' + p.bw);
+                        logUART('TX', 'Custom preset "' + p.name + '": FREQ=' + fmtFreq(p.fStart) + ' MHz, MOD=' + getModLabel(p.mod) + ', BW=' + getBwLabel(p.bw));
+                        // Highlight custom button
+                        btn.style.outline = '2px solid #4caf50';
+                        setTimeout(function() { btn.style.outline = ''; }, 1500);
+                    }
+                };
                 grid.appendChild(btn);
             })(idx);
         }
     }
 
+    // ===== PRESET EDITOR =====
+    function initPresetEditor() {
+        updatePresetStats();
+        renderEditorList();
+    }
+
+    function updatePresetStats() {
+        var total = PRESETS.length;
+        var fw = 0, custom = 0;
+        var mods = { FM:0, AM:0, USB:0, LSB:0 };
+
+        for (var i = 0; i < total; i++) {
+            if (typeof PRESETS[i].fwIdx === 'number' && PRESETS[i].fwIdx >= 0) fw++;
+            else custom++;
+            var ml = getModLabel(PRESETS[i].mod);
+            if (mods.hasOwnProperty(ml)) mods[ml]++;
+        }
+
+        var el = function(id, val) {
+            var e = document.getElementById(id);
+            if (e) e.textContent = val;
+        };
+        el('peStatTotal', total);
+        el('peStatFirmware', fw);
+        el('peStatCustom', custom);
+        el('peStatMods', 'FM:' + mods.FM + ' AM:' + mods.AM + ' USB:' + mods.USB + ' LSB:' + mods.LSB);
+    }
+
+    function renderEditorList(filter) {
+        var list = document.getElementById('presetEditorList');
+        if (!list) return;
+        list.innerHTML = '';
+        var filterLc = (filter || '').toLowerCase();
+
+        for (var i = 0; i < PRESETS.length; i++) {
+            var p = PRESETS[i];
+            var searchStr = (p.name + ' ' + fmtFreq(p.fStart) + ' ' + fmtFreq(p.fEnd) + ' ' + getModLabel(p.mod)).toLowerCase();
+            if (filterLc && searchStr.indexOf(filterLc) === -1) continue;
+
+            var isFw = (typeof p.fwIdx === 'number' && p.fwIdx >= 0);
+            var row = document.createElement('div');
+            row.className = 'preset-editor-row' + (isFw ? ' pe-fw' : ' pe-custom');
+            row.setAttribute('data-idx', i);
+
+            row.innerHTML =
+                '<span class="pe-pos">' + (i+1) + '/' + PRESETS.length + '</span>' +
+                '<span class="pe-type">' + (isFw ? '<span class="pe-badge-fw" title="Firmware preset #' + p.fwIdx + '">FW#' + p.fwIdx + '</span>' : '<span class="pe-badge-custom">CUSTOM</span>') + '</span>' +
+                '<span class="pe-name" title="' + p.name + '">' + p.name + '</span>' +
+                '<span class="pe-freq">' + fmtFreq(p.fStart) + ' - ' + fmtFreq(p.fEnd) + '</span>' +
+                '<span class="pe-detail">' + getModLabel(p.mod) + '</span>' +
+                '<span class="pe-detail">' + getStepsLabel(p.stepsCount) + ' steps</span>' +
+                '<span class="pe-detail">' + getStepSizeLabel(p.stepSize) + '</span>' +
+                '<span class="pe-detail">' + getBwLabel(p.bw) + '</span>' +
+                '<span class="pe-actions">' +
+                    '<button class="pe-btn pe-up" title="Move Up" onclick="spectrumMovePreset(' + i + ',-1)">\u25B2</button>' +
+                    '<button class="pe-btn pe-down" title="Move Down" onclick="spectrumMovePreset(' + i + ',1)">\u25BC</button>' +
+                    '<button class="pe-btn pe-del" title="Remove" onclick="spectrumRemovePreset(' + i + ')">\u2715</button>' +
+                '</span>';
+
+            list.appendChild(row);
+        }
+    }
+
+    function movePreset(idx, dir) {
+        var newIdx = idx + dir;
+        if (newIdx < 0 || newIdx >= PRESETS.length) return;
+        var tmp = PRESETS[idx];
+        PRESETS[idx] = PRESETS[newIdx];
+        PRESETS[newIdx] = tmp;
+        savePresets();
+        initPresets();
+        renderEditorList(document.getElementById('peSearch') ? document.getElementById('peSearch').value : '');
+        updatePresetStats();
+    }
+
+    function removePreset(idx) {
+        if (idx < 0 || idx >= PRESETS.length) return;
+        var p = PRESETS[idx];
+        if (!confirm('Remove "' + p.name + '"?')) return;
+        PRESETS.splice(idx, 1);
+        savePresets();
+        initPresets();
+        renderEditorList(document.getElementById('peSearch') ? document.getElementById('peSearch').value : '');
+        updatePresetStats();
+    }
+
+
+    // ===== AUTO-CALCULATE STEPS based on frequency range =====
+    // Matches firmware patterns from spectrum.h
+    var STEP_SIZES_INTERNAL = [1, 10, 50, 100, 250, 500, 625, 833, 1000, 1250, 1500, 2000, 2500, 5000, 10000];
+    var STEPS_COUNTS = [128, 64, 32, 16];
+
+    function autoCalcSteps() {
+        var startEl = document.getElementById('peAddStart');
+        var endEl = document.getElementById('peAddEnd');
+        var stepsEl = document.getElementById('peAddSteps');
+        var stepSzEl = document.getElementById('peAddStepSize');
+        var modEl = document.getElementById('peAddMod');
+        var bwEl = document.getElementById('peAddBW');
+        if (!startEl || !endEl || !stepsEl || !stepSzEl) return;
+
+        var s = parseFloat(startEl.value);
+        var e = parseFloat(endEl.value);
+        if (isNaN(s) || isNaN(e) || e <= s || s < 0.01 || e > 1340) return;
+
+        // Convert MHz to firmware internal units (10 Hz)
+        var fStart = Math.round(s * 100000);
+        var fEnd = Math.round(e * 100000);
+        var span = fEnd - fStart;  // in 10Hz units
+
+        // Find best stepsCount + stepSize combo
+        // Goal: stepsCount * stepSize should be close to span
+        var bestSteps = 0, bestStep = 12, bestDiff = Infinity;
+        for (var si = 0; si < STEPS_COUNTS.length; si++) {
+            var sc = STEPS_COUNTS[si];
+            var idealStep = span / sc;
+            // Find closest step size
+            for (var ssi = 0; ssi < STEP_SIZES_INTERNAL.length; ssi++) {
+                var ss = STEP_SIZES_INTERNAL[ssi];
+                var coverage = sc * ss;
+                var diff = Math.abs(coverage - span);
+                // Prefer coverage >= span (don't want to miss frequencies)
+                if (coverage < span) diff += span * 0.1;  // penalty for under-coverage
+                if (diff < bestDiff) {
+                    bestDiff = diff;
+                    bestSteps = si;
+                    bestStep = ssi;
+                }
+            }
+        }
+
+        stepsEl.value = bestSteps;
+        stepSzEl.value = bestStep;
+
+        // Auto-set modulation and BW based on frequency
+        if (modEl && bwEl) {
+            if (s >= 87.5 && e <= 118) {
+                modEl.value = 0; bwEl.value = 0;  // FM Broadcast: FM + Wide
+            } else if (s >= 118 && e <= 138) {
+                modEl.value = 1; bwEl.value = 1;  // Airband: AM + Narrow
+            } else if (s >= 0.01 && e <= 30) {
+                modEl.value = 2; bwEl.value = 2;  // HF: USB + Narrower
+            } else if ((s >= 144 && e <= 148) || (s >= 430 && e <= 470)) {
+                modEl.value = 0; bwEl.value = 0;  // VHF/UHF Ham: FM + Wide
+            } else if (s >= 446 && e <= 446.2) {
+                modEl.value = 0; bwEl.value = 1;  // PMR: FM + Narrow
+            }
+            // Otherwise leave user's selection
+        }
+
+        // Show coverage info
+        var coverage = STEPS_COUNTS[bestSteps] * STEP_SIZES_INTERNAL[bestStep];
+        var coverPct = ((coverage / span) * 100).toFixed(0);
+        var infoEl = document.getElementById('peAutoInfo');
+        if (infoEl) {
+            infoEl.textContent = 'Span: ' + (span / 100000).toFixed(3) + ' MHz | Coverage: ' + coverPct + '%';
+            infoEl.style.display = 'block';
+        }
+    }
+
+    function addPreset() {
+        var name = document.getElementById('peAddName');
+        var start = document.getElementById('peAddStart');
+        var end = document.getElementById('peAddEnd');
+        var mod = document.getElementById('peAddMod');
+        var steps = document.getElementById('peAddSteps');
+        var stepSz = document.getElementById('peAddStepSize');
+        var bw = document.getElementById('peAddBW');
+
+        if (!name || !start || !end) return;
+        var n = name.value.trim();
+        var s = parseFloat(start.value);
+        var e = parseFloat(end.value);
+
+        if (!n) { alert('Name is required'); return; }
+        if (isNaN(s) || isNaN(e) || s <= 0 || e <= s) { alert('Invalid frequency range'); return; }
+
+        // Convert MHz to firmware format (Hz * 10)
+        var fStart = Math.round(s * 100000);
+        var fEnd = Math.round(e * 100000);
+
+        PRESETS.push({
+            name: n.substring(0, 15),
+            fStart: fStart,
+            fEnd: fEnd,
+            stepsCount: parseInt(steps.value) || 0,
+            stepSize: parseInt(stepSz.value) || 12,
+            mod: parseInt(mod.value) || 0,
+            bw: parseInt(bw.value) || 0,
+            fwIdx: -1  // custom
+        });
+
+        savePresets();
+        initPresets();
+        renderEditorList();
+        updatePresetStats();
+
+        // Clear form
+        name.value = '';
+        start.value = '';
+        end.value = '';
+    }
+
+    function exportPresets() {
+        var data = JSON.stringify(PRESETS, null, 2);
+        var blob = new Blob([data], { type: 'application/json' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'spectrum_presets_' + new Date().toISOString().slice(0,10) + '.json';
+        a.click();
+    }
+
+    function importPresets() {
+        var input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = function(ev) {
+            var file = ev.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(re) {
+                try {
+                    var data = JSON.parse(re.target.result);
+                    if (!Array.isArray(data)) { alert('Invalid format: expected array'); return; }
+
+                    // Validate each preset
+                    var valid = [];
+                    for (var i = 0; i < data.length; i++) {
+                        var p = data[i];
+                        if (!p.name || typeof p.fStart !== 'number' || typeof p.fEnd !== 'number') {
+                            alert('Invalid preset at index ' + i + ': missing name/fStart/fEnd');
+                            return;
+                        }
+                        valid.push({
+                            name: String(p.name).substring(0, 15),
+                            fStart: p.fStart,
+                            fEnd: p.fEnd,
+                            stepsCount: (typeof p.stepsCount === 'number') ? p.stepsCount : 0,
+                            stepSize: (typeof p.stepSize === 'number') ? p.stepSize : 12,
+                            mod: (typeof p.mod === 'number') ? p.mod : 0,
+                            bw: (typeof p.bw === 'number') ? p.bw : 0,
+                            fwIdx: (typeof p.fwIdx === 'number') ? p.fwIdx : -1
+                        });
+                    }
+
+                    if (confirm('Import ' + valid.length + ' presets? This will replace all current presets.')) {
+                        PRESETS = valid;
+                        savePresets();
+                        initPresets();
+                        renderEditorList();
+                        updatePresetStats();
+                    }
+                } catch(ex) {
+                    alert('Error parsing JSON: ' + ex.message);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+
+    function resetPresets() {
+        if (!confirm('Reset all presets to the 70 firmware defaults? Custom presets will be lost.')) return;
+        resetPresetsToDefaults();
+        savePresets();
+        initPresets();
+        renderEditorList();
+        updatePresetStats();
+    }
+
+    function filterEditorList() {
+        var search = document.getElementById('peSearch');
+        renderEditorList(search ? search.value : '');
+    }
+
     // ===== INITIALIZATION =====
     function init() {
+        loadPresets();
         initPresets();
-        
+        initPresetEditor();
+
+        // Auto-calculate steps when frequency inputs change
+        var peStart = document.getElementById('peAddStart');
+        var peEnd = document.getElementById('peAddEnd');
+        if (peStart) peStart.addEventListener('input', autoCalcSteps);
+        if (peEnd) peEnd.addEventListener('input', autoCalcSteps);
+
         var tabs = document.querySelectorAll('.spectrum-tab');
         for (var i = 0; i < tabs.length; i++) {
             (function(tab) {
@@ -710,42 +1008,44 @@
                 });
             })(tabs[i]);
         }
-        
-        var connectBtn = document.getElementById('spectrumConnectBtn');
-        if (connectBtn) {
-            connectBtn.addEventListener('click', toggleConnection);
+
+        var modeBtns = document.querySelectorAll('.mode-btn');
+        for (var j = 0; j < modeBtns.length; j++) {
+            (function(btn) {
+                btn.addEventListener('click', function() {
+                    var mode = parseInt(btn.getAttribute('data-mode'));
+                    if (!isNaN(mode)) setMode(mode);
+                });
+            })(modeBtns[j]);
         }
-        
-        var manualInput = document.getElementById('manualCmd');
-        if (manualInput) {
-            manualInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') sendManual();
-            });
-        }
-        
-        updateLogDisplay();
-        
-        console.log('Spectrum UART v12.20 initialized');
     }
 
-    // ===== EXPOSE TO WINDOW =====
-    window.spectrumConnect = connect;
-    window.spectrumDisconnect = disconnect;
-    window.spectrumToggleConnection = toggleConnection;
-    window.spectrumSendCommand = sendCommand;
-    window.spectrumSetMode = setMode;
-    window.spectrumShowTab = showTab;
-    window.spectrumSendKey = sendKey;
-    window.spectrumSendManual = sendManual;
-    window.spectrumExportLog = exportLog;
-    window.spectrumClearLog = clearLog;
-    window.spectrumInit = init;
-
-    // Auto-initialize when DOM is ready
+    // Start
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
-        setTimeout(init, 100);
+        init();
     }
+
+    // ===== WINDOW EXPORTS =====
+    window.spectrumConnect = connect;
+    window.spectrumDisconnect = disconnect;
+    window.spectrumToggleConnection = toggleConnection;
+    window.spectrumSetMode = setMode;
+    window.spectrumShowTab = showTab;
+    window.spectrumInit = init;
+    window.spectrumSendKey = sendKey;
+    window.spectrumSendManual = sendManual;
+    window.spectrumClearLog = clearLog;
+    window.spectrumExportLog = exportLog;
+    window.spectrumSendCommand = sendCommand;
+    window.spectrumMovePreset = movePreset;
+    window.spectrumRemovePreset = removePreset;
+    window.spectrumAddPreset = addPreset;
+    window.spectrumExportPresets = exportPresets;
+    window.spectrumImportPresets = importPresets;
+    window.spectrumResetPresets = resetPresets;
+    window.spectrumFilterEditorList = filterEditorList;
+    window.spectrumAutoCalcSteps = autoCalcSteps;
 
 })();
