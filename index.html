@@ -4521,10 +4521,10 @@
               <div class="spectrum-control-section">
                 <div class="spectrum-section-title">📡 Scan</div>
                 <div class="spectrum-btn-grid spectrum-btn-grid-4">
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BW=+')">🔊 BW+</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BW=-')">🔉 BW-</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('BW')">🔊 BW ⟳</button>
                   <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEPS')">📊 N Steps</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEP')">📏 Scan Step</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEP=+')">📏 Step+</button>
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('STEP=-')">📏 Step-</button>
                 </div>
               </div>
 
@@ -4541,9 +4541,8 @@
 
               <div class="spectrum-control-section">
                 <div class="spectrum-section-title">📻 Modulation & Presets</div>
-                <div class="spectrum-btn-grid spectrum-btn-grid-4">
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=+')">📻 Mod+</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=-')">📻 Mod-</button>
+                <div class="spectrum-btn-grid spectrum-btn-grid-3">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD')">📻 Mod ⟳</button>
                   <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PRESET=+')">⏩ Preset+</button>
                   <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PRESET=-')">⏪ Preset-</button>
                 </div>
@@ -4587,9 +4586,8 @@
 
               <div class="spectrum-control-section">
                 <div class="spectrum-section-title">📻 Modulation</div>
-                <div class="spectrum-btn-grid spectrum-btn-grid-2">
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=+')">📻 Modulation+</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD=-')">📻 Modulation-</button>
+                <div class="spectrum-btn-grid spectrum-btn-grid-1">
+                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MOD')">📻 Mod ⟳</button>
                 </div>
               </div>
 
@@ -4747,20 +4745,12 @@
 
               <div class="spectrum-control-section">
                 <div class="spectrum-section-title">🎨 Display Options</div>
-                <div class="spectrum-btn-grid spectrum-btn-grid-3">
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('GRID')">📐 Grid</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('MARKER')">📍 Marker</button>
+                <div class="spectrum-btn-grid spectrum-btn-grid-1">
                   <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('PEAK')">🔝 Peak</button>
                 </div>
               </div>
 
-              <div class="spectrum-control-section">
-                <div class="spectrum-section-title">🔊 Audio</div>
-                <div class="spectrum-btn-grid spectrum-btn-grid-2">
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('VOL=+')">🔊 Volume+</button>
-                  <button class="spectrum-ctrl-btn" onclick="spectrumSendCommand('VOL=-')">🔉 Volume-</button>
-                </div>
-              </div>
+
             </div>
 
           </div>
