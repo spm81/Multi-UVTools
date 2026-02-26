@@ -66,7 +66,7 @@ const K5_CHANNEL_PROFILES = {
     layout: 'split'   // Data split across multiple memory regions
   },
   f4hwn_v43: {
-    name: 'F4HWN v4.3 (200 Channels)',
+    name: 'F4HWN v4.3.* / MCFW 1.35.* (200 Channels)',
     channelCount: 200,
     channelSize: 16,  // Bytes per channel in freq area
     nameSize: 16,     // Bytes per name
@@ -78,6 +78,21 @@ const K5_CHANNEL_PROFILES = {
     },
     layout: 'split',  // Data split across multiple memory regions
     features: ['scrambler', 'compander', 'dtmfDecode', 'txLock', 'busyLock', 'scanlist', 'pttid']
+  },
+  f4hwn_v51: {
+    name: 'F4HWN v5.1.* (1024 Channels)',
+    channelCount: 1024,
+    channelSize: 16,
+    nameSize: 16,
+    attrSize: 2,
+    addresses: {
+      freq: 0x0000,
+      name: 0x4000,
+      attr: 0x8000
+    },
+    layout: 'split',
+    features: ['compander', 'dtmfDecode', 'txLock', 'busyLock', 'scanlist', 'pttid'],
+    hasScrambler: false
   },
   ijv_vx3: {
     name: 'IJV_vX3xx (999 Channels)',
@@ -157,6 +172,11 @@ const SCANLIST_LIST = [
   "List [1, 3]",
   "List [2, 3]",
   "All List [1, 2, 3]",
+];
+const V51_SCANLIST_LIST = [
+  "OFF",
+  ...Array.from({length: 24}, (_, i) => `List [${i + 1}]`),
+  "ALL"
 ];
 const STEPS = [
   2.5, 5, 6.25, 10, 12.5, 25, 8.33, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 1.25,
@@ -679,9 +699,12 @@ const encodeIJVChannels = () => {
 };
 
 const decodeChannels = (channelBytes, nameBytes, attrBytes) => {
+  const profile = getK5Profile();
+  const channelCount = profile.channelCount;
+  const is2ByteAttr = profile.attrSize === 2;
   const view = new DataView(channelBytes.buffer, channelBytes.byteOffset, channelBytes.byteLength);
   const decoded = [];
-  for (let i = 0; i < K5_CHANNEL_COUNT; i += 1) {
+  for (let i = 0; i < channelCount; i += 1) {
     const base = i * 16;
     const channel = buildEmptyChannel(i + 1);
     const freqRaw = view.getUint32(base, true);
@@ -694,10 +717,17 @@ const decodeChannels = (channelBytes, nameBytes, attrBytes) => {
     const flagsDtmf = channelBytes[base + 13];
     const step = channelBytes[base + 14];
     const scrambler = channelBytes[base + 15];
-    const attr = attrBytes[i] ?? 0;
-
-    channel.scanlist = (attr >> 5) & 0x7;
-    channel.compander = (attr >> 3) & 0x3;
+    if (is2ByteAttr) {
+      const attrByte0 = attrBytes[i * 2] ?? 0;
+      const attrByte1 = attrBytes[i * 2 + 1] ?? 0;
+      channel.compander = (attrByte0 >> 3) & 0x3;
+      channel.band = attrByte0 & 0x07;
+      channel.scanlist = attrByte1;
+    } else {
+      const attr = attrBytes[i] ?? 0;
+      channel.scanlist = (attr >> 5) & 0x7;
+      channel.compander = (attr >> 3) & 0x3;
+    }
     channel.band = attr & 0x7;
 
     const nameSlice = nameBytes.slice(i * 16, i * 16 + 16);
@@ -740,7 +770,11 @@ const decodeChannels = (channelBytes, nameBytes, attrBytes) => {
     channel.dtmfDecode = Boolean(flagsDtmf & 0x01);
 
     channel.step = STEPS[step] ?? STEPS[0];
-    channel.scrambler = SCRAMBLER_LIST[scrambler] ?? "OFF";
+    if (profile.hasScrambler !== false) {
+      channel.scrambler = SCRAMBLER_LIST[scrambler] ?? "OFF";
+    } else {
+      channel.scrambler = "OFF";
+    }
 
     decoded.push(channel);
   }
@@ -1028,9 +1062,12 @@ const encodeTK11Tone = (type, value) => {
 };
 
 const encodeChannels = () => {
-  const channelBytes = new Uint8Array(K5_CHANNEL_COUNT * 16);
-  const nameBytes = new Uint8Array(K5_CHANNEL_COUNT * 16).fill(0xff);
-  const attrBytes = new Uint8Array(K5_CHANNEL_COUNT).fill(0x00);
+  const profile = getK5Profile();
+  const channelCount = profile.channelCount;
+  const is2ByteAttr = profile.attrSize === 2;
+  const channelBytes = new Uint8Array(channelCount * 16);
+  const nameBytes = new Uint8Array(channelCount * 16).fill(0xff);
+  const attrBytes = new Uint8Array(channelCount * (is2ByteAttr ? 2 : 1)).fill(is2ByteAttr ? 0xff : 0x00);
   const view = new DataView(channelBytes.buffer);
 
   channels.forEach((channel, index) => {
@@ -1077,7 +1114,9 @@ const encodeChannels = () => {
 
     const stepIndex = Math.max(0, STEPS.indexOf(channel.step));
     channelBytes[base + 14] = stepIndex;
-    channelBytes[base + 15] = Math.max(0, SCRAMBLER_LIST.indexOf(channel.scrambler));
+    if (profile.hasScrambler !== false) {
+      channelBytes[base + 15] = Math.max(0, SCRAMBLER_LIST.indexOf(channel.scrambler));
+    }
 
     const name = channel.name.trim().slice(0, 10);
     if (name) {
@@ -1088,7 +1127,12 @@ const encodeChannels = () => {
 
     const attr =
       ((channel.scanlist & 0x7) << 5) | ((channel.compander & 0x3) << 3) | (channel.band & 0x7);
-    attrBytes[index] = attr;
+    if (is2ByteAttr) {
+      attrBytes[index * 2] = ((channel.compander & 0x03) << 3) | (channel.band & 0x07);
+      attrBytes[index * 2 + 1] = channel.scanlist ?? 0;
+    } else {
+      attrBytes[index] = attr;
+    }
   });
 
   return { channelBytes, nameBytes, attrBytes };
@@ -1099,6 +1143,7 @@ const renderTable = () => {
   const totalChannels = channels.length;
   const isTK11 = getSelectedRadio() === 'TK11';
   const isIJV = currentK5Profile === 'ijv_vx3';
+  const isV51 = currentK5Profile === 'f4hwn_v51';
   
   if (viewMode === "all") {
     start = 0;
@@ -1201,7 +1246,7 @@ const renderTable = () => {
           <td><input type="checkbox" data-index="${i}" data-field="busy" ${channel.busy ? "checked" : ""} ${canEdit ? "" : "disabled"} /></td>
           <td><input type="checkbox" data-index="${i}" data-field="txLock" ${channel.txLock ? "checked" : ""} ${canEdit ? "" : "disabled"} /></td>
           <td>${buildSelect("pttid", i, PTTID_LIST, channel.pttid, !canEdit)}</td>
-          <td>${buildSelect("scanlist", i, SCANLIST_LIST, SCANLIST_LIST[channel.scanlist] ?? "None", !canEdit)}</td>
+          <td>${buildSelect("scanlist", i, isV51 ? V51_SCANLIST_LIST : SCANLIST_LIST, (isV51 ? V51_SCANLIST_LIST : SCANLIST_LIST)[channel.scanlist] ?? (isV51 ? "OFF" : "None"), !canEdit)}</td>
         </tr>
       `);
     }
@@ -1377,8 +1422,8 @@ if (channelBody) channelBody.addEventListener("change", (event) => {
   } else if (field === "step") {
     channel.step = Number.parseFloat(target.value);
   } else if (field === "scanlist") {
-    // Handle both K5 and TK11 scanlist formats
     const isTK11 = getSelectedRadio() === 'TK11';
+    const isV51 = currentK5Profile === 'f4hwn_v51';
     if (isTK11) {
       if (target.value === 'None') {
         channel.scanlist = 0;
@@ -1387,6 +1432,9 @@ if (channelBody) channelBody.addEventListener("change", (event) => {
       } else {
         channel.scanlist = parseInt(target.value) || 0;
       }
+    } else if (isV51) {
+      const idx = V51_SCANLIST_LIST.indexOf(target.value);
+      channel.scanlist = idx >= 0 ? idx : 0;
     } else {
       channel.scanlist = SCANLIST_LIST.indexOf(target.value);
     }
@@ -1523,8 +1571,52 @@ const readChannels = async () => {
         }
         
         channels = decodeIJVChannels(channelBytes, channelCount);
+      } else if (currentK5Profile === 'f4hwn_v51') {
+        // F4HWN v5.1: 1024 channels with extended memory layout
+        const BLOCK_SIZE = 256;
+        const addr = profile.addresses;
+        const freqSize = channelCount * 16;
+        const nameSize = channelCount * 16;
+        const attrTotalSize = channelCount * 2;
+        const totalBytes = freqSize + nameSize + attrTotalSize;
+        let bytesRead = 0;
+
+        const channelBytes = new Uint8Array(freqSize);
+        for (let i = 0; i < Math.ceil(freqSize / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const readSize = Math.min(BLOCK_SIZE, freqSize - offset);
+          const blockData = await readRange(addr.freq + offset, readSize);
+          channelBytes.set(blockData, offset);
+          bytesRead += readSize;
+          setProgress((bytesRead / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        const nameBytes = new Uint8Array(nameSize);
+        for (let i = 0; i < Math.ceil(nameSize / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const readSize = Math.min(BLOCK_SIZE, nameSize - offset);
+          const blockData = await readRange(addr.name + offset, readSize);
+          nameBytes.set(blockData, offset);
+          bytesRead += readSize;
+          setProgress((bytesRead / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        const attrBytes = new Uint8Array(attrTotalSize);
+        for (let i = 0; i < Math.ceil(attrTotalSize / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const readSize = Math.min(BLOCK_SIZE, attrTotalSize - offset);
+          const blockData = await readRange(addr.attr + offset, readSize);
+          attrBytes.set(blockData, offset);
+          bytesRead += readSize;
+          setProgress((bytesRead / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        channels = decodeChannels(channelBytes, nameBytes, attrBytes);
       } else {
-        // Default K5: 200 channels
+        // Default K5 / v4.3: 200 channels
         const channelBytes = await readRange(0x0000, channelCount * 16);
         updateProgress();
         const attrBytes = await readRange(0x0d60, channelCount);
@@ -1630,6 +1722,7 @@ const writeChannels = async () => {
       // K5/K1: Write using EEPROM protocol
       await eepromInit(port);
 
+      const profile = getK5Profile();
       if (currentK5Profile === 'ijv_vx3') {
         // IJV firmware: 999 channels at 0x2000, 32 bytes each
         const channelBytes = encodeIJVChannels();
@@ -1648,8 +1741,41 @@ const writeChannels = async () => {
             await new Promise(r => setTimeout(r, 0));
           }
         }
+      } else if (currentK5Profile === 'f4hwn_v51') {
+        const { channelBytes, nameBytes, attrBytes } = encodeChannels();
+        const BLOCK_SIZE = 256;
+        const addr = profile.addresses;
+        const totalBytes = channelBytes.length + nameBytes.length + attrBytes.length;
+        let bytesWritten = 0;
+
+        for (let i = 0; i < Math.ceil(channelBytes.length / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const writeSize = Math.min(BLOCK_SIZE, channelBytes.length - offset);
+          await writeRange(addr.freq + offset, channelBytes.slice(offset, offset + writeSize));
+          bytesWritten += writeSize;
+          setProgress((bytesWritten / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        for (let i = 0; i < Math.ceil(nameBytes.length / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const writeSize = Math.min(BLOCK_SIZE, nameBytes.length - offset);
+          await writeRange(addr.name + offset, nameBytes.slice(offset, offset + writeSize));
+          bytesWritten += writeSize;
+          setProgress((bytesWritten / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
+
+        for (let i = 0; i < Math.ceil(attrBytes.length / BLOCK_SIZE); i++) {
+          const offset = i * BLOCK_SIZE;
+          const writeSize = Math.min(BLOCK_SIZE, attrBytes.length - offset);
+          await writeRange(addr.attr + offset, attrBytes.slice(offset, offset + writeSize));
+          bytesWritten += writeSize;
+          setProgress((bytesWritten / totalBytes) * 100, true);
+          if (i % 10 === 0) await new Promise(r => setTimeout(r, 0));
+        }
       } else {
-        // Default K5: 200 channels
+        // Default K5 / v4.3: 200 channels
         const { channelBytes, nameBytes, attrBytes } = encodeChannels();
         const totalWrites = 3;
         let progressStep = 0;
@@ -1726,7 +1852,7 @@ const exportCsv = () => {
     channel.busy ? "1" : "0",
     channel.txLock ? "1" : "0",
     channel.pttid,
-    SCANLIST_LIST[channel.scanlist] ?? "None",
+    (currentK5Profile === 'f4hwn_v51' ? V51_SCANLIST_LIST : SCANLIST_LIST)[channel.scanlist] ?? (currentK5Profile === 'f4hwn_v51' ? "OFF" : "None"),
   ]);
   const csv = [headers.join(","), ...rows.map((row) => row.join(","))].join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
@@ -1772,7 +1898,8 @@ const importCsv = () => {
       channel.busy = columns[13] === "1";
       channel.txLock = columns[14] === "1";
       channel.pttid = columns[15] ?? "OFF";
-      channel.scanlist = Math.max(0, SCANLIST_LIST.indexOf(columns[16]));
+      const csvScanlistList = currentK5Profile === 'f4hwn_v51' ? V51_SCANLIST_LIST : SCANLIST_LIST;
+      channel.scanlist = Math.max(0, csvScanlistList.indexOf(columns[16]));
       updateDuplexFromOffset(channel);
     });
     renderTable();
