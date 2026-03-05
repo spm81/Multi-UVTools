@@ -181,6 +181,16 @@
       ]
     },
     {
+      "group": "Reald Firmware",
+      "firmwares": [
+        {
+          "name": "ARDF v0.6",
+          "path": "firmware/ARDF-v0.6.bin",
+          "profile": "Reald"
+        }
+      ]
+    },
+    {
       "group": "Robzyl Firmware",
       "firmwares": [
         {
@@ -423,6 +433,16 @@
       ]
     },
     {
+      "group": "Delta Firmware",
+      "firmwares": [
+        {
+          "name": "deltafw.fusion.v1.7.1.03162e9.25022026 (beta)",
+          "path": "firmware/deltafw.fusion.v1.7.1.03162e9.25022026.bin",
+          "profile": "Delta"
+        }
+      ]
+    },
+    {
       "group": "Calypso Firmware",
       "firmwares": [
         {
@@ -484,6 +504,16 @@
           "name": "F4HWN v5.1.0",
           "path": "firmware/f4hwn.fusion.v5.1.0",
           "profile": "F4HWN"
+        }
+      ]
+    },
+    {
+      "group": "Fagci Firmware",
+      "firmwares": [
+        {
+          "name": "k1-fw-alfa-by-fagci-20260301_1530",
+          "path": "firmware/k1-fw-alfa-by-fagci-20260301_1530.bin",
+          "profile": "Fagci"
         }
       ]
     },

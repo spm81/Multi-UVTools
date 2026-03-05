@@ -727,8 +727,8 @@ const decodeChannels = (channelBytes, nameBytes, attrBytes) => {
       const attr = attrBytes[i] ?? 0;
       channel.scanlist = (attr >> 5) & 0x7;
       channel.compander = (attr >> 3) & 0x3;
+      channel.band = attr & 0x7;
     }
-    channel.band = attr & 0x7;
 
     const nameSlice = nameBytes.slice(i * 16, i * 16 + 16);
     let name = "";
