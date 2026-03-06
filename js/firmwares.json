@@ -507,7 +507,12 @@
         },
         {
           "name": "F4HWN v5.1.0",
-          "path": "firmware/f4hwn.fusion.v5.1.0",
+          "path": "firmware/f4hwn.fusion.v5.1.0.bin",
+          "profile": "F4HWN"
+        },
+        {
+          "name": "F4HWN v5.2.0",
+          "path": "firmware/f4hwn.fusion.v5.2.0.bin",
           "profile": "F4HWN"
         }
       ]
