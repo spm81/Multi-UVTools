@@ -311,6 +311,16 @@
       ]
     },
     {
+      "group": "Vuurwerk Firmware",
+      "firmwares": [
+        {
+          "name": "Vuurwerk v1.2.3",
+          "path": "firmware/vuurwerk-v1.2.3.packed.bin",
+          "profile": "Vuurwerk Firmware"
+        }
+      ]
+    },
+    {
       "group": "Quansheng Stock Firmware",
       "firmwares": [
         {
@@ -454,6 +464,11 @@
           "name": "Calypso Edition (Last Version)",
           "path": "https://github.com/igimalek/uv-k1-k5v3-calypso/blob/main/compiled-firmware/ouro.calypso.bin",
           "profile": "Calypso"
+        },
+        {
+          "name": "Calypso v1.7.0",
+          "path": "firmware/ouro.calypso_K1_v1.7.0.bin",
+          "profile": "Calypso"
         }
       ]
     },
@@ -523,6 +538,11 @@
         {
           "name": "k1-fw-alfa-by-fagci-20260301_1541",
           "path": "firmware/k1-fw-alfa-by-fagci-20260301_1541.bin",
+          "profile": "Fagci"
+        },
+        {
+          "name": "k1-fw-alfa-by-fagci-20260315_1437",
+          "path": "firmware/k1-fw-alfa-by-fagci-20260315_1437.bin",
           "profile": "Fagci"
         }
       ]
